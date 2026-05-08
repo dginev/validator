@@ -53,7 +53,7 @@ import nu.validator.xml.SystemErrErrorHandler;
  */
 public class EmbeddedValidator {
 
-    public static final String SCHEMA_URL = "http://s.validator.nu/html5-all.rnc";
+    public static final String SCHEMA_URL = "http://s.validator.nu/html5-scholarly.rnc";
 
     public static enum OutputFormat {
         TEXT, XML, JSON, GNU
@@ -208,8 +208,12 @@ public class EmbeddedValidator {
      *            url to the required schema
      */
     public void setSchemaUrl(String schemaUrl) {
-        if (schemaUrl != null && !schemaUrl.startsWith("http:")) {
-            throw new IllegalArgumentException("schemaUrl should be a URL");
+        if (schemaUrl != null
+                && !schemaUrl.startsWith("http:")
+                && !schemaUrl.startsWith("https:")
+                && !schemaUrl.startsWith("file:")) {
+            throw new IllegalArgumentException(
+                    "schemaUrl should be an http:, https:, or file: URL");
         }
         this.schemaUrl = schemaUrl;
     }

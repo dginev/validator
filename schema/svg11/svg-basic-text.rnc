@@ -65,12 +65,15 @@ grammar {
     SVG.TextContent.extra.class = notAllowed
     SVG.TextContent.class = altGlyph | SVG.TextContent.extra.class
     a:documentation [ "\x{a}" ~ "    text: Text Element\x{a}" ~ "  " ]
+    ## LaTeXML/ar5iv SVG labels can wrap MathML foreignObject labels
+    ## in transformed groups inside text.
     SVG.text.class =
         text
         | SVG.Description.class
         | SVG.Animation.class
         | # <ref name="SVG.TextContent.extra.class"/>
           SVG.Hyperlink.class
+        | g
     SVG.text.content = SVG.text.class*
     \text = element text { attlist.text, SVG.text.content }
     attlist.text &=

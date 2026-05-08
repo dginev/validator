@@ -1,0 +1,1100 @@
+datatypes w = "http://whattf.org/datatype-draft"
+default namespace = "http://www.w3.org/1999/xhtml"
+
+# #####################################################################
+##  LaTeXML scholarly HTML profile                                    #
+# #####################################################################
+
+## Entry point for HTML documents emitted by LaTeXML.
+##
+## LaTeXML serializes a document as a page shell containing one article
+## and an optional generated footer.  The definitions below keep that
+## shell distinct from the document-level publication model so validation
+## errors name the intent that failed instead of only the concrete HTML
+## element that happened to carry it.
+
+	ltx.content.start =
+		( ltx.page.elem | ltx.arxiv.body | ltx.ar5iv.body )
+
+# #####################################################################
+## LaTeXML HTML Attribute Contract
+
+## Common attributes with class removed.
+##
+## LaTeXML's XML schema keeps semantic membership in element names such
+## as section, para, equation, tabular, and text.  The HTML transform
+## moves that information into deterministic class tokens, normally
+## beginning with "ltx_" plus the original XML element local name.  These
+## helpers keep the stock HTML attribute vocabulary, but require the
+## LaTeXML class token that carries the profile semantics.
+	ltx.attrs.no-class =
+		( common.attrs.id?
+		& common.attrs.title?
+		& common.attrs.base?
+		& common.attrs.space?
+		& common.attrs.i18n
+		& common.attrs.present
+		& common.attrs.other
+		& aria.global?
+		)
+	ltx.attrs.no-class-no-id =
+		( common.attrs.title?
+		& common.attrs.base?
+		& common.attrs.space?
+		& common.attrs.i18n
+		& common.attrs.present
+		& common.attrs.other
+		& aria.global?
+		)
+	ltx.table.cell.attrs =
+		( ltx.attrs.no-class
+		& tables.attrs.cell-structure
+		& tables.attrs.headers?
+		& tables.attrs.scope?
+		)
+	ltx.anchor.href.attrs =
+		( ltx.attrs.no-class
+		& shared-hyperlink.attrs.href
+		& shared-hyperlink.attrs.download?
+		& shared-hyperlink.attrs.target?
+		& shared-hyperlink.attrs.rel?
+		& shared-hyperlink.attrs.hreflang?
+		& shared-hyperlink.attrs.type?
+		& shared-hyperlink.attrs.ping?
+		& referrerpolicy?
+		)
+	ltx.image.attrs =
+		( ltx.attrs.no-class
+		& ( ( img.attrs.src & img.attrs.srcset? )
+		  | ( img.attrs.srcset & img.attrs.src? ) )
+		& img.attrs.sizes?
+		& img.attrs.generator-unable-to-provide-required-alt?
+		& img.attrs.height?
+		& img.attrs.width?
+		& img.attrs.usemap?
+		& img.attrs.ismap?
+		& img.attrs.decoding?
+		& img.attrs.loading?
+		& common.attrs.fetchpriority?
+		& referrerpolicy?
+		& embedded.content.attrs.crossorigin?
+		& img.attrs.alt?
+		)
+
+	ltx.class.extra =
+		( ltx.class.semantic.modifier
+		| ltx.class.layout.modifier
+		| ltx.class.font.modifier
+		| ltx.class.reference.modifier
+		| ltx.class.role.modifier
+		| ltx.class.generated.modifier
+		)
+	ltx.class.semantic.modifier =
+		( "ltx_authors_1line"
+		| "ltx_authors_multiline"
+		| "ltx_fleqn"
+		| "ltx_leqno"
+		| "ltx_runin"
+		| "ltx_noindent"
+		| "ltx_indent"
+		| "ltx_indent_first"
+		| "ltx_indentfirst"
+		| "ltx_pruned_first"
+		| "ltx_markedasmath"
+		| "ltx_math_unparsed"
+		| "ltx_missing"
+		| "ltx_missing_label"
+		| "ltx_missing_citation"
+		| "ltx_nolink"
+		| "ltx_nodisplay" )
+	ltx.class.layout.modifier =
+		( "ltx_align_left"
+		| "ltx_align_center"
+		| "ltx_align_right"
+		| "ltx_align_middle"
+		| "ltx_align_baseline"
+		| "ltx_centering"
+		| "ltx_nopad"
+		| "ltx_nopad_l"
+		| "ltx_nopad_r"
+		| "ltx_th"
+		| "ltx_guessed_headers"
+		| "ltx_inline-block"
+		| "ltx_hflipped"
+		| "ltx_vflipped"
+		| "ltx_overlay"
+		| "ltx_overlay_base"
+		| "ltx_overlay_over"
+		| "ltx_phantom"
+		| "ltx_minipage"
+		| "ltx_eqn_table"
+		| "ltx_eqn_row"
+		| "ltx_eqn_cell"
+		| "ltx_eqn_eqno"
+		| "ltx_eqn_center_padleft"
+		| "ltx_eqn_center_padright"
+		| "ltx_eqn_eqnarray"
+		| "ltx_eqn_align"
+		| "ltx_eqn_gather"
+		| "ltx_eqn_numcases"
+		| "ltx_eqn_lefteqn"
+		| "ltx_intertext" )
+	ltx.class.font.modifier =
+		( "ltx_emph"
+		| "ltx_font_bold"
+		| "ltx_font_medium"
+		| "ltx_font_italic"
+		| "ltx_font_upright"
+		| "ltx_font_slanted"
+		| "ltx_font_smallcaps"
+		| "ltx_font_oldstyle"
+		| "ltx_font_mathcaligraphic"
+		| "ltx_font_mathscript"
+		| "ltx_font_serif"
+		| "ltx_font_sansserif"
+		| "ltx_font_typewriter"
+		| "ltx_mathvariant_italic"
+		| "ltx_mathvariant_bold"
+		| "ltx_mathvariant_bold-italic"
+		| "ltx_mathvariant_sans-serif"
+		| "ltx_mathvariant-bold-sans-serif"
+		| "ltx_mathvariant-sans-serif-italic"
+		| "ltx_mathvariant-bold-sans-serif-italic"
+		| "ltx_mathvariant_monospace"
+		| "ltx_mathvariant_double-struck"
+		| "ltx_mathvariant_script"
+		| "ltx_mathvariant_bold-script"
+		| "ltx_mathvariant-fraktur"
+		| "ltx_mathvariant_bold-fraktur" )
+	ltx.class.reference.modifier =
+		( "ltx_citemacro_cite"
+		| "ltx_refmacro_nameref"
+		| "ltx_ref_self"
+		| "ltx_ref_tag"
+		| "ltx_ref_title"
+		| "ltx_bib_author"
+		| "ltx_bib_author-year"
+		| "ltx_bib_key"
+		| "ltx_bib_abbrv"
+		| "ltx_bib_year"
+		| "ltx_bib_type"
+		| "ltx_bib_title"
+		| "ltx_bib_etal"
+		| "ltx_bib_external"
+		| "ltx_bib_cited" )
+	ltx.class.role.modifier =
+		( "ltx_role_author"
+		| "ltx_role_address"
+		| "ltx_role_email"
+		| "ltx_role_footnote"
+		| "ltx_note_frontmatter" )
+	ltx.class.generated.modifier =
+		xsd:NMTOKEN {
+			pattern =
+				"ltx_(title|tag|tocentry|toclist|theorem|float|img|bib|glossary|role|border|th|framed|cv|affiliation|ulem|math|unit|svg|tikzmatrix|inline-quote|outerquote|innerquote|citation|ccitation|textquote|blockquote|displayquote|ast)_[A-Za-z0-9_.:]+(-[A-Za-z0-9_.:]+)*"
+		}
+
+	ltx.class.page.main =
+		attribute class { list { "ltx_page_main", ltx.class.extra* } }
+	ltx.class.page.content =
+		attribute class { list { "ltx_page_content", ltx.class.extra* } }
+	ltx.class.page.footer =
+		attribute class { list { "ltx_page_footer", ltx.class.extra* } }
+	ltx.class.page.logo =
+		attribute class { list { "ltx_page_logo", ltx.class.extra* } }
+	ltx.class.page.navbar =
+		attribute class { list { "ltx_page_navbar", ltx.class.extra* } }
+	ltx.class.latexml.logo =
+		attribute class { list { "ltx_LaTeXML_logo", ltx.class.extra* } }
+	ltx.class.arxiv.header =
+		attribute class { list { "arxiv-html-header", ltx.class.extra* } }
+	ltx.class.arxiv.footer =
+		attribute class { list { "arxiv-html-footer", ltx.class.extra* } }
+	ltx.class.arxiv.infobox =
+		attribute class { list { "infobox", ltx.class.extra* } }
+	ltx.class.keyboard.glossary =
+		attribute class { list { "keyboard-glossary", ltx.class.extra* } }
+	ltx.class.arxiv.fixed.buttons =
+		attribute id { "fixed-buttons-container" }
+	ltx.class.arxiv.beta.badge =
+		attribute id { "beta-badge" }
+	ltx.class.ar5iv.footer =
+		attribute class { list { "ar5iv-footer", ltx.class.extra* } }
+	ltx.class.scaffold =
+		attribute class { list { ltx.class.scaffold.token+ } }
+	ltx.class.scaffold.token =
+		( "arxiv-html-header"
+		| "arxiv-html-footer"
+		| "html-header-logo"
+		| "html-header-nav"
+		| "header-button"
+		| "hover-effect"
+		| "desktop-only"
+		| "mobile-only"
+		| "toggle-icon"
+		| "color-tog"
+		| "automatic-tog"
+		| "light-tog"
+		| "dark-tog"
+		| "logo"
+		| "sr-only"
+		| "modal-header"
+		| "modal-title"
+		| "modal-close"
+		| "modal-body"
+		| "modal-footer"
+		| "modal-submit"
+		| "form-control"
+		| "infobox"
+		| "keyboard-glossary"
+		| "ar5iv-footer"
+		| "ar5iv-footer-button"
+		| "ar5iv-home-button"
+		| "ar5iv-nav-button"
+		| "ar5iv-nav-button-next"
+		| "ar5iv-nav-button-prev"
+		| "ar5iv-text-button"
+		| "ar5iv-severity-warning"
+		| "arxiv-ui-theme"
+		| "ar5iv-toggle-color-scheme"
+		| "color-scheme-icon"
+		| "ltx_page_logo"
+		| "ltx_LaTeXML_logo"
+		| "ltx_ref"
+		| "ltx_font_smallcaps" )
+
+	ltx.class.document =
+		attribute class { list { "ltx_document", ltx.class.extra* } }
+	ltx.class.title.document =
+		attribute class { list { "ltx_title", "ltx_title_document", ltx.class.extra* } }
+	ltx.class.title.abstract =
+		attribute class { list { "ltx_title", "ltx_title_abstract", ltx.class.extra* } }
+	ltx.class.title.frontmatter =
+		attribute class {
+			list {
+				"ltx_title",
+				ltx.class.extra*,
+				( "ltx_title_keywords"
+				| "ltx_title_classification"
+				| "ltx_title_bibliography"
+				| "ltx_title_theorem"
+				| "ltx_title_proof" ),
+				ltx.class.extra*
+			}
+		}
+	ltx.class.title.section =
+		attribute class { list { "ltx_title", ltx.class.extra*, ltx.class.title.section.kind, ltx.class.extra* } }
+	ltx.class.title.section.kind =
+		( "ltx_title_section"
+		| "ltx_title_subsection"
+		| "ltx_title_subsubsection"
+		| "ltx_title_paragraph"
+		| "ltx_title_subparagraph" )
+	ltx.class.cv.heading =
+		attribute class { list { ( "author-name" | "author-title" | "author-contact" ), ltx.class.extra* } }
+	ltx.class.authors =
+		attribute class { list { "ltx_authors", ltx.class.extra* } }
+	ltx.class.creator =
+		attribute class { list { "ltx_creator", ltx.class.extra* } }
+	ltx.class.dates =
+		attribute class { list { "ltx_dates", ltx.class.extra* } }
+	ltx.class.abstract =
+		attribute class { list { "ltx_abstract", ltx.class.extra* } }
+	ltx.class.frontmatter =
+		attribute class { list { ( "ltx_keywords" | "ltx_classification" | "ltx_acknowledgements" ), ltx.class.extra* } }
+	ltx.class.cv.header =
+		attribute class { list { "flex-grid", ltx.class.extra* } }
+	ltx.class.cv.column =
+		attribute class { list { ( "col-25" | "col-50" ), ltx.class.extra* } }
+
+	ltx.class.section =
+		attribute class {
+			list {
+				( "ltx_section"
+				| "ltx_subsection"
+				| "ltx_subsubsection"
+				| "ltx_paragraph"
+				| "ltx_subparagraph" ),
+				ltx.class.extra*
+			}
+		}
+	ltx.class.para =
+		attribute class { list { "ltx_para", ltx.class.extra* } }
+	ltx.class.p =
+		attribute class { list { "ltx_p", ltx.class.extra* } }
+	ltx.class.block =
+		attribute class { list { "ltx_block", ltx.class.extra* } }
+	ltx.class.pagination =
+		attribute class { list { "ltx_pagination", ltx.class.extra* } }
+	ltx.class.theorem =
+		attribute class { list { ( "ltx_theorem" | "ltx_proof" ), ltx.class.extra* } }
+	ltx.class.bibliography =
+		attribute class { list { "ltx_bibliography", ltx.class.extra* } }
+	ltx.class.toc =
+		attribute class { list { "ltx_TOC", ltx.class.extra* } }
+	ltx.class.toclist =
+		attribute class { list { "ltx_toclist", ltx.class.extra* } }
+	ltx.class.tocentry =
+		attribute class { list { "ltx_tocentry", ltx.class.extra* } }
+
+	ltx.class.figure =
+		attribute class { list { ( "ltx_figure" | "ltx_table" ), ltx.class.extra* } }
+	ltx.class.caption =
+		attribute class { list { "ltx_caption", ltx.class.extra* } }
+	ltx.class.equation.table =
+		attribute class { list { ( "ltx_equation" | "ltx_equationgroup" ), ltx.class.extra*, "ltx_eqn_table", ltx.class.extra* } }
+	ltx.class.equation.row =
+		attribute class { list { ( "ltx_equation" | "ltx_eqn_row" ), ltx.class.extra*, "ltx_eqn_row"?, ltx.class.extra* } }
+	ltx.class.equation.cell =
+		attribute class { list { ( "ltx_eqn_cell" | "ltx_td" ), ltx.class.extra* } }
+
+	ltx.class.tabular =
+		attribute class { list { "ltx_tabular", ltx.class.extra* } }
+	ltx.class.thead =
+		attribute class { list { "ltx_thead", ltx.class.extra* } }
+	ltx.class.tbody =
+		attribute class { list { "ltx_tbody", ltx.class.extra* } }
+	ltx.class.tfoot =
+		attribute class { list { "ltx_tfoot", ltx.class.extra* } }
+	ltx.class.tr =
+		attribute class { list { "ltx_tr", ltx.class.extra* } }
+	ltx.class.td =
+		attribute class { list { "ltx_td", ltx.class.extra* } }
+
+	ltx.class.itemize =
+		attribute class { list { "ltx_itemize", ltx.class.extra* } }
+	ltx.class.enumerate =
+		attribute class { list { "ltx_enumerate", ltx.class.extra* } }
+	ltx.class.description =
+		attribute class { list { "ltx_description", ltx.class.extra* } }
+	ltx.class.biblist =
+		attribute class { list { "ltx_biblist", ltx.class.extra* } }
+	ltx.class.item =
+		attribute class { list { ( "ltx_item" | "ltx_bibitem" ), ltx.class.extra* } }
+	ltx.class.tag =
+		attribute class { list { "ltx_tag", ltx.class.extra* } }
+
+	ltx.class.span =
+		attribute class {
+			list {
+				( "ltx_text"
+				| "ltx_personname"
+				| "ltx_font_smallcaps"
+				| "ltx_tag"
+				| "ltx_author_before"
+				| "ltx_author_notes"
+				| "ltx_author_after"
+				| "ltx_ref"
+				| "ltx_url"
+				| "ltx_LaTeXML_logo"
+				| "ltx_note"
+				| "ltx_inline-block"
+				| "ltx_p"
+				| "ltx_contact"
+				| "ltx_bibblock"
+				| "ltx_note_mark"
+				| "ltx_note_outer"
+				| "ltx_note_content"
+				| "author-name"
+				| "author-title"
+				| "author-contact" ),
+				ltx.class.extra*
+			}
+		}
+	ltx.class.a =
+		attribute class { list { ( "ltx_ref" | "ltx_url" | "ltx_LaTeXML_logo" ), ltx.class.extra* } }
+	ltx.class.img =
+		attribute class { list { ( "ltx_graphics" | "ltx_img" | "ltx_orcidlogo" ), ltx.class.extra* } }
+	ltx.class.break =
+		attribute class { list { "ltx_break", ltx.class.extra* } }
+	ltx.class.cite =
+		attribute class { list { "ltx_cite", ltx.class.extra* } }
+	ltx.class.sup =
+		attribute class { list { ( "ltx_sup" | "ltx_note_mark" ), ltx.class.extra* } }
+	ltx.class.note =
+		attribute class { list { ( "ltx_note" | "ltx_note_outer" ), ltx.class.extra* } }
+
+# #####################################################################
+## Official Hosted Page Scaffolds
+
+## Official Scaffold Content: hosted page chrome with explicit class tokens.
+##
+## This model is intentionally separate from the LaTeXML article content
+## model.  Hosted scaffolds need ordinary HTML controls, forms, and links,
+## but their class values should still be constrained to known arXiv/ar5iv
+## chrome tokens or LaTeXML provenance tokens.
+	ltx.scaffold.attrs =
+		( attribute * - class { text }*
+		& ltx.class.scaffold?
+		)
+	ltx.scaffold.inner =
+		( text
+		& ( ltx.scaffold.elem | svg )*
+		)
+	ltx.scaffold.elem =
+		( element a { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element button { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element div { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element form { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element header { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element footer { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element nav { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element p { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element ul { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element ol { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element li { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element span { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element strong { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element em { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element small { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element label { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element h1 { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element h2 { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element h3 { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element h4 { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element h5 { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element h6 { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element input { empty & ltx.scaffold.attrs }
+		| element img { empty & ltx.scaffold.attrs }
+		| element textarea { text & ltx.scaffold.attrs }
+		| element br { empty & ltx.scaffold.attrs }
+		)
+
+## arXiv HTML scaffold: official arxiv.org chrome wrapped around LaTeXML content
+	ltx.arxiv.body =
+		( text,
+		  ltx.arxiv.dialog.elem?,
+		  text,
+		  ltx.arxiv.header.elem,
+		  text,
+		  ltx.arxiv.navbar.elem?,
+		  text,
+		  ltx.arxiv.page.main.elem,
+		  text,
+		  ltx.arxiv.footer.elem,
+		  text,
+		  ltx.arxiv.keyboard.glossary.elem?,
+		  text,
+		  ltx.arxiv.fixed.buttons.elem?,
+		  text,
+		  common.elem.script-supporting*
+		)
+	ltx.arxiv.dialog.elem =
+		element dialog { ltx.scaffold.inner & ltx.scaffold.attrs }
+	ltx.arxiv.header.elem =
+		element header { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.arxiv.header }
+	ltx.arxiv.footer.elem =
+		element footer { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.arxiv.footer }
+	ltx.arxiv.navbar.elem =
+		element nav { ltx.toc.elem & ltx.attrs.no-class & ltx.class.page.navbar }
+	ltx.arxiv.keyboard.glossary.elem =
+		element div { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.keyboard.glossary }
+	ltx.arxiv.fixed.buttons.elem =
+		element div { ltx.arxiv.fixed.buttons.inner & ltx.attrs.no-class-no-id & ltx.class.arxiv.fixed.buttons }
+	ltx.arxiv.fixed.buttons.inner =
+		( text,
+		  element div { text & ltx.attrs.no-class-no-id & ltx.class.arxiv.beta.badge },
+		  text,
+		  element a { ltx.scaffold.inner & ltx.scaffold.attrs },
+		  text
+		)
+	ltx.arxiv.page.main.elem =
+		element div { ltx.arxiv.page.main.inner & ltx.page.attrs }
+	ltx.arxiv.page.main.inner =
+		( text,
+		  ltx.arxiv.infobox.elem?,
+		  text,
+		  ltx.page.content.elem,
+		  text
+		)
+	ltx.arxiv.infobox.elem =
+		element div { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.arxiv.infobox }
+
+## Table of Contents: generated navigation for hosted LaTeXML pages
+	ltx.toc.elem =
+		element nav { ltx.toc.inner & ltx.attrs.no-class & ltx.class.toc }
+	ltx.toc.inner =
+		( text,
+		  ltx.toc.list.elem,
+		  text
+		)
+	ltx.toc.list.elem =
+		element ol { ltx.toc.list.inner & ltx.attrs.no-class & ltx.class.toclist }
+	ltx.toc.list.inner =
+		( text,
+		  ltx.toc.entry.elem*,
+		  text
+		)
+	ltx.toc.entry.elem =
+		element li { ltx.toc.entry.inner & ltx.attrs.no-class & ltx.class.tocentry }
+	ltx.toc.entry.inner =
+		( text,
+		  ltx.anchor.elem,
+		  text,
+		  ltx.toc.list.elem?,
+		  text
+		)
+
+## ar5iv scaffold: article body plus ar5iv navigation/footer controls
+	ltx.ar5iv.body =
+		( text,
+		  ltx.ar5iv.page.main.elem,
+		  text,
+		  common.elem.script-supporting*
+		)
+	ltx.ar5iv.page.main.elem =
+		element div { ltx.ar5iv.page.main.inner & ltx.page.attrs }
+	ltx.ar5iv.page.main.inner =
+		( text,
+		  ltx.page.content.elem,
+		  text,
+		  ltx.ar5iv.footerbar.elem?,
+		  text,
+		  ltx.ar5iv.footer.elem?,
+		  text
+		)
+	ltx.ar5iv.footerbar.elem =
+		element div { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.ar5iv.footer }
+	ltx.ar5iv.footer.elem =
+		element footer { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.page.footer }
+
+# #####################################################################
+## Page Shell
+
+## Page Shell: outer generated body wrapper
+	ltx.page.elem =
+		element div { ltx.page.inner & ltx.page.attrs }
+	ltx.page.attrs =
+		( ltx.attrs.no-class & ltx.class.page.main )
+	ltx.page.inner =
+		( text,
+		  ltx.page.content.elem,
+		  text,
+		  ltx.page.footer.elem?,
+		  text
+		)
+
+## Page Content: wrapper around the authored document
+	ltx.page.content.elem =
+		element div { ltx.page.content.inner & ltx.page.content.attrs }
+	ltx.page.content.attrs =
+		( ltx.attrs.no-class & ltx.class.page.content )
+	ltx.page.content.inner =
+		( text,
+		  ltx.document.elem,
+		  text
+		)
+
+## Page Footer: generated LaTeXML provenance
+	ltx.page.footer.elem =
+		element footer { ltx.page.footer.inner & ltx.page.footer.attrs }
+	ltx.page.footer.attrs =
+		( ltx.attrs.no-class & ltx.class.page.footer )
+	ltx.page.footer.inner =
+		( text,
+		  ltx.footer.provenance.elem*,
+		  text
+		)
+
+## Footer Provenance: generated logo/credit block
+	ltx.footer.provenance.elem =
+		element div { ltx.footer.provenance.inner & ltx.footer.provenance.attrs }
+	ltx.footer.provenance.attrs =
+		( ltx.attrs.no-class & ( ltx.class.page.logo | ltx.class.latexml.logo ) )
+	ltx.footer.provenance.inner =
+		( ltx.footer.inline.content )
+	ltx.footer.inline.content =
+		( text
+		& ( element a { ltx.footer.inline.content & ltx.anchor.href.attrs & ltx.class.a }
+		  | element a { ltx.footer.inline.content & ltx.anchor.href.attrs }
+		  | ltx.image.elem
+		  | element span { ltx.footer.inline.content & ltx.attrs.no-class }
+		  | element span { ltx.footer.inline.content & ltx.attrs.no-class & ltx.class.span }
+		  )*
+		)
+
+# #####################################################################
+## Document Structure
+
+## Scholarly Document: article emitted from a LaTeX source
+	ltx.document.elem =
+		element article { ltx.document.inner & ltx.document.attrs }
+	ltx.document.attrs =
+		( ltx.attrs.no-class & ltx.class.document )
+	ltx.document.inner =
+		( text,
+		  ltx.document.front.elem*,
+		  text,
+		  ltx.block.content*,
+		  text
+		)
+
+## Document Front Matter: title, authors, dates, abstract, or class-specific header
+	ltx.document.front.elem =
+		( ltx.document.title.elem
+		| ltx.author.list.elem
+		| ltx.date.list.elem
+		| ltx.abstract.elem
+		| ltx.frontmatter.block.elem
+		| ltx.cv.header.elem
+		)
+
+## Document Title
+	ltx.document.title.elem =
+		element h1 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.document }
+
+## Author List
+	ltx.author.list.elem =
+		element div { ltx.author.list.inner & ltx.attrs.no-class & ltx.class.authors }
+	ltx.author.list.inner =
+		( text,
+		  ( ltx.creator.elem | ltx.span.elem )*,
+		  text
+		)
+
+## Creator: person or institutional contributor
+	ltx.creator.elem =
+		element span { ltx.inline.content & ltx.creator.attrs }
+	ltx.creator.attrs =
+		( ltx.attrs.no-class & ltx.class.creator )
+
+## Date List
+	ltx.date.list.elem =
+		element div { ltx.inline.content & ltx.attrs.no-class & ltx.class.dates }
+
+## Abstract
+	ltx.abstract.elem =
+		element div { ltx.abstract.inner & ltx.attrs.no-class & ltx.class.abstract }
+	ltx.abstract.inner =
+		( text,
+		  ltx.abstract.title.elem?,
+		  text,
+		  ( ltx.paragraph.line.elem | ltx.block.content )*,
+		  text
+		)
+	ltx.abstract.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
+		)
+	ltx.frontmatter.block.elem =
+		element div { ltx.frontmatter.block.inner & ltx.attrs.no-class & ltx.class.frontmatter }
+	ltx.frontmatter.block.inner =
+		( text,
+		  ltx.frontmatter.title.elem?,
+		  text,
+		  ltx.inline.elem*,
+		  text
+		)
+	ltx.frontmatter.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		)
+
+## CV Header: custom header grid used by LaTeXML moderncv output
+	ltx.cv.header.elem =
+		element div { ltx.cv.header.inner & ltx.attrs.no-class & ltx.class.cv.header }
+	ltx.cv.header.inner =
+		( text,
+		  ltx.cv.header.column.elem*,
+		  text
+		)
+	ltx.cv.header.column.elem =
+		element div { ltx.cv.header.column.inner & ltx.attrs.no-class & ltx.class.cv.column }
+	ltx.cv.header.column.inner =
+		( text,
+		  ( ltx.cv.heading.elem | ltx.heading.elem | ltx.block.content | ltx.inline.elem )*,
+		  text
+		)
+	ltx.cv.heading.elem =
+		( element h1 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.cv.heading }
+		| element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.cv.heading }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.cv.heading }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.cv.heading }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.cv.heading }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.cv.heading }
+		)
+
+## Section: recursive LaTeX sectional units
+	ltx.section.elem =
+		element section { ltx.section.inner & ltx.attrs.no-class & ltx.class.section }
+	ltx.section.inner =
+		( text,
+		  ltx.section.title.elem?,
+		  text,
+		  ltx.block.content*,
+		  text
+		)
+
+## Section Title: heading rank selected by LaTeXML from section depth
+	ltx.section.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		)
+
+	ltx.heading.elem =
+		( element h1 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		)
+	ltx.heading.inner =
+		( ltx.inline.content )
+
+# #####################################################################
+## Block-Level Publication Content
+
+## Block Content: structural units LaTeXML emits inside documents and sections
+	ltx.block.content =
+		( ltx.section.elem
+		| ltx.paragraph.elem
+		| ltx.figure.elem
+		| ltx.equation.table.elem
+		| ltx.itemized.list.elem
+		| ltx.enumerated.list.elem
+		| ltx.description.list.elem
+		| ltx.theorem.elem
+		| ltx.bibliography.elem
+		  | ltx.tabular.elem
+		  | ltx.block.elem
+		  | ltx.pagination.elem
+		  )
+
+## Paragraph Wrapper: LaTeXML paragraph-level grouping
+	ltx.paragraph.elem =
+		element div { ltx.paragraph.inner & ltx.attrs.no-class & ltx.class.para }
+	ltx.paragraph.inner =
+		( text,
+		  ( ltx.paragraph.line.elem
+		  | ltx.equation.table.elem
+		  | ltx.figure.elem
+		  | ltx.itemized.list.elem
+		  | ltx.enumerated.list.elem
+		  | ltx.description.list.elem
+		  | ltx.theorem.elem
+		  | ltx.block.elem
+		  )*,
+		  text
+		)
+
+## Paragraph Line: actual prose paragraph, including inline math and references
+	ltx.paragraph.line.elem =
+		element p { ltx.inline.content & ltx.attrs.no-class & ltx.class.p }
+
+## Generic Block: CSS block fragments produced by LaTeXML bindings
+	ltx.block.elem =
+		element div { ltx.block.inner & ltx.attrs.no-class & ltx.class.block }
+	ltx.block.inner =
+		( text,
+		  ( ltx.paragraph.line.elem
+		  | ltx.block.elem
+		  | ltx.inline.elem
+		  )*,
+		  text
+		)
+
+## Pagination Marker: explicit page break marker in CV-style documents
+	ltx.pagination.elem =
+		element div { ltx.pagination.inner & ltx.attrs.no-class & ltx.class.pagination }
+	ltx.pagination.inner =
+		( empty )
+
+# #####################################################################
+## Floats, Equations, and Tables
+
+## Theorem-like Block: theorem, proof, definition, lemma, remark, and related environments
+	ltx.theorem.elem =
+		element div { ltx.theorem.inner & ltx.attrs.no-class & ltx.class.theorem }
+	ltx.theorem.inner =
+		( text,
+		  ltx.theorem.title.elem?,
+		  text,
+		  ltx.block.content*,
+		  text
+		)
+	ltx.theorem.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		)
+
+## Bibliography
+	ltx.bibliography.elem =
+		element section { ltx.bibliography.inner & ltx.attrs.no-class & ltx.class.bibliography }
+	ltx.bibliography.inner =
+		( text,
+		  ltx.bibliography.title.elem?,
+		  text,
+		  ltx.bibliography.list.elem?,
+		  text
+		)
+	ltx.bibliography.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		)
+	ltx.bibliography.list.elem =
+		element ul { ltx.bibliography.list.inner & ltx.attrs.no-class & ltx.class.biblist }
+	ltx.bibliography.list.inner =
+		( text,
+		  ltx.bibliography.item.elem*,
+		  text
+		)
+	ltx.bibliography.item.elem =
+		element li { ltx.bibliography.item.inner & ltx.attrs.no-class & ltx.class.item }
+	ltx.bibliography.item.inner =
+		( text,
+		  ( ltx.item.tag.elem
+		  | ltx.span.elem
+		  | ltx.inline.elem
+		  | ltx.paragraph.line.elem
+		  )*,
+		  text
+		)
+
+## Float: figure or table float with optional caption
+	ltx.figure.elem =
+		element figure { ltx.figure.inner & ltx.attrs.no-class & ltx.class.figure }
+	ltx.figure.inner =
+		( text,
+		  ltx.caption.elem?,
+		  text,
+		  ( ltx.paragraph.line.elem
+		  | ltx.tabular.elem
+		  | ltx.linebreak.elem
+		  | ltx.inline.elem
+		  )*,
+		  text,
+		  ltx.caption.elem?,
+		  text
+		)
+
+## Figure Panel: figure body that contains generated visual/table material
+	ltx.figure.body =
+		( ltx.paragraph.line.elem
+		| ltx.tabular.elem
+		| ltx.linebreak.elem
+		| ltx.inline.elem
+		)
+
+## Caption
+	ltx.caption.elem =
+		element figcaption { ltx.inline.content & ltx.attrs.no-class & ltx.class.caption }
+
+## Display Equation Table: LaTeXML equation number alignment scaffold
+	ltx.equation.table.elem =
+		element table { ltx.equation.table.inner & ltx.attrs.no-class & ltx.class.equation.table }
+	ltx.equation.table.inner =
+		( text,
+		  ltx.equation.rowgroup.elem+,
+		  text
+		)
+
+## Display Equation Row Group: equations are emitted in a table body
+	ltx.equation.rowgroup.elem =
+		element tbody { ltx.equation.rowgroup.inner & ltx.attrs.no-class & ltx.class.tbody? }
+	ltx.equation.rowgroup.inner =
+		( text,
+		  ltx.equation.row.elem+,
+		  text
+		)
+
+## Display Equation Row: alignment pads, formula cell, optional equation number
+	ltx.equation.row.elem =
+		element tr { ltx.equation.row.inner & ltx.attrs.no-class & ltx.class.equation.row }
+	ltx.equation.row.inner =
+		( text,
+		  ltx.equation.cell.elem*,
+		  text
+		)
+
+## Display Equation Cell: formula, padding, alignment, or equation number cell
+	ltx.equation.cell.elem =
+		element td { ltx.equation.number.cell.inner & ltx.table.cell.attrs & ltx.class.equation.cell }
+	ltx.equation.number.cell.inner =
+		( text,
+		  ( ltx.item.tag.elem
+		  | ltx.inline.elem
+		  | ltx.math.elem
+		  | ltx.paragraph.line.elem
+		  )*,
+		  text
+		)
+
+## Tabular: table emitted for TeX tabular/array-like material
+	ltx.tabular.elem =
+		element table { ltx.tabular.inner & ltx.attrs.no-class & ltx.class.tabular }
+	ltx.tabular.inner =
+		( text,
+		  ltx.table.caption.elem?,
+		  text,
+		  ltx.table.rowgroup.elem+,
+		  text
+		)
+	ltx.table.caption.elem =
+		element caption { ltx.inline.content & ltx.attrs.no-class & ltx.class.caption }
+
+## Table Row Group
+	ltx.table.rowgroup.elem =
+		( element thead { ltx.table.rowgroup.inner & ltx.attrs.no-class & ltx.class.thead }
+		| element tbody { ltx.table.rowgroup.inner & ltx.attrs.no-class & ltx.class.tbody }
+		| element tfoot { ltx.table.rowgroup.inner & ltx.attrs.no-class & ltx.class.tfoot }
+		)
+	ltx.table.rowgroup.inner =
+		( text,
+		  ltx.table.row.elem*,
+		  text
+		)
+
+## Table Row
+	ltx.table.row.elem =
+		element tr { ltx.table.row.inner & ltx.attrs.no-class & ltx.class.tr }
+	ltx.table.row.inner =
+		( text,
+		  ( ltx.table.cell.elem | ltx.table.header.cell.elem )*,
+		  text
+		)
+
+## Table Cell
+	ltx.table.cell.elem =
+		element td { ltx.table.cell.inner & ltx.table.cell.attrs & ltx.class.td }
+	ltx.table.header.cell.elem =
+		element th { ltx.table.cell.inner & ltx.table.cell.attrs & ltx.class.td }
+	ltx.table.cell.inner =
+		( text,
+		  ( ltx.paragraph.line.elem
+		  | ltx.inline.elem
+		  | ltx.math.elem
+		  | ltx.block.elem
+		  | ltx.tabular.elem
+		  )*,
+		  text
+		)
+
+# #####################################################################
+## Lists
+
+## Itemized List
+	ltx.itemized.list.elem =
+		element ul { ltx.list.inner & ltx.attrs.no-class & ltx.class.itemize }
+
+## Enumerated List
+	ltx.enumerated.list.elem =
+		element ol { ltx.list.inner & ltx.attrs.no-class & ltx.class.enumerate }
+
+	ltx.list.inner =
+		( text,
+		  ltx.list.item.elem*,
+		  text
+		)
+
+## List Item
+	ltx.list.item.elem =
+		element li { ltx.list.item.inner & ltx.attrs.no-class & ltx.class.item }
+	ltx.list.item.inner =
+		( text,
+		  ltx.item.tag.elem?,
+		  text,
+		  ltx.block.content*,
+		  text
+		)
+
+## Description List
+	ltx.description.list.elem =
+		element dl { ltx.description.list.inner & ltx.attrs.no-class & ltx.class.description }
+	ltx.description.list.inner =
+		( text,
+		  ( ltx.description.term.elem, text, ltx.description.body.elem, text )*
+		)
+	ltx.description.term.elem =
+		element dt { ltx.description.term.inner & ltx.attrs.no-class & ltx.class.item }
+	ltx.description.term.inner =
+		( ltx.inline.content )
+	ltx.description.body.elem =
+		element dd { ltx.description.body.inner & ltx.attrs.no-class & ltx.class.item }
+	ltx.description.body.inner =
+		( text,
+		  ltx.block.content*,
+		  text
+		)
+
+## Item Tag: visible label/bullet emitted outside native list numbering
+	ltx.item.tag.elem =
+		element span { ltx.inline.content & ltx.attrs.no-class & ltx.class.tag }
+
+# #####################################################################
+## Inline Content
+
+## Inline Content: text-level material emitted by LaTeXML
+	ltx.inline.content =
+		( text
+		& ltx.inline.elem*
+		)
+
+## Inline Element: phrasing constructs observed across article and CV output
+	ltx.inline.elem =
+		( ltx.span.elem
+		| ltx.anchor.elem
+		| ltx.emphasis.elem
+		| ltx.cite.elem
+		| ltx.sup.elem
+		| ltx.note.elem
+		| ltx.image.elem
+		| ltx.linebreak.elem
+		| ltx.math.elem
+		| svg
+		)
+
+## Inline Span: text, font, transform, contact, and tag spans
+	ltx.span.elem =
+		element span { ltx.inline.content & ltx.attrs.no-class & ltx.class.span }
+
+## Link or Cross Reference
+	ltx.anchor.elem =
+		( element a { ltx.inline.content & ltx.anchor.href.attrs & ltx.class.a }
+		| element a { ltx.inline.content & ltx.anchor.href.attrs }
+		| element a { ltx.inline.content & ltx.attrs.no-class & ltx.class.a }
+		| element a { ltx.inline.content & ltx.attrs.no-class }
+		)
+
+## Emphasis
+	ltx.emphasis.elem =
+		element em { ltx.inline.content & em.attrs }
+
+## Citation
+	ltx.cite.elem =
+		element cite { ltx.inline.content & ltx.attrs.no-class & ltx.class.cite }
+
+## Superscript
+	ltx.sup.elem =
+		element sup { ltx.inline.content & ltx.attrs.no-class & ltx.class.sup }
+
+## Note
+	ltx.note.elem =
+		element span { ltx.inline.content & ltx.attrs.no-class & ltx.class.note }
+
+## Inline Image
+	ltx.image.elem =
+		element img { img.inner & ltx.image.attrs & ltx.class.img? }
+
+## Line Break
+	ltx.linebreak.elem =
+		element br { br.inner & ltx.attrs.no-class & ltx.class.break }
+
+## Math Formula: MathML presentation/content handled by the MathML schema
+	ltx.math.elem =
+		( math )

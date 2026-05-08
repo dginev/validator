@@ -420,6 +420,7 @@ def buildSchemaDrivers():
     buildSchemaDriverHtml5(html5Dir)
     buildSchemaDriverHtml5RDFa(html5Dir)
     buildSchemaDriverHtml5RDFaLite(html5Dir)
+    buildSchemaDriverHtml5Scholarly(html5Dir)
     buildSchemaDriverXhtmlCore(html5Dir)
     buildSchemaDriverXhtmlCorePlusWf2(html5Dir)
     buildSchemaDriverXhtml5xhtmlNoMicrodata(html5Dir)
@@ -460,6 +461,7 @@ coreSchemaDriverFiles = [
     "html5-no-microdata.rnc",
     "html5-rdfalite-w3c.rnc",
     "html5-rdfalite.rnc",
+    "html5-scholarly.rnc",
     "html5-svg-mathml.rnc",
     "html5.rnc",
     "svg-xhtml5-rdf-mathml.rnc",
@@ -477,6 +479,7 @@ htmlSchemaDriverFiles = [
     "html5full-no-microdata.rnc",
     "html5full-rdfa.rnc",
     "html5full-rdfalite.rnc",
+    "html5full-scholarly.rnc",
     "html5full.rnc",
     "its20-html5-types.rnc",
     "its20-html5.rnc",
@@ -586,6 +589,14 @@ include "rdfa.rnc" {
 }
 '''
 
+schemaDriverHtml5Scholarly = '''\
+include "scholarly-ltx.rnc"
+include "html5full-rdfa.rnc" {
+    body.inner =
+		( ltx.content.start )
+}
+'''
+
 
 def openDriver(schemaDir, driverName, sourceName=""):
     removeIfExists(os.path.join(schemaDir, driverName))
@@ -638,6 +649,10 @@ def buildSchemaDriverHtml5RDFaLite(schemaDir):
     f.write(schemaDriverHtml5RDFaLite)
     f.close()
 
+def buildSchemaDriverHtml5Scholarly(schemaDir):
+    f = openDriver(schemaDir, "html5full-scholarly.rnc")
+    f.write(schemaDriverHtml5Scholarly)
+    f.close()
 
 ################################
 # XHTML schema drivers
