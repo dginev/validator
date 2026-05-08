@@ -421,6 +421,10 @@ def buildSchemaDrivers():
     buildSchemaDriverHtml5RDFa(html5Dir)
     buildSchemaDriverHtml5RDFaLite(html5Dir)
     buildSchemaDriverHtml5Scholarly(html5Dir)
+    scholarlySourceDir = os.path.join(schemaSrcDir, "html5")
+    for file in scholarlySchemaModuleFiles:
+        print("Copying %s to %s" % (os.path.join(scholarlySourceDir, file), os.path.join(html5Dir, file)))  # nopep8
+        shutil.copy(os.path.join(scholarlySourceDir, file), html5Dir)
     buildSchemaDriverXhtmlCore(html5Dir)
     buildSchemaDriverXhtmlCorePlusWf2(html5Dir)
     buildSchemaDriverXhtml5xhtmlNoMicrodata(html5Dir)
@@ -493,6 +497,16 @@ htmlSchemaDriverFiles = [
     "xhtml5full-xhtml-rdfa.rnc",
     "xhtml5full-xhtml-rdfalite.rnc",
     "xhtml5full-xhtml.rnc"
+]
+
+scholarlySchemaModuleFiles = [
+    "scholarly-ltx.rnc",
+    "scholarly-ltx-classes.rnc",
+    "scholarly-ltx-inline.rnc",
+    "scholarly-ltx-scaffold.rnc",
+    "scholarly-ltx-structure.rnc",
+    "scholarly-ltx-blocks.rnc",
+    "scholarly-ltx-floats.rnc"
 ]
 
 schemaDriverBase = '''\

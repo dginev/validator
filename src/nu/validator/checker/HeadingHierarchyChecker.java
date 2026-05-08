@@ -120,6 +120,9 @@ public class HeadingHierarchyChecker extends Checker {
 
         // Check if this is a heading element
         if (isHeadingElement(localName)) {
+            if (isLatexmlGeneratedNonOutlineHeading(atts)) {
+                return;
+            }
             int baseLevel = localName.charAt(1) - '0';
             int computedLevel = computeHeadingLevel(baseLevel);
             headings.add(new HeadingInfo(computedLevel, localName,
@@ -196,6 +199,40 @@ public class HeadingHierarchyChecker extends Checker {
     private static boolean isHeadingElement(String localName) {
         return "h1" == localName || "h2" == localName || "h3" == localName
                 || "h4" == localName || "h5" == localName || "h6" == localName;
+    }
+
+    /**
+     * LaTeXML uses h6 for generated run-in titles and front-matter labels
+     * whose structural intent is carried by ltx_title_* class tokens rather
+     * than by the literal h1-h6 rank.
+     */
+    private static boolean isLatexmlGeneratedNonOutlineHeading(Attributes atts) {
+        String classValue = atts.getValue("", "class");
+        if (classValue == null || classValue.indexOf("ltx_title") == -1) {
+            return false;
+        }
+        return containsClass(classValue, "ltx_title_abstract")
+                || containsClass(classValue, "ltx_title_theorem")
+                || containsClass(classValue, "ltx_title_proof")
+                || containsClass(classValue, "ltx_title_classification")
+                || containsClass(classValue, "ltx_title_keywords");
+    }
+
+    private static boolean containsClass(String classValue, String token) {
+        int tokenLength = token.length();
+        int index = classValue.indexOf(token);
+        while (index != -1) {
+            int end = index + tokenLength;
+            boolean startsAtBoundary = index == 0
+                    || Character.isWhitespace(classValue.charAt(index - 1));
+            boolean endsAtBoundary = end == classValue.length()
+                    || Character.isWhitespace(classValue.charAt(end));
+            if (startsAtBoundary && endsAtBoundary) {
+                return true;
+            }
+            index = classValue.indexOf(token, end);
+        }
+        return false;
     }
 
     /**

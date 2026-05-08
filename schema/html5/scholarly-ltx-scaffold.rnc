@@ -1,0 +1,199 @@
+# #####################################################################
+## Official Hosted Page Scaffolds
+
+## Official Scaffold Content: hosted page chrome with explicit class tokens.
+##
+## This model is intentionally separate from the LaTeXML article content
+## model.  Hosted scaffolds need ordinary HTML controls, forms, and links,
+## but their class values should still be constrained to known arXiv/ar5iv
+## chrome tokens or LaTeXML provenance tokens.
+	ltx.scaffold.attrs =
+		( attribute * - class { text }*
+		& ltx.class.scaffold?
+		)
+	ltx.scaffold.inner =
+		( text
+		& ( ltx.scaffold.elem | svg )*
+		)
+	ltx.scaffold.elem =
+		( element a { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element button { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element div { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element form { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element header { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element footer { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element nav { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element p { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element ul { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element ol { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element li { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element span { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element strong { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element em { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element small { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element label { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element h1 { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element h2 { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element h3 { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element h4 { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element h5 { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element h6 { ltx.scaffold.inner & ltx.scaffold.attrs }
+		| element input { empty & ltx.scaffold.attrs }
+		| element img { empty & ltx.scaffold.attrs }
+		| element textarea { text & ltx.scaffold.attrs }
+		| element br { empty & ltx.scaffold.attrs }
+		)
+
+## arXiv HTML scaffold: official arxiv.org chrome wrapped around LaTeXML content
+	ltx.arxiv.body =
+		( text,
+		  ltx.arxiv.dialog.elem?,
+		  text,
+		  ltx.arxiv.header.elem,
+		  text,
+		  ltx.arxiv.navbar.elem?,
+		  text,
+		  ltx.arxiv.page.main.elem,
+		  text,
+		  ltx.arxiv.footer.elem,
+		  text,
+		  ltx.arxiv.keyboard.glossary.elem?,
+		  text,
+		  ltx.arxiv.fixed.buttons.elem?,
+		  text,
+		  common.elem.script-supporting*
+		)
+	ltx.arxiv.dialog.elem =
+		element dialog { ltx.scaffold.inner & ltx.scaffold.attrs }
+	ltx.arxiv.header.elem =
+		element header { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.arxiv.header }
+	ltx.arxiv.footer.elem =
+		element footer { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.arxiv.footer }
+	ltx.arxiv.navbar.elem =
+		element nav { ltx.toc.elem & ltx.attrs.no-class & ltx.class.page.navbar }
+	ltx.arxiv.keyboard.glossary.elem =
+		element div { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.keyboard.glossary }
+	ltx.arxiv.fixed.buttons.elem =
+		element div { ltx.arxiv.fixed.buttons.inner & ltx.attrs.no-class-no-id & ltx.class.arxiv.fixed.buttons }
+	ltx.arxiv.fixed.buttons.inner =
+		( text,
+		  element div { text & ltx.attrs.no-class-no-id & ltx.class.arxiv.beta.badge },
+		  text,
+		  element a { ltx.scaffold.inner & ltx.scaffold.attrs },
+		  text
+		)
+	ltx.arxiv.page.main.elem =
+		element div { ltx.arxiv.page.main.inner & ltx.page.attrs }
+	ltx.arxiv.page.main.inner =
+		( text,
+		  ltx.arxiv.infobox.elem?,
+		  text,
+		  ltx.page.content.elem,
+		  text
+		)
+	ltx.arxiv.infobox.elem =
+		element div { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.arxiv.infobox }
+
+## Table of Contents: generated navigation for hosted LaTeXML pages
+	ltx.toc.elem =
+		element nav { ltx.toc.inner & ltx.attrs.no-class & ltx.class.toc }
+	ltx.toc.inner =
+		( text,
+		  ltx.toc.list.elem,
+		  text
+		)
+	ltx.toc.list.elem =
+		element ol { ltx.toc.list.inner & ltx.attrs.no-class & ltx.class.toclist }
+	ltx.toc.list.inner =
+		( text,
+		  ltx.toc.entry.elem*,
+		  text
+		)
+	ltx.toc.entry.elem =
+		element li { ltx.toc.entry.inner & ltx.attrs.no-class & ltx.class.tocentry }
+	ltx.toc.entry.inner =
+		( text,
+		  ltx.anchor.elem,
+		  text,
+		  ltx.toc.list.elem?,
+		  text
+		)
+
+## ar5iv scaffold: article body plus ar5iv navigation/footer controls
+	ltx.ar5iv.body =
+		( text,
+		  ltx.ar5iv.page.main.elem,
+		  text,
+		  common.elem.script-supporting*
+		)
+	ltx.ar5iv.page.main.elem =
+		element div { ltx.ar5iv.page.main.inner & ltx.page.attrs }
+	ltx.ar5iv.page.main.inner =
+		( text,
+		  ltx.page.content.elem,
+		  text,
+		  ltx.ar5iv.footerbar.elem?,
+		  text,
+		  ltx.ar5iv.footer.elem?,
+		  text
+		)
+	ltx.ar5iv.footerbar.elem =
+		element div { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.ar5iv.footer }
+	ltx.ar5iv.footer.elem =
+		element footer { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.page.footer }
+
+# #####################################################################
+## Page Shell
+
+## Page Shell: outer generated body wrapper
+	ltx.page.elem =
+		element div { ltx.page.inner & ltx.page.attrs }
+	ltx.page.attrs =
+		( ltx.attrs.no-class & ltx.class.page.main )
+	ltx.page.inner =
+		( text,
+		  ltx.page.content.elem,
+		  text,
+		  ltx.page.footer.elem?,
+		  text
+		)
+
+## Page Content: wrapper around the authored document
+	ltx.page.content.elem =
+		element div { ltx.page.content.inner & ltx.page.content.attrs }
+	ltx.page.content.attrs =
+		( ltx.attrs.no-class & ltx.class.page.content )
+	ltx.page.content.inner =
+		( text,
+		  ltx.document.elem,
+		  text
+		)
+
+## Page Footer: generated LaTeXML provenance
+	ltx.page.footer.elem =
+		element footer { ltx.page.footer.inner & ltx.page.footer.attrs }
+	ltx.page.footer.attrs =
+		( ltx.attrs.no-class & ltx.class.page.footer )
+	ltx.page.footer.inner =
+		( text,
+		  ltx.footer.provenance.elem*,
+		  text
+		)
+
+## Footer Provenance: generated logo/credit block
+	ltx.footer.provenance.elem =
+		element div { ltx.footer.provenance.inner & ltx.footer.provenance.attrs }
+	ltx.footer.provenance.attrs =
+		( ltx.attrs.no-class & ( ltx.class.page.logo | ltx.class.latexml.logo ) )
+	ltx.footer.provenance.inner =
+		( ltx.footer.inline.content )
+	ltx.footer.inline.content =
+		( text
+		& ( element a { ltx.footer.inline.content & ltx.anchor.href.attrs & ltx.class.a }
+		  | element a { ltx.footer.inline.content & ltx.anchor.href.attrs }
+		  | ltx.image.elem
+		  | element span { ltx.footer.inline.content & ltx.attrs.no-class }
+		  | element span { ltx.footer.inline.content & ltx.attrs.no-class & ltx.class.span }
+		  )*
+		)
+

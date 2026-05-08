@@ -239,6 +239,12 @@ http://s.validator.nu/html5/html5full-rdfalite.rnc	schema/html5/html5full-rdfali
 http://s.validator.nu/html5/html5full-rdfa.rnc	schema/html5/html5full-rdfa.rnc
 http://s.validator.nu/html5/html5full-scholarly.rnc	schema/html5/html5full-scholarly.rnc
 http://s.validator.nu/html5/scholarly-ltx.rnc	schema/html5/scholarly-ltx.rnc
+http://s.validator.nu/html5/scholarly-ltx-classes.rnc	schema/html5/scholarly-ltx-classes.rnc
+http://s.validator.nu/html5/scholarly-ltx-inline.rnc	schema/html5/scholarly-ltx-inline.rnc
+http://s.validator.nu/html5/scholarly-ltx-scaffold.rnc	schema/html5/scholarly-ltx-scaffold.rnc
+http://s.validator.nu/html5/scholarly-ltx-structure.rnc	schema/html5/scholarly-ltx-structure.rnc
+http://s.validator.nu/html5/scholarly-ltx-blocks.rnc	schema/html5/scholarly-ltx-blocks.rnc
+http://s.validator.nu/html5/scholarly-ltx-floats.rnc	schema/html5/scholarly-ltx-floats.rnc
 http://s.validator.nu/html5/xhtml5full-html-no-microdata.rnc	schema/html5/xhtml5full-html-no-microdata.rnc
 http://s.validator.nu/html5/xhtml5full-html-rdfalite.rnc	schema/html5/xhtml5full-html-rdfalite.rnc
 http://s.validator.nu/html5/xhtml5full-html-rdfa.rnc	schema/html5/xhtml5full-html-rdfa.rnc

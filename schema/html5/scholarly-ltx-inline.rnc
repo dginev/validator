@@ -1,0 +1,67 @@
+# #####################################################################
+## Inline Content
+
+## Inline Content: text-level material emitted by LaTeXML
+	ltx.inline.content =
+		( text
+		& ltx.inline.elem*
+		)
+
+## Inline Element: phrasing constructs observed across article and CV output
+	ltx.inline.elem =
+		( ltx.span.elem
+		| ltx.anchor.elem
+		| ltx.emphasis.elem
+		| ltx.cite.elem
+		| ltx.sup.elem
+		| ltx.sub.elem
+		| ltx.note.elem
+		| ltx.image.elem
+		| ltx.linebreak.elem
+		| ltx.math.elem
+		| svg
+		)
+
+## Inline Span: text, font, transform, contact, and tag spans
+	ltx.span.elem =
+		element span { ltx.inline.content & ltx.attrs.no-class & ltx.class.span }
+
+## Link or Cross Reference
+	ltx.anchor.elem =
+		( element a { ltx.inline.content & ltx.anchor.href.attrs & ltx.class.a }
+		| element a { ltx.inline.content & ltx.anchor.href.attrs }
+		| element a { ltx.inline.content & ltx.attrs.no-class & ltx.class.a }
+		| element a { ltx.inline.content & ltx.attrs.no-class }
+		)
+
+## Emphasis
+	ltx.emphasis.elem =
+		element em { ltx.inline.content & em.attrs }
+
+## Citation
+	ltx.cite.elem =
+		element cite { ltx.inline.content & ltx.attrs.no-class & ltx.class.cite }
+
+## Superscript
+	ltx.sup.elem =
+		element sup { ltx.inline.content & ltx.attrs.no-class & ltx.class.sup }
+
+## Subscript
+	ltx.sub.elem =
+		element sub { ltx.inline.content & ltx.attrs.no-class & ltx.class.sub }
+
+## Note
+	ltx.note.elem =
+		element span { ltx.inline.content & ltx.attrs.no-class & ltx.class.note }
+
+## Inline Image
+	ltx.image.elem =
+		element img { img.inner & ltx.image.attrs & ltx.class.img? }
+
+## Line Break
+	ltx.linebreak.elem =
+		element br { br.inner & ltx.attrs.no-class & ltx.class.break }
+
+## Math Formula: MathML presentation/content handled by the MathML schema
+	ltx.math.elem =
+		( math )

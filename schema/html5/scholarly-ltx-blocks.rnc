@@ -1,0 +1,115 @@
+# #####################################################################
+## Block-Level Publication Content
+
+## Block Content: structural units LaTeXML emits inside documents and sections
+	ltx.block.content =
+		( ltx.section.elem
+		| ltx.paragraph.elem
+		| ltx.figure.elem
+		| ltx.equation.table.elem
+		| ltx.itemized.list.elem
+		| ltx.enumerated.list.elem
+		| ltx.description.list.elem
+		| ltx.theorem.elem
+		| ltx.bibliography.elem
+			| ltx.quote.elem
+			| ltx.listing.elem
+			| ltx.listing.line.elem
+			| ltx.block.rule.elem
+		| ltx.tabular.elem
+		| ltx.block.elem
+		| ltx.pagination.elem
+		  )
+
+## Paragraph Wrapper: LaTeXML paragraph-level grouping
+	ltx.paragraph.elem =
+		element div { ltx.paragraph.inner & ltx.attrs.no-class & ltx.class.para }
+	ltx.paragraph.inner =
+		( text,
+		  ( ltx.paragraph.line.elem
+		  | ltx.equation.table.elem
+		  | ltx.figure.elem
+		  | ltx.itemized.list.elem
+		  | ltx.enumerated.list.elem
+		  | ltx.description.list.elem
+			  | ltx.theorem.elem
+			  | ltx.quote.elem
+			  | ltx.listing.elem
+			  | ltx.listing.line.elem
+			  | ltx.image.elem
+		  | ltx.block.elem
+		  )*,
+		  text
+		)
+
+## Paragraph Line: actual prose paragraph, including inline math and references
+	ltx.paragraph.line.elem =
+		element p { ltx.inline.content & ltx.attrs.no-class & ltx.class.p }
+
+## Generic Block: CSS block fragments produced by LaTeXML bindings
+	ltx.block.elem =
+		element div { ltx.block.inner & ltx.attrs.no-class & ltx.class.block }
+	ltx.block.inner =
+		( text,
+			  ( ltx.paragraph.line.elem
+			  | ltx.block.elem
+			  | ltx.listing.elem
+			  | ltx.listing.line.elem
+			  | ltx.transform.outer.elem
+		  | ltx.inline.elem
+		  )*,
+		  text
+		)
+
+## Pagination Marker: explicit page break marker in CV-style documents
+	ltx.pagination.elem =
+		element div { ltx.pagination.inner & ltx.attrs.no-class & ltx.class.pagination }
+	ltx.pagination.inner =
+		( empty )
+
+## Quotation Block: display quotations emitted from quote-like environments
+	ltx.quote.elem =
+		element blockquote { ltx.quote.inner & ltx.attrs.no-class & ltx.class.quote }
+	ltx.class.quote =
+		attribute class { list { "ltx_quote", ltx.class.extra* } }
+	ltx.quote.inner =
+		( text,
+		  ( ltx.paragraph.line.elem | ltx.block.content )*,
+		  text
+		)
+
+## Listing Block: source-code listings preserve token classes from listings/minted
+	ltx.listing.elem =
+		element div { ltx.listing.inner & ltx.attrs.no-class & ltx.class.listing }
+	ltx.class.listing =
+		attribute class { list { "ltx_listing", ltx.class.listing.extra* } }
+	ltx.listing.inner =
+		( text,
+		  ltx.listing.data.elem?,
+		  text,
+		  ltx.listing.line.elem*,
+		  text
+		)
+	ltx.listing.data.elem =
+		element div { ltx.listing.data.inner & ltx.attrs.no-class-no-id & ltx.class.listing.data }
+	ltx.class.listing.data =
+		attribute class { list { "ltx_listing_data", ltx.class.extra* } }
+	ltx.listing.data.inner =
+		( text
+		& ltx.anchor.elem*
+		)
+	ltx.listing.line.elem =
+		element div { ltx.listing.line.inner & ltx.attrs.no-class & ltx.class.listing.line }
+	ltx.class.listing.line =
+		attribute class { list { "ltx_listingline", ltx.class.extra* } }
+	ltx.listing.line.inner =
+		( text
+		& ltx.inline.elem*
+		)
+
+## Standalone Rule: horizontal rules emitted as styled spans between blocks
+	ltx.block.rule.elem =
+		element span { ltx.inline.content & ltx.attrs.no-class & ltx.class.rule }
+	ltx.class.rule =
+		attribute class { list { "ltx_rule", ltx.class.extra* } }
+

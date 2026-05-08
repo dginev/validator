@@ -918,16 +918,6 @@ public class Assertions extends Checker {
             "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr", "xmp"
     ));
 
-    private static final Set<String> MATHML_ELEMENTS = new HashSet<>(Arrays.asList(
-            "annotation", "annotation-xml", "maction", "maligngroup", "malignmark", "math",
-            "menclose", "merror", "mfenced", "mfrac", "mglyph", "mi", "mlabeledtr",
-            "mlongdiv", "mmultiscripts", "mn", "mo", "mover", "mpadded", "mphantom",
-            "mprescripts", "mroot", "mrow", "ms", "mscarries", "mscarry", "msgroup",
-            "msline", "mspace", "msqrt", "msrow", "mstack", "mstyle", "msub", "msubsup",
-            "msup", "mtable", "mtd", "mtext", "mtr", "munder", "munderover", "none",
-            "semantics"
-    ));
-
     private static final Set<String> SVG_ELEMENTS = new HashSet<>(Arrays.asList(
             "a", "altGlyph", "altGlyphDef", "altGlyphItem", "animate", "animateColor",
             "animateMotion", "animateTransform", "circle", "clipPath", "color-profile",
@@ -2426,11 +2416,6 @@ public class Assertions extends Checker {
             err("The “" + localName
                     + "” element is a completely-unknown element that"
                     + " is not allowed anywhere in any SVG content.");
-        } else if ("http://www.w3.org/1998/Math/MathML" == uri
-                && !MATHML_ELEMENTS.contains(localName)) {
-            err("The “" + localName
-                    + "” element is a completely-unknown element that"
-                    + " is not allowed anywhere in any MathML content.");
         }
         if ("http://www.w3.org/1999/xhtml" == uri) {
             boolean controls = false;

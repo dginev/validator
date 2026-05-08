@@ -1,0 +1,296 @@
+# #####################################################################
+## Floats, Equations, and Tables
+
+## Theorem-like Block: theorem, proof, definition, lemma, remark, and related environments
+	ltx.theorem.elem =
+		element div { ltx.theorem.inner & ltx.attrs.no-class & ltx.class.theorem }
+	ltx.theorem.inner =
+		( text,
+		  ltx.theorem.title.elem?,
+		  text,
+		  ltx.block.content*,
+		  text
+		)
+	ltx.theorem.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		)
+
+## Bibliography
+	ltx.bibliography.elem =
+		element section { ltx.bibliography.inner & ltx.attrs.no-class & ltx.class.bibliography }
+	ltx.bibliography.inner =
+		( text,
+		  ltx.bibliography.title.elem?,
+		  text,
+		  ltx.bibliography.list.elem?,
+		  text
+		)
+	ltx.bibliography.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		)
+	ltx.bibliography.list.elem =
+		element ul { ltx.bibliography.list.inner & ltx.attrs.no-class & ltx.class.biblist }
+	ltx.bibliography.list.inner =
+		( text,
+		  ltx.bibliography.item.elem*,
+		  text
+		)
+	ltx.bibliography.item.elem =
+		element li { ltx.bibliography.item.inner & ltx.attrs.no-class & ltx.class.item }
+	ltx.bibliography.item.inner =
+		( text,
+		  ( ltx.item.tag.elem
+		  | ltx.span.elem
+		  | ltx.inline.elem
+		  | ltx.paragraph.line.elem
+		  )*,
+		  text
+		)
+
+## Float: figure or table float with optional caption
+	ltx.figure.elem =
+		element figure { ltx.figure.inner & ltx.attrs.no-class & ltx.class.figure }
+	ltx.figure.inner =
+		( text,
+		  ltx.caption.elem?,
+		  text,
+		  ( ltx.paragraph.line.elem
+		  | ltx.tabular.elem
+		  | ltx.equation.table.elem
+		  | ltx.figure.flex.elem
+		  | ltx.listing.elem
+		  | ltx.listing.line.elem
+		  | ltx.transform.outer.elem
+		  | ltx.block.elem
+		  | ltx.linebreak.elem
+		  | ltx.image.elem
+		  | ltx.inline.elem
+		  )*,
+		  text,
+		  ltx.caption.elem?,
+		  text
+		)
+
+## Figure Panel: figure body that contains generated visual/table material
+	ltx.figure.body =
+		( ltx.paragraph.line.elem
+		| ltx.tabular.elem
+		| ltx.equation.table.elem
+		| ltx.figure.flex.elem
+		| ltx.listing.elem
+		| ltx.listing.line.elem
+		| ltx.transform.outer.elem
+		| ltx.itemized.list.elem
+		| ltx.enumerated.list.elem
+		| ltx.description.list.elem
+		| ltx.block.elem
+		| ltx.linebreak.elem
+		| ltx.image.elem
+		| ltx.inline.elem
+		)
+
+## Figure Panel: generated flex grids used for algorithms and multi-panel figures
+	ltx.figure.flex.elem =
+		element div { ltx.figure.flex.inner & ltx.attrs.no-class & ltx.class.figure.flex }
+	ltx.class.figure.flex =
+		attribute class { list { "ltx_flex_figure", ltx.class.extra* } }
+	ltx.figure.flex.inner =
+		( text,
+		  ( ltx.figure.flex.cell.elem
+		  | ltx.figure.flex.break.elem
+		  | ltx.listing.line.elem
+		  | ltx.block.rule.elem
+		  )*,
+		  text
+		)
+	ltx.figure.flex.cell.elem =
+		element div { ltx.figure.flex.cell.inner & ltx.attrs.no-class & ltx.class.figure.flex.cell }
+	ltx.class.figure.flex.cell =
+		attribute class { list { "ltx_flex_cell", ltx.class.extra* } }
+	ltx.figure.flex.cell.inner =
+		( text,
+		  ltx.figure.body*,
+		  text
+		)
+	ltx.figure.flex.break.elem =
+		element div { empty & ltx.attrs.no-class & ltx.class.figure.flex.break }
+	ltx.class.figure.flex.break =
+		attribute class { list { "ltx_flex_break", ltx.class.extra* } }
+
+## Transformed Table Wrapper: LaTeXML wraps scaled table material in CSS transforms
+	ltx.transform.outer.elem =
+		element div { ltx.transform.outer.inner & ltx.attrs.no-class & ltx.class.transform.outer }
+	ltx.class.transform.outer =
+		attribute class { list { "ltx_inline-block", ltx.class.extra* } }
+	ltx.transform.outer.inner =
+		( text,
+		  ltx.transform.inner.elem?,
+		  text
+		)
+	ltx.transform.inner.elem =
+		element span { ltx.transform.inner.inner & ltx.attrs.no-class & ltx.class.transform.inner }
+	ltx.class.transform.inner =
+		attribute class { list { "ltx_transformed_inner", ltx.class.extra* } }
+	ltx.transform.inner.inner =
+		( text,
+		  ( ltx.tabular.elem
+		  | ltx.equation.table.elem
+		  | ltx.image.elem
+		  | ltx.inline.elem
+		  )*,
+		  text
+		)
+
+## Caption
+	ltx.caption.elem =
+		element figcaption { ltx.inline.content & ltx.attrs.no-class & ltx.class.caption }
+
+## Display Equation Table: LaTeXML equation number alignment scaffold
+	ltx.equation.table.elem =
+		element table { ltx.equation.table.inner & ltx.attrs.no-class & ltx.class.equation.table }
+	ltx.equation.table.inner =
+		( text,
+		  ltx.equation.rowgroup.elem+,
+		  text
+		)
+
+## Display Equation Row Group: equations are emitted in a table body
+	ltx.equation.rowgroup.elem =
+		element tbody { ltx.equation.rowgroup.inner & ltx.attrs.no-class & ltx.class.tbody? }
+	ltx.equation.rowgroup.inner =
+		( text,
+		  ltx.equation.row.elem+,
+		  text
+		)
+
+## Display Equation Row: alignment pads, formula cell, optional equation number
+	ltx.equation.row.elem =
+		element tr { ltx.equation.row.inner & ltx.attrs.no-class & ltx.class.equation.row }
+	ltx.equation.row.inner =
+		( text,
+		  ltx.equation.cell.elem*,
+		  text
+		)
+
+## Display Equation Cell: formula, padding, alignment, or equation number cell
+	ltx.equation.cell.elem =
+		element td { ltx.equation.number.cell.inner & ltx.table.cell.attrs & ltx.class.equation.cell }
+	ltx.equation.number.cell.inner =
+		( text,
+		  ( ltx.item.tag.elem
+		  | ltx.inline.elem
+		  | ltx.math.elem
+		  | ltx.paragraph.line.elem
+		  )*,
+		  text
+		)
+
+## Tabular: table emitted for TeX tabular/array-like material
+	ltx.tabular.elem =
+		element table { ltx.tabular.inner & ltx.attrs.no-class & ltx.class.tabular }
+	ltx.tabular.inner =
+		( text,
+		  ltx.table.caption.elem?,
+		  text,
+		  ltx.table.rowgroup.elem+,
+		  text
+		)
+	ltx.table.caption.elem =
+		element caption { ltx.inline.content & ltx.attrs.no-class & ltx.class.caption }
+
+## Table Row Group
+	ltx.table.rowgroup.elem =
+		( element thead { ltx.table.rowgroup.inner & ltx.attrs.no-class & ltx.class.thead }
+		| element tbody { ltx.table.rowgroup.inner & ltx.attrs.no-class & ltx.class.tbody }
+		| element tfoot { ltx.table.rowgroup.inner & ltx.attrs.no-class & ltx.class.tfoot }
+		)
+	ltx.table.rowgroup.inner =
+		( text,
+		  ltx.table.row.elem*,
+		  text
+		)
+
+## Table Row
+	ltx.table.row.elem =
+		element tr { ltx.table.row.inner & ltx.attrs.no-class & ltx.class.tr }
+	ltx.table.row.inner =
+		( text,
+		  ( ltx.table.cell.elem | ltx.table.header.cell.elem )*,
+		  text
+		)
+
+## Table Cell
+	ltx.table.cell.elem =
+		element td { ltx.table.cell.inner & ltx.table.cell.attrs & ltx.class.td }
+	ltx.table.header.cell.elem =
+		element th { ltx.table.cell.inner & ltx.table.cell.attrs & ltx.class.td }
+	ltx.table.cell.inner =
+		( text,
+		  ( ltx.paragraph.line.elem
+		  | ltx.inline.elem
+		  | ltx.math.elem
+		  | ltx.block.elem
+		  | ltx.tabular.elem
+		  )*,
+		  text
+		)
+
+# #####################################################################
+## Lists
+
+## Itemized List
+	ltx.itemized.list.elem =
+		element ul { ltx.list.inner & ltx.attrs.no-class & ltx.class.itemize }
+
+## Enumerated List
+	ltx.enumerated.list.elem =
+		element ol { ltx.list.inner & ltx.attrs.no-class & ltx.class.enumerate }
+
+	ltx.list.inner =
+		( text,
+		  ltx.list.item.elem*,
+		  text
+		)
+
+## List Item
+	ltx.list.item.elem =
+		element li { ltx.list.item.inner & ltx.attrs.no-class & ltx.class.item }
+	ltx.list.item.inner =
+		( text,
+		  ltx.item.tag.elem?,
+		  text,
+		  ltx.block.content*,
+		  text
+		)
+
+## Description List
+	ltx.description.list.elem =
+		element dl { ltx.description.list.inner & ltx.attrs.no-class & ltx.class.description }
+	ltx.description.list.inner =
+		( text,
+		  ( ltx.description.term.elem, text, ltx.description.body.elem, text )*
+		)
+	ltx.description.term.elem =
+		element dt { ltx.description.term.inner & ltx.attrs.no-class & ltx.class.item }
+	ltx.description.term.inner =
+		( ltx.inline.content )
+	ltx.description.body.elem =
+		element dd { ltx.description.body.inner & ltx.attrs.no-class & ltx.class.item }
+	ltx.description.body.inner =
+		( text,
+		  ltx.block.content*,
+		  text
+		)
+
+## Item Tag: visible label/bullet emitted outside native list numbering
+	ltx.item.tag.elem =
+		element span { ltx.inline.content & ltx.attrs.no-class & ltx.class.tag }
+

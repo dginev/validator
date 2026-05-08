@@ -1,0 +1,444 @@
+# #####################################################################
+## LaTeXML HTML Attribute Contract
+
+## Common attributes with class removed.
+##
+## LaTeXML's XML schema keeps semantic membership in element names such
+## as section, para, equation, tabular, and text.  The HTML transform
+## moves that information into deterministic class tokens, normally
+## beginning with "ltx_" plus the original XML element local name.  These
+## helpers keep the stock HTML attribute vocabulary, but require the
+## LaTeXML class token that carries the profile semantics.
+	ltx.attrs.no-class =
+		( common.attrs.id?
+		& common.attrs.title?
+		& common.attrs.base?
+		& common.attrs.space?
+		& common.attrs.i18n
+		& common.attrs.present
+		& common.attrs.other
+		& aria.global?
+		)
+	ltx.attrs.no-class-no-id =
+		( common.attrs.title?
+		& common.attrs.base?
+		& common.attrs.space?
+		& common.attrs.i18n
+		& common.attrs.present
+		& common.attrs.other
+		& aria.global?
+		)
+	ltx.table.cell.attrs =
+		( ltx.attrs.no-class
+		& tables.attrs.cell-structure
+		& tables.attrs.headers?
+		& tables.attrs.scope?
+		)
+	ltx.anchor.href.attrs =
+		( ltx.attrs.no-class
+		& shared-hyperlink.attrs.href
+		& shared-hyperlink.attrs.download?
+		& shared-hyperlink.attrs.target?
+		& shared-hyperlink.attrs.rel?
+		& shared-hyperlink.attrs.hreflang?
+		& shared-hyperlink.attrs.type?
+		& shared-hyperlink.attrs.ping?
+		& referrerpolicy?
+		)
+	ltx.image.attrs =
+		( ltx.attrs.no-class
+		& ( ( img.attrs.src & img.attrs.srcset? )
+		  | ( img.attrs.srcset & img.attrs.src? ) )
+		& img.attrs.sizes?
+		& img.attrs.generator-unable-to-provide-required-alt?
+		& img.attrs.height?
+		& img.attrs.width?
+		& img.attrs.usemap?
+		& img.attrs.ismap?
+		& img.attrs.decoding?
+		& img.attrs.loading?
+		& common.attrs.fetchpriority?
+		& referrerpolicy?
+		& embedded.content.attrs.crossorigin?
+		& img.attrs.alt?
+		)
+
+	ltx.class.extra =
+		( ltx.class.semantic.modifier
+		| ltx.class.layout.modifier
+		| ltx.class.font.modifier
+		| ltx.class.reference.modifier
+		| ltx.class.role.modifier
+		| ltx.class.generated.modifier
+		)
+		ltx.class.inline.extra =
+			( ltx.class.extra
+			| ltx.class.listing.inline.modifier
+			)
+		ltx.class.listing.extra =
+			( ltx.class.extra
+			| ltx.class.listing.modifier
+			| ltx.class.listing.inline.modifier
+			)
+	ltx.class.semantic.modifier =
+		( "ltx_authors_1line"
+		| "ltx_authors_multiline"
+		| "ltx_fleqn"
+		| "ltx_leqno"
+		| "ltx_runin"
+		| "ltx_noindent"
+		| "ltx_indent"
+		| "ltx_indent_first"
+		| "ltx_indentfirst"
+		| "ltx_pruned_first"
+		| "ltx_appendix"
+		| "ltx_quote"
+		| "ltx_leader"
+		| "ltx_markedasmath"
+		| "ltx_math_unparsed"
+		| "ltx_missing"
+		| "ltx_missing_label"
+		| "ltx_missing_citation"
+		| "ltx_nolink"
+		| "ltx_nodisplay" )
+	ltx.class.layout.modifier =
+		( "ltx_align_left"
+		| "ltx_align_center"
+		| "ltx_align_right"
+		| "ltx_align_middle"
+		| "ltx_align_baseline"
+		| "ltx_centering"
+		| "ltx_nopad"
+		| "ltx_nopad_l"
+		| "ltx_nopad_r"
+		| "ltx_th"
+		| "ltx_guessed_headers"
+		| "ltx_inline-block"
+		| "ltx_hflipped"
+		| "ltx_vflipped"
+		| "ltx_overlay"
+		| "ltx_overlay_base"
+		| "ltx_overlay_over"
+		| "ltx_phantom"
+		| "ltx_minipage"
+		| "ltx_eqn_table"
+		| "ltx_eqn_row"
+		| "ltx_eqn_cell"
+		| "ltx_eqn_eqno"
+		| "ltx_eqn_center_padleft"
+		| "ltx_eqn_center_padright"
+		| "ltx_eqn_eqnarray"
+		| "ltx_eqn_align"
+		| "ltx_eqn_gather"
+		| "ltx_eqn_numcases"
+		| "ltx_eqn_lefteqn"
+		| "ltx_intertext"
+		| "ltx_figure_panel"
+		| "ltx_flex_figure"
+		| "ltx_flex_cell"
+		| "ltx_flex_break"
+		| "ltx_flex_size_1"
+		| "ltx_img_landscape"
+		| "ltx_transformed_outer"
+		| "ltx_transformed_inner"
+		| "ltx_framed"
+		| "ltx_framed_top"
+		| "ltx_framed_rectangle" )
+	ltx.class.font.modifier =
+		( "ltx_emph"
+		| "ltx_font_bold"
+		| "ltx_font_medium"
+		| "ltx_font_italic"
+		| "ltx_font_upright"
+		| "ltx_font_slanted"
+		| "ltx_font_smallcaps"
+		| "ltx_font_oldstyle"
+		| "ltx_font_mathcaligraphic"
+		| "ltx_font_mathscript"
+		| "ltx_font_serif"
+		| "ltx_font_sansserif"
+		| "ltx_font_typewriter"
+		| "ltx_mathvariant_italic"
+		| "ltx_mathvariant_bold"
+		| "ltx_mathvariant_bold-italic"
+		| "ltx_mathvariant_sans-serif"
+		| "ltx_mathvariant-bold-sans-serif"
+		| "ltx_mathvariant-sans-serif-italic"
+		| "ltx_mathvariant-bold-sans-serif-italic"
+		| "ltx_mathvariant_monospace"
+		| "ltx_mathvariant_double-struck"
+		| "ltx_mathvariant_script"
+		| "ltx_mathvariant_bold-script"
+		| "ltx_mathvariant-fraktur"
+		| "ltx_mathvariant_bold-fraktur" )
+	ltx.class.reference.modifier =
+		( "ltx_citemacro_cite"
+		| "ltx_refmacro_nameref"
+		| "ltx_ref_self"
+		| "ltx_ref_tag"
+		| "ltx_ref_title"
+		| "ltx_url"
+		| "ltx_bib_author"
+		| "ltx_bib_author-year"
+		| "ltx_bib_key"
+		| "ltx_bib_abbrv"
+		| "ltx_bib_year"
+		| "ltx_bib_type"
+		| "ltx_bib_title"
+		| "ltx_bib_etal"
+		| "ltx_bib_external"
+		| "ltx_bib_cited"
+		| "ltx_bib_misc"
+		| "ltx_bib_links"
+		| "ltx_citemacro_citep"
+		| "ltx_citemacro_citet"
+		| "ltx_role_refnum"
+		| "doi"
+		| "issn" )
+	ltx.class.role.modifier =
+		( "ltx_role_author"
+		| "ltx_role_address"
+		| "ltx_role_email"
+		| "ltx_role_refnum"
+		| "ltx_role_footnote"
+		| "ltx_role_newpage"
+		| "ltx_note_frontmatter" )
+	ltx.class.listing.modifier =
+		( "ltx_listing"
+		| "ltx_lstlisting"
+		)
+	ltx.class.listing.inline.modifier =
+		( "ltx_lst_identifier"
+		| "ltx_lst_space" )
+	ltx.class.generated.modifier =
+		xsd:NMTOKEN {
+			pattern =
+				"ltx_(title|tag|tocentry|toclist|theorem|float|img|bib|glossary|role|border|th|framed|cv|affiliation|ulem|math|unit|svg|tikzmatrix|inline-quote|outerquote|innerquote|citation|ccitation|textquote|blockquote|displayquote|ast)_[A-Za-z0-9_.:]+(-[A-Za-z0-9_.:]+)*"
+		}
+
+	ltx.class.page.main =
+		attribute class { list { "ltx_page_main", ltx.class.extra* } }
+	ltx.class.page.content =
+		attribute class { list { "ltx_page_content", ltx.class.extra* } }
+	ltx.class.page.footer =
+		attribute class { list { "ltx_page_footer", ltx.class.extra* } }
+	ltx.class.page.logo =
+		attribute class { list { "ltx_page_logo", ltx.class.extra* } }
+	ltx.class.page.navbar =
+		attribute class { list { "ltx_page_navbar", ltx.class.extra* } }
+	ltx.class.latexml.logo =
+		attribute class { list { "ltx_LaTeXML_logo", ltx.class.extra* } }
+	ltx.class.arxiv.header =
+		attribute class { list { "arxiv-html-header", ltx.class.extra* } }
+	ltx.class.arxiv.footer =
+		attribute class { list { "arxiv-html-footer", ltx.class.extra* } }
+	ltx.class.arxiv.infobox =
+		attribute class { list { "infobox", ltx.class.extra* } }
+	ltx.class.keyboard.glossary =
+		attribute class { list { "keyboard-glossary", ltx.class.extra* } }
+	ltx.class.arxiv.fixed.buttons =
+		attribute id { "fixed-buttons-container" }
+	ltx.class.arxiv.beta.badge =
+		attribute id { "beta-badge" }
+	ltx.class.ar5iv.footer =
+		attribute class { list { "ar5iv-footer", ltx.class.extra* } }
+	ltx.class.scaffold =
+		attribute class { list { ltx.class.scaffold.token+ } }
+	ltx.class.scaffold.token =
+		( "arxiv-html-header"
+		| "arxiv-html-footer"
+		| "html-header-logo"
+		| "html-header-nav"
+		| "header-button"
+		| "hover-effect"
+		| "desktop-only"
+		| "mobile-only"
+		| "toggle-icon"
+		| "color-tog"
+		| "automatic-tog"
+		| "light-tog"
+		| "dark-tog"
+		| "logo"
+		| "sr-only"
+		| "modal-header"
+		| "modal-title"
+		| "modal-close"
+		| "modal-body"
+		| "modal-footer"
+		| "modal-submit"
+		| "form-control"
+		| "infobox"
+		| "keyboard-glossary"
+		| "ar5iv-footer"
+		| "ar5iv-footer-button"
+		| "ar5iv-home-button"
+		| "ar5iv-nav-button"
+		| "ar5iv-nav-button-next"
+		| "ar5iv-nav-button-prev"
+		| "ar5iv-text-button"
+		| "ar5iv-severity-warning"
+		| "arxiv-ui-theme"
+		| "ar5iv-toggle-color-scheme"
+		| "color-scheme-icon"
+		| "ltx_page_logo"
+		| "ltx_LaTeXML_logo"
+		| "ltx_ref"
+		| "ltx_font_smallcaps" )
+
+	ltx.class.document =
+		attribute class { list { "ltx_document", ltx.class.extra* } }
+	ltx.class.title.document =
+		attribute class { list { "ltx_title", "ltx_title_document", ltx.class.extra* } }
+	ltx.class.title.abstract =
+		attribute class { list { "ltx_title", "ltx_title_abstract", ltx.class.extra* } }
+	ltx.class.title.frontmatter =
+		attribute class {
+			list {
+				"ltx_title",
+				ltx.class.extra*,
+				( "ltx_title_keywords"
+				| "ltx_title_classification"
+				| "ltx_title_bibliography"
+				| "ltx_title_theorem"
+				| "ltx_title_proof"
+				| "ltx_title_appendix" ),
+				ltx.class.extra*
+			}
+		}
+	ltx.class.title.section =
+		attribute class { list { "ltx_title", ltx.class.extra*, ltx.class.title.section.kind, ltx.class.extra* } }
+	ltx.class.title.section.kind =
+		( "ltx_title_section"
+		| "ltx_title_subsection"
+		| "ltx_title_subsubsection"
+		| "ltx_title_paragraph"
+		| "ltx_title_subparagraph"
+		| "ltx_title_appendix" )
+	ltx.class.cv.heading =
+		attribute class { list { ( "author-name" | "author-title" | "author-contact" ), ltx.class.extra* } }
+	ltx.class.authors =
+		attribute class { list { "ltx_authors", ltx.class.extra* } }
+	ltx.class.creator =
+		attribute class { list { "ltx_creator", ltx.class.extra* } }
+	ltx.class.dates =
+		attribute class { list { "ltx_dates", ltx.class.extra* } }
+	ltx.class.abstract =
+		attribute class { list { "ltx_abstract", ltx.class.extra* } }
+	ltx.class.frontmatter =
+		attribute class { list { ( "ltx_keywords" | "ltx_classification" | "ltx_acknowledgements" ), ltx.class.extra* } }
+	ltx.class.cv.header =
+		attribute class { list { "flex-grid", ltx.class.extra* } }
+	ltx.class.cv.column =
+		attribute class { list { ( "col-25" | "col-50" ), ltx.class.extra* } }
+
+	ltx.class.section =
+		attribute class {
+			list {
+				( "ltx_section"
+				| "ltx_subsection"
+				| "ltx_subsubsection"
+				| "ltx_paragraph"
+				| "ltx_subparagraph"
+				| "ltx_appendix" ),
+				ltx.class.extra*
+			}
+		}
+	ltx.class.para =
+		attribute class { list { "ltx_para", ltx.class.extra* } }
+	ltx.class.p =
+		attribute class { list { "ltx_p", ltx.class.extra* } }
+	ltx.class.block =
+		attribute class { list { "ltx_block", ltx.class.extra* } }
+	ltx.class.pagination =
+		attribute class { list { "ltx_pagination", ltx.class.extra* } }
+	ltx.class.theorem =
+		attribute class { list { ( "ltx_theorem" | "ltx_proof" ), ltx.class.extra* } }
+	ltx.class.bibliography =
+		attribute class { list { "ltx_bibliography", ltx.class.extra* } }
+	ltx.class.toc =
+		attribute class { list { "ltx_TOC", ltx.class.extra* } }
+	ltx.class.toclist =
+		attribute class { list { "ltx_toclist", ltx.class.extra* } }
+	ltx.class.tocentry =
+		attribute class { list { "ltx_tocentry", ltx.class.extra* } }
+
+	ltx.class.figure =
+		attribute class { list { ( "ltx_figure" | "ltx_table" | "ltx_float" ), ltx.class.extra* } }
+	ltx.class.caption =
+		attribute class { list { "ltx_caption", ltx.class.extra* } }
+	ltx.class.equation.table =
+		attribute class { list { ( "ltx_equation" | "ltx_equationgroup" ), ltx.class.extra*, "ltx_eqn_table", ltx.class.extra* } }
+	ltx.class.equation.row =
+		attribute class { list { ( "ltx_equation" | "ltx_eqn_row" ), ltx.class.extra*, "ltx_eqn_row"?, ltx.class.extra* } }
+	ltx.class.equation.cell =
+		attribute class { list { ( "ltx_eqn_cell" | "ltx_td" ), ltx.class.extra* } }
+
+	ltx.class.tabular =
+		attribute class { list { "ltx_tabular", ltx.class.extra* } }
+	ltx.class.thead =
+		attribute class { list { "ltx_thead", ltx.class.extra* } }
+	ltx.class.tbody =
+		attribute class { list { "ltx_tbody", ltx.class.extra* } }
+	ltx.class.tfoot =
+		attribute class { list { "ltx_tfoot", ltx.class.extra* } }
+	ltx.class.tr =
+		attribute class { list { "ltx_tr", ltx.class.extra* } }
+	ltx.class.td =
+		attribute class { list { "ltx_td", ltx.class.extra* } }
+
+	ltx.class.itemize =
+		attribute class { list { "ltx_itemize", ltx.class.extra* } }
+	ltx.class.enumerate =
+		attribute class { list { "ltx_enumerate", ltx.class.extra* } }
+	ltx.class.description =
+		attribute class { list { "ltx_description", ltx.class.extra* } }
+	ltx.class.biblist =
+		attribute class { list { "ltx_biblist", ltx.class.extra* } }
+	ltx.class.item =
+		attribute class { list { ( "ltx_item" | "ltx_bibitem" ), ltx.class.extra* } }
+	ltx.class.tag =
+		attribute class { list { "ltx_tag", ltx.class.extra* } }
+
+	ltx.class.span =
+		attribute class {
+			list {
+				( "ltx_text"
+				| "ltx_personname"
+				| "ltx_font_smallcaps"
+				| "ltx_tag"
+				| "ltx_author_before"
+				| "ltx_author_notes"
+				| "ltx_author_after"
+				| "ltx_ref"
+				| "ltx_url"
+				| "ltx_LaTeXML_logo"
+				| "ltx_note"
+				| "ltx_inline-block"
+				| "ltx_p"
+				| "ltx_contact"
+				| "ltx_bibblock"
+				| "ltx_rule"
+				| "ltx_note_mark"
+				| "ltx_note_outer"
+				| "ltx_note_content"
+				| "author-name"
+				| "author-title"
+				| "author-contact" ),
+					ltx.class.inline.extra*
+				}
+			}
+	ltx.class.a =
+		attribute class { list { ( "ltx_ref" | "ltx_url" | "ltx_LaTeXML_logo" ), ltx.class.inline.extra* } }
+	ltx.class.img =
+		attribute class { list { ( "ltx_graphics" | "ltx_img" | "ltx_orcidlogo" ), ltx.class.extra* } }
+	ltx.class.break =
+		attribute class { list { "ltx_break", "ltx_break"?, ltx.class.extra* } }
+	ltx.class.cite =
+		attribute class { list { "ltx_cite", ltx.class.extra* } }
+	ltx.class.sup =
+		attribute class { list { ( "ltx_sup" | "ltx_note_mark" ), ltx.class.inline.extra* } }
+	ltx.class.sub =
+		attribute class { list { "ltx_sub", ltx.class.inline.extra* } }
+	ltx.class.note =
+		attribute class { list { ( "ltx_note" | "ltx_note_outer" ), ltx.class.inline.extra* } }
+

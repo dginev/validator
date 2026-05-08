@@ -1,0 +1,138 @@
+# #####################################################################
+## Document Structure
+
+## Scholarly Document: article emitted from a LaTeX source
+	ltx.document.elem =
+		element article { ltx.document.inner & ltx.document.attrs }
+	ltx.document.attrs =
+		( ltx.attrs.no-class & ltx.class.document )
+	ltx.document.inner =
+		( text,
+		  ltx.document.front.elem*,
+		  text,
+		  ltx.block.content*,
+		  text
+		)
+
+## Document Front Matter: title, authors, dates, abstract, or class-specific header
+	ltx.document.front.elem =
+		( ltx.document.title.elem
+		| ltx.author.list.elem
+		| ltx.date.list.elem
+		| ltx.abstract.elem
+		| ltx.frontmatter.block.elem
+		| ltx.cv.header.elem
+		)
+
+## Document Title
+	ltx.document.title.elem =
+		element h1 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.document }
+
+## Author List
+	ltx.author.list.elem =
+		element div { ltx.author.list.inner & ltx.attrs.no-class & ltx.class.authors }
+	ltx.author.list.inner =
+		( text,
+		  ( ltx.creator.elem | ltx.span.elem )*,
+		  text
+		)
+
+## Creator: person or institutional contributor
+	ltx.creator.elem =
+		element span { ltx.inline.content & ltx.creator.attrs }
+	ltx.creator.attrs =
+		( ltx.attrs.no-class & ltx.class.creator )
+
+## Date List
+	ltx.date.list.elem =
+		element div { ltx.inline.content & ltx.attrs.no-class & ltx.class.dates }
+
+## Abstract
+	ltx.abstract.elem =
+		element div { ltx.abstract.inner & ltx.attrs.no-class & ltx.class.abstract }
+	ltx.abstract.inner =
+		( text,
+		  ltx.abstract.title.elem?,
+		  text,
+		  ( ltx.paragraph.line.elem | ltx.block.content )*,
+		  text
+		)
+	ltx.abstract.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
+		)
+	ltx.frontmatter.block.elem =
+		element div { ltx.frontmatter.block.inner & ltx.attrs.no-class & ltx.class.frontmatter }
+	ltx.frontmatter.block.inner =
+		( text,
+		  ltx.frontmatter.title.elem?,
+		  text,
+		  ltx.inline.elem*,
+		  text
+		)
+	ltx.frontmatter.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		)
+
+## CV Header: custom header grid used by LaTeXML moderncv output
+	ltx.cv.header.elem =
+		element div { ltx.cv.header.inner & ltx.attrs.no-class & ltx.class.cv.header }
+	ltx.cv.header.inner =
+		( text,
+		  ltx.cv.header.column.elem*,
+		  text
+		)
+	ltx.cv.header.column.elem =
+		element div { ltx.cv.header.column.inner & ltx.attrs.no-class & ltx.class.cv.column }
+	ltx.cv.header.column.inner =
+		( text,
+		  ( ltx.cv.heading.elem | ltx.heading.elem | ltx.block.content | ltx.inline.elem )*,
+		  text
+		)
+	ltx.cv.heading.elem =
+		( element h1 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.cv.heading }
+		| element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.cv.heading }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.cv.heading }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.cv.heading }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.cv.heading }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.cv.heading }
+		)
+
+## Section: recursive LaTeX sectional units
+	ltx.section.elem =
+		element section { ltx.section.inner & ltx.attrs.no-class & ltx.class.section }
+	ltx.section.inner =
+		( text,
+		  ltx.section.title.elem?,
+		  text,
+		  ltx.block.content*,
+		  text
+		)
+
+## Section Title: heading rank selected by LaTeXML from section depth
+	ltx.section.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		)
+
+	ltx.heading.elem =
+		( element h1 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		)
+	ltx.heading.inner =
+		( ltx.inline.content )
+

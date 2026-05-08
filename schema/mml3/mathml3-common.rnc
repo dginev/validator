@@ -68,7 +68,7 @@ annotation-xml =
     | annotation-xml.svg
     | annotation-xml.mathml
     )
-    annotation-xml.model = (MathExpression | anyElement)*
+    annotation-xml.model = (MathExpression | ContExp | anyElement)*
     anyElement =
       element * - m:* {
         (attribute * { text }
