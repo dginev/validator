@@ -94,3 +94,85 @@ validator.nu schemas, with narrow profile extensions for observed LaTeXML
 output. Current examples include MathML `intent` on `math` and an ar5iv/LaTeXML
 SVG label pattern where SVG `text` contains a transformed `g` that wraps a
 MathML `foreignObject`.
+
+## Generating Schema Documentation
+
+Use the repository helper to generate a standalone split HTML documentation site:
+
+```sh
+tools/generate-scholarly-schema-docs
+```
+
+By default, this writes the site to:
+
+```text
+build/docs/scholarly-schema/index.html
+```
+
+Use `--output DIR`, `--work DIR`, or `--latexml-dir DIR` to override the output
+site directory, intermediate build directory, or LaTeXML checkout.
+
+The LaTeXML manual has a schema documentation generator at:
+
+```sh
+/home/deyan/git/my-LaTeXML/doc/manual/genschema
+```
+
+That script does not read RELAX NG compact syntax directly. The helper above
+performs the full workflow: copy the split schema modules to a work directory,
+convert them to XML RELAX NG `.rng`, run `genschema`, wrap the generated
+`schema.tex`, and run `latexmlc`.
+
+The manual equivalent is:
+
+```sh
+DOCBUILD=/tmp/ltx-schema-doc
+rm -rf "$DOCBUILD"
+mkdir -p "$DOCBUILD"
+
+cp schema/html5/scholarly-ltx*.rnc "$DOCBUILD"/
+trang "$DOCBUILD/scholarly-ltx.rnc" "$DOCBUILD/scholarly-ltx.rng"
+
+cd "$DOCBUILD"
+/home/deyan/git/my-LaTeXML/doc/manual/genschema --force \
+  scholarly-ltx.rng schema.tex
+```
+
+`trang` converts the included compact modules as sibling `.rng` files, so the
+generated `schema.tex` preserves the module split.
+
+To build a standalone HTML documentation site, wrap the generated `schema.tex`
+in a small LaTeX document:
+
+```tex
+\documentclass{book}
+\usepackage{latexml}
+\usepackage{latexmlman}
+\usepackage{makeidx}
+\makeindex
+\title{Scholarly LaTeXML HTML Schema}
+\author{validator}
+\date{\today}
+\begin{document}
+\maketitle
+\tableofcontents
+\chapter{Scholarly LaTeXML HTML Schema}
+\input{schema}
+\end{document}
+```
+
+Save that wrapper as `schema-doc.tex` in `$DOCBUILD`, then run:
+
+```sh
+TEXINPUTS=/home/deyan/git/my-LaTeXML/doc/sty:/home/deyan/git/my-LaTeXML/blib/lib/LaTeXML/texmf:: \
+latexmlc --format=html5 \
+  --split --splitnaming=labelrelative --splitat=section \
+  --sourcedir="$DOCBUILD" \
+  --destination="$DOCBUILD/site/index.html" \
+  "$DOCBUILD/schema-doc.tex"
+```
+
+The resulting site has an index page plus one split page per schema module. A
+focused scholarly-profile build will leave cross references to upstream HTML5
+patterns such as `common.attrs.id`, `aria.global`, and `img.attrs.src`
+unresolved unless the broader HTML5 schema is also documented.
