@@ -1,109 +1,29 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-usage() {
-  cat <<'USAGE'
-Usage: tools/generate-scholarly-schema-docs [options]
-
-Generate standalone HTML documentation for the split LaTeXML scholarly schema.
-
-Options:
-  --output DIR       Destination site directory.
-                     Default: build/docs/scholarly-schema
-  --work DIR         Temporary working directory.
-                     Default: build/docs/scholarly-schema-work
-  --latexml-dir DIR  LaTeXML checkout containing doc/manual/genschema.
-                     Default: /home/deyan/git/my-LaTeXML
-  --help             Show this help.
-USAGE
-}
+# Thin wrapper: invokes latexml-oxide's
+# `tools/generate-scholarly-schema-docs` against this repo's
+# `schema/html5/scholarly-ltx.rnc`.
+#
+# Per-module narratives flow in from `## comments` at the head of each
+# RNC file via trang + tools/genschema; no separate metadata file is
+# needed.
+#
+# Override LATEXML_OXIDE_TOOLS to point at a different oxide checkout.
 
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-output_dir="$repo_root/build/docs/scholarly-schema"
-work_dir="$repo_root/build/docs/scholarly-schema-work"
-latexml_dir="/home/deyan/git/my-LaTeXML"
+oxide_tools="${LATEXML_OXIDE_TOOLS:-/home/deyan/git/latexml-oxide/tools}"
+output_dir="${1:-$repo_root/build/docs/scholarly-schema}"
 
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --output)
-      output_dir=$2
-      shift 2
-      ;;
-    --work)
-      work_dir=$2
-      shift 2
-      ;;
-    --latexml-dir)
-      latexml_dir=$2
-      shift 2
-      ;;
-    --help)
-      usage
-      exit 0
-      ;;
-    *)
-      echo "Unknown option: $1" >&2
-      usage >&2
-      exit 2
-      ;;
-  esac
-done
-
-genschema="$latexml_dir/doc/manual/genschema"
-latexml_texmf="$latexml_dir/blib/lib/LaTeXML/texmf"
-latexml_sty="$latexml_dir/doc/sty"
-
-if ! command -v trang >/dev/null 2>&1; then
-  echo "error: trang is required on PATH" >&2
+oxide_script="$oxide_tools/generate-scholarly-schema-docs"
+if [[ ! -x "$oxide_script" ]]; then
+  echo "error: oxide schema-doc script not found at $oxide_script" >&2
+  echo "set LATEXML_OXIDE_TOOLS or pass an absolute path" >&2
   exit 1
 fi
 
-if ! command -v latexmlc >/dev/null 2>&1; then
-  echo "error: latexmlc is required on PATH" >&2
-  exit 1
-fi
-
-if [[ ! -x "$genschema" ]]; then
-  echo "error: genschema not executable at $genschema" >&2
-  exit 1
-fi
-
-rm -rf "$work_dir"
-mkdir -p "$work_dir" "$output_dir"
-
-cp "$repo_root"/schema/html5/scholarly-ltx*.rnc "$work_dir"/
-trang "$work_dir/scholarly-ltx.rnc" "$work_dir/scholarly-ltx.rng"
-
-(
-  cd "$work_dir"
-  "$genschema" --force scholarly-ltx.rng schema.tex
-)
-
-cat > "$work_dir/schema-doc.tex" <<'TEX'
-\documentclass{book}
-\usepackage{latexml}
-\usepackage{latexmlman}
-\usepackage{makeidx}
-\makeindex
-\title{Scholarly LaTeXML HTML Schema}
-\author{validator}
-\date{\today}
-\begin{document}
-\maketitle
-\tableofcontents
-\chapter{Scholarly LaTeXML HTML Schema}
-\input{schema}
-\end{document}
-TEX
-
-(
-  cd "$work_dir"
-  TEXINPUTS="$latexml_sty:$latexml_texmf::" \
-  latexmlc --format=html5 \
-    --split --splitnaming=labelrelative --splitat=section \
-    --sourcedir="$work_dir" \
-    --destination="$output_dir/index.html" \
-    schema-doc.tex
-)
-
-echo "Generated scholarly schema documentation at $output_dir/index.html"
+"$oxide_script" \
+  --schema "$repo_root/schema/html5/scholarly-ltx.rnc" \
+  --output "$output_dir" \
+  --title  "Scholarly LaTeXML HTML Schema" \
+  --author "validator"
