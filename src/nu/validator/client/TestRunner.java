@@ -62,6 +62,8 @@ public class TestRunner extends MessageEmitterAdapter {
 
     private static final String XHTML_SCHEMA = "http://s.validator.nu/xhtml5-all.rnc";
 
+    private static final String SCHOLARLY_SCHEMA = "http://s.validator.nu/html5-scholarly.rnc";
+
     private boolean inError = false;
 
     private boolean emitMessages = false;
@@ -631,6 +633,8 @@ public class TestRunner extends MessageEmitterAdapter {
                         checkTestDirectoryAgainstSchema(directory, RDFALITE_SCHEMA);
                     } else if (directory.getName().contains("xhtml")) {
                         checkTestDirectoryAgainstSchema(directory, XHTML_SCHEMA);
+                    } else if (directory.getName().contains("scholarly")) {
+                        checkTestDirectoryAgainstSchema(directory, SCHOLARLY_SCHEMA);
                     } else {
                         checkTestDirectoryAgainstSchema(directory, DEFAULT_SCHEMA);
                     }

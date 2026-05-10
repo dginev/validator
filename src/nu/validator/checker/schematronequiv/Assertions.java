@@ -919,13 +919,46 @@ public class Assertions extends Checker {
     ));
 
     private static final Set<String> MATHML_ELEMENTS = new HashSet<>(Arrays.asList(
+            // Presentation MathML
             "annotation", "annotation-xml", "maction", "maligngroup", "malignmark", "math",
             "menclose", "merror", "mfenced", "mfrac", "mglyph", "mi", "mlabeledtr",
             "mlongdiv", "mmultiscripts", "mn", "mo", "mover", "mpadded", "mphantom",
             "mprescripts", "mroot", "mrow", "ms", "mscarries", "mscarry", "msgroup",
             "msline", "mspace", "msqrt", "msrow", "mstack", "mstyle", "msub", "msubsup",
             "msup", "mtable", "mtd", "mtext", "mtr", "munder", "munderover", "none",
-            "semantics"
+            "semantics",
+            // Content MathML 3 — token / container / operator
+            "apply", "bind", "bvar", "cbytes", "cerror", "ci", "cn", "cs", "csymbol",
+            "domainofapplication", "fn", "interval", "lambda", "lowlimit", "otherwise",
+            "piece", "piecewise", "share", "uplimit",
+            // Content MathML 3 — arithmetic / power / log
+            "abs", "arg", "ceiling", "compose", "conjugate", "divide", "exp", "factorial",
+            "factorof", "floor", "gcd", "ident", "imaginary", "lcm", "ln", "log", "logbase",
+            "max", "min", "minus", "plus", "power", "quotient", "real", "rem", "root", "times",
+            // Content MathML 3 — relations
+            "approx", "eq", "equivalent", "geq", "gt", "leq", "lt", "neq",
+            // Content MathML 3 — logic
+            "and", "exists", "forall", "implies", "not", "or", "xor",
+            // Content MathML 3 — calculus / sets
+            "cartesianproduct", "card", "codomain", "complexes", "curl", "diff",
+            "divergence", "domain", "emptyset", "exponentiale", "eulergamma", "false",
+            "grad", "image", "imaginaryi", "in", "infinity", "int", "integers",
+            "intersect", "inverse", "laplacian", "limit", "list", "mean", "median",
+            "moment", "momentabout", "mode", "naturalnumbers", "notanumber", "notin",
+            "notprsubset", "notsubset", "outerproduct", "partialdiff", "pi", "primes",
+            "prsubset", "rationals", "reals", "relation", "scalarproduct", "sdev",
+            "selector", "set", "setdiff", "subset", "tendsto", "true", "union", "variance",
+            // Content MathML 3 — trig + hyperbolic + linear algebra
+            "arccos", "arccosh", "arccot", "arccoth", "arccsc", "arccsch", "arcsec",
+            "arcsech", "arcsin", "arcsinh", "arctan", "arctanh", "cos", "cosh", "cot",
+            "coth", "csc", "csch", "determinant", "matrix", "matrixrow", "sec", "sech",
+            "sin", "sinh", "tan", "tanh", "transpose", "vector", "vectorproduct",
+            // Content MathML 3 — qualifier / declare / condition
+            "condition", "declare", "degree", "decoderpath",
+            // Content MathML 3 — annotation/semantic carriers (mostly Presentation,
+            // listed above). Reserved keywords that older content-stream tooling
+            // sometimes emits:
+            "ceiling", "floor", "product", "sum"
     ));
 
     private static final Set<String> SVG_ELEMENTS = new HashSet<>(Arrays.asList(
