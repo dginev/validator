@@ -3,3 +3,4 @@
 -1	-	HTML (parsed with an XML parser) + SVG + MathML	http://s.validator.nu/xhtml5.rnc http://s.validator.nu/html5/assertions.sch http://c.validator.nu/all/
 7	http://www.w3.org/1999/xhtml	HTML (parsed with an XML parser) + SVG + MathML + RDFa	http://s.validator.nu/xhtml5-all.rnc http://s.validator.nu/html5/assertions.sch http://c.validator.nu/all/
 -1	http://www.w3.org/2000/svg	SVG + URL + HTML + MathML	http://s.validator.nu/svg-xhtml5-rdf-mathml.rnc http://s.validator.nu/html5/assertions.sch http://c.validator.nu/all/
+-1	-	HTML scholarly (LaTeXML profile, MathML 3 Content)	http://s.validator.nu/html5-scholarly.rnc http://s.validator.nu/html5/assertions.sch http://c.validator.nu/all/
