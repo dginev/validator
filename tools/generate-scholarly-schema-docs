@@ -9,21 +9,45 @@ set -euo pipefail
 # RNC file via trang + tools/genschema; no separate metadata file is
 # needed.
 #
-# Override LATEXML_OXIDE_TOOLS to point at a different oxide checkout.
+# The wrapper looks up the oxide tools dir in this order:
+#   1. $LATEXML_OXIDE_TOOLS  (explicit override)
+#   2. <repo_root>/../latexml-oxide/tools  (sibling checkout)
+#   3. anywhere `generate-scholarly-schema-docs` resolves on $PATH
+# Falls through with a clear error message if none of the above
+# locate a working oxide tools directory.
 
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-oxide_tools="${LATEXML_OXIDE_TOOLS:-/home/deyan/git/latexml-oxide/tools}"
 output_dir="${1:-$repo_root/build/docs/scholarly-schema}"
 
-oxide_script="$oxide_tools/generate-scholarly-schema-docs"
-if [[ ! -x "$oxide_script" ]]; then
-  echo "error: oxide schema-doc script not found at $oxide_script" >&2
-  echo "set LATEXML_OXIDE_TOOLS or pass an absolute path" >&2
+resolve_oxide_script() {
+  if [[ -n "${LATEXML_OXIDE_TOOLS:-}" && -x "$LATEXML_OXIDE_TOOLS/generate-scholarly-schema-docs" ]]; then
+    echo "$LATEXML_OXIDE_TOOLS/generate-scholarly-schema-docs"
+    return 0
+  fi
+  local sibling="$repo_root/../latexml-oxide/tools/generate-scholarly-schema-docs"
+  if [[ -x "$sibling" ]]; then
+    echo "$sibling"
+    return 0
+  fi
+  if command -v generate-scholarly-schema-docs >/dev/null 2>&1; then
+    command -v generate-scholarly-schema-docs
+    return 0
+  fi
+  return 1
+}
+
+oxide_script=$(resolve_oxide_script) || {
+  echo "error: latexml-oxide's generate-scholarly-schema-docs not found." >&2
+  echo "  tried (in order):" >&2
+  echo "    \$LATEXML_OXIDE_TOOLS/generate-scholarly-schema-docs" >&2
+  echo "    $repo_root/../latexml-oxide/tools/generate-scholarly-schema-docs" >&2
+  echo "    \$PATH" >&2
+  echo "  set LATEXML_OXIDE_TOOLS or check out latexml-oxide as a sibling repo." >&2
   exit 1
-fi
+}
 
 "$oxide_script" \
   --schema "$repo_root/schema/html5/scholarly-ltx.rnc" \
   --output "$output_dir" \
-  --title  "Scholarly LaTeXML HTML Schema" \
+  --title  "LaTeXML's Scholarly HTML Schema" \
   --author "validator"
