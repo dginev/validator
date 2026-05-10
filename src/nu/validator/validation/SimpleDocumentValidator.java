@@ -359,8 +359,11 @@ public class SimpleDocumentValidator {
                     new TableChecker(), jingPropertyMap));
             validator = new CombineValidator(validator, new CheckerValidator(
                     new DuplicateDtChecker(), jingPropertyMap));
+            boolean scholarlyProfile = this.mainSchemaUrl != null
+                    && this.mainSchemaUrl.contains("scholarly");
             validator = new CombineValidator(validator, new CheckerValidator(
-                    new HeadingHierarchyChecker(), jingPropertyMap));
+                    new HeadingHierarchyChecker(scholarlyProfile),
+                    jingPropertyMap));
             validator = new CombineValidator(validator, new CheckerValidator(
                     new MicrodataChecker(), jingPropertyMap));
             validator = new CombineValidator(validator, new CheckerValidator(

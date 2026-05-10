@@ -82,8 +82,21 @@ public class HeadingHierarchyChecker extends Checker {
     private Locator locator;
     private Deque<AncestorInfo> ancestorStack;
     private List<HeadingInfo> headings;
+    private final boolean allowLatexmlGeneratedHeadings;
 
     public HeadingHierarchyChecker() {
+        this(false);
+    }
+
+    /**
+     * @param allowLatexmlGeneratedHeadings if {@code true}, h6 elements
+     *        marked with LaTeXML-generated {@code ltx_title_*} class tokens
+     *        (abstract / theorem / proof / classification / keywords titles)
+     *        are skipped from outline-rank checking. Intended for the
+     *        scholarly HTML5 profile.
+     */
+    public HeadingHierarchyChecker(boolean allowLatexmlGeneratedHeadings) {
+        this.allowLatexmlGeneratedHeadings = allowLatexmlGeneratedHeadings;
     }
 
     @Override
@@ -120,7 +133,8 @@ public class HeadingHierarchyChecker extends Checker {
 
         // Check if this is a heading element
         if (isHeadingElement(localName)) {
-            if (isLatexmlGeneratedNonOutlineHeading(atts)) {
+            if (allowLatexmlGeneratedHeadings
+                    && isLatexmlGeneratedNonOutlineHeading(atts)) {
                 return;
             }
             int baseLevel = localName.charAt(1) - '0';
