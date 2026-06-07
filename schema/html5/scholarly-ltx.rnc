@@ -5,46 +5,50 @@ default namespace = "http://www.w3.org/1999/xhtml"
 ##  LaTeXML scholarly HTML profile                                    #
 # #####################################################################
 
-## This schema validates the HTML5 that LaTeXML emits for scholarly
+## This schema validates the HTML5 emitted by LaTeXML for scholarly
 ## documents: arXiv articles, ar5iv pages, and full books.  It mirrors
-## LaTeXML's own XML schema.  Each XML element becomes an HTML element
-## carrying a class token -- \code{ltx_} plus the XML name -- so
-## \code{ltx:section} becomes \code{section.ltx_section} and
-## \code{ltx:text} becomes \code{span.ltx_text}.
+## the structure of LaTeXML's own XML schema, in which every XML
+## element is rendered as an HTML element carrying a deterministic
+## class token -- \code{ltx_} followed by the XML name -- so that
+## \code{ltx:section} renders as \code{section.ltx_section}, and
+## \code{ltx:text} as \code{span.ltx_text}.
 ##
-## Start reading in \moduleref{scholarly-ltx-model}.  Every element
-## belongs to one of a few content classes -- Inline, Block, Para,
-## Misc, and Meta, the same classes the XML schema uses -- and every
-## container is built from four shared models over those classes.  The
-## concrete element shapes live in \moduleref{scholarly-ltx-inline},
+## The module \moduleref{scholarly-ltx-model} is the natural entry
+## point.  Every element belongs to one of a small number of content
+## classes -- Inline, Block, Para, Misc, and Meta, matching the
+## classes of the XML schema -- and every container is built from four
+## shared models over those classes.  The concrete element definitions
+## reside in \moduleref{scholarly-ltx-inline},
 ## \moduleref{scholarly-ltx-blocks}, \moduleref{scholarly-ltx-floats},
 ## and \moduleref{scholarly-ltx-structure}; the attribute and
 ## class-token contracts in \moduleref{scholarly-ltx-classes}.
-## Hosted-page chrome (the arXiv and ar5iv shells) is kept apart in
-## \moduleref{scholarly-ltx-scaffold}, so page furniture cannot leak
-## into article content.
+## Hosted-page chrome -- the arXiv and ar5iv page shells -- is
+## confined to \moduleref{scholarly-ltx-scaffold}, separate from the
+## article model.
 ##
-## Where the emitted HTML deliberately deviates from the XML model or
-## from the HTML specification, the deviation is accepted and
-## documented at the pattern that carries it: this schema describes
+## Where the emitted HTML deliberately deviates from the XML content
+## model or from the HTML specification, the deviation is accepted and
+## documented at the pattern that carries it: the schema describes
 ## what LaTeXML actually emits.
 ##
-## The methodology, in brief:
-## (1) Intent first -- the XML schema defines meaning, the transform
-## defines projection; each pattern cites the model it renders.
-## (2) Empirical grounding -- every constraint is corpus-tested against
-## converted articles and books before it lands.
-## (3) Faithful output -- deliberate deviations are documented, never
+## \begin{description}
+## \item[Intent first] The XML schema defines meaning; the transform
+## defines its HTML projection.  Each pattern cites the model it
+## renders.
+## \item[Empirical grounding] Every constraint is tested against a
+## corpus of converted articles and books before it lands.
+## \item[Faithful output] Deliberate deviations are documented, never
 ## silently patched.
-## (4) Loosen uniformly, tighten pointwise -- permissions flow through
-## the shared models; restrictions attach to specific patterns with a
-## transform citation.
-## (5) Separate worlds -- article model, page chrome, and per-package
-## vocabularies stay in distinct compartments.
-## (6) Errors name intent -- a failure reports the publication concept
-## that broke, not just the HTML element.
-## (7) Track upstream -- the union structure mirrors the XML schema's
-## own extension idiom, so upstream changes port mechanically.
+## \item[Loosen uniformly, tighten pointwise] Permissions flow through
+## the shared models; restrictions attach to specific patterns, each
+## with a transform citation.
+## \item[Separate worlds] The article model, the page chrome, and
+## per-package vocabularies remain in distinct compartments.
+## \item[Errors name intent] A validation failure reports the
+## publication concept that broke, not merely the HTML element.
+## \item[Track upstream] The union structure mirrors the XML schema's
+## extension idiom, so upstream changes port mechanically.
+## \end{description}
 
 ## Entry point: LaTeXML serializes a document as a page shell holding
 ## one article and an optional generated footer; this start pattern
