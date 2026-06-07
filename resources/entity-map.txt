@@ -252,5 +252,5 @@ http://s.validator.nu/html5/xhtml5full-html-rdfa.rnc	schema/html5/xhtml5full-htm
 http://s.validator.nu/html5/xhtml5full-xhtml-no-microdata.rnc	schema/html5/xhtml5full-xhtml-no-microdata.rnc
 http://s.validator.nu/html5/xhtml5full-xhtml-rdfalite.rnc	schema/html5/xhtml5full-xhtml-rdfalite.rnc
 http://s.validator.nu/html5/xhtml5full-xhtml-rdfa.rnc	schema/html5/xhtml5full-xhtml-rdfa.rnc
-http://s.validator.nu/latexml.rng	schema/latexml/LaTeXML.rng
+http://s.validator.nu/latexml.rnc	schema/latexml/latexml.rnc
 http://s.validator.nu/mathml4-core.rnc	schema/mathml4/mathml4-core.rnc
