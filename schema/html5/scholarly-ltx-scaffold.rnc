@@ -199,11 +199,9 @@
 		( ltx.footer.inline.content )
 	ltx.footer.inline.content =
 		( text
-		& ( element a { ltx.footer.inline.content & ltx.anchor.href.attrs & ltx.class.a }
-		  | element a { ltx.footer.inline.content & ltx.anchor.href.attrs }
+		& ( element a { ltx.footer.inline.content & ltx.anchor.href.attrs & ltx.class.a? }
 		  | ltx.image.elem
-		  | element span { ltx.footer.inline.content & ltx.attrs.no-class }
-		  | element span { ltx.footer.inline.content & ltx.attrs.no-class & ltx.class.span }
+		  | element span { ltx.footer.inline.content & ltx.attrs.no-class & ltx.class.span? }
 		  )*
 		)
 
