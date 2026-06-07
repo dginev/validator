@@ -16,6 +16,7 @@ default namespace = "http://www.w3.org/1999/xhtml"
 	ltx.content.start =
 		( ltx.page.elem | ltx.arxiv.body | ltx.ar5iv.body )
 
+include "scholarly-ltx-model.rnc"
 include "scholarly-ltx-classes.rnc"
 include "scholarly-ltx-inline.rnc"
 include "scholarly-ltx-scaffold.rnc"

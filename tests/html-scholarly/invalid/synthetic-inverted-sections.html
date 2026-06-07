@@ -1,0 +1,31 @@
+<!DOCTYPE html><html lang="zxx">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Synthetic: inverted sectional nesting</title>
+<!-- Synthetic negative fixture: a section.ltx_section nested inside
+     section.ltx_subsection.  The sectional hierarchy is monotone
+     descent — a subsection may contain subsubsection and deeper units,
+     never a same-or-shallower one. -->
+</head>
+<body>
+<div class="ltx_page_main">
+<div class="ltx_page_content">
+<article class="ltx_document">
+<h1 class="ltx_title ltx_title_document">Synthetic Invalid Article</h1>
+<section id="S1" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">Section</h2>
+<section id="S1.SS1" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">Subsection</h3>
+<section id="S1.SS1.S2" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">Illegally nested section</h2>
+<div id="S1.SS1.S2.p1" class="ltx_para">
+<p class="ltx_p">Text inside an inverted hierarchy.</p>
+</div>
+</section>
+</section>
+</section>
+</article>
+</div>
+</div>
+</body>
+</html>

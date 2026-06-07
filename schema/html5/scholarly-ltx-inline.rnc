@@ -1,62 +1,101 @@
 # #####################################################################
 ## Inline Content
 
-## Inline Content: text-level material emitted by LaTeXML
-	ltx.inline.content =
-		( text
-		& ltx.inline.elem*
+## Class contributions (see scholarly-ltx-model.rnc).  Each member is
+## annotated with the LaTeXML XML element it renders.
+	ltx.Inline.class |=
+		( ltx.span.elem        # ltx:text (and inline span renditions)
+		| ltx.anchor.elem      # ltx:ref, ltx:anchor, ltx:bibref
+		| ltx.emphasis.elem    # ltx:emph
+		| ltx.cite.elem        # ltx:cite
+		| ltx.glossaryref.elem # ltx:glossaryref
+		| ltx.sup.elem         # ltx:sup
+		| ltx.sub.elem         # ltx:sub
+		| ltx.math.elem        # ltx:Math
 		)
-
-## Inline Element: phrasing constructs observed across article and CV output
-	ltx.inline.elem =
-		( ltx.span.elem
-		| ltx.anchor.elem
-		| ltx.emphasis.elem
-		| ltx.cite.elem
-		| ltx.sup.elem
-		| ltx.sub.elem
-		| ltx.note.elem
-		| ltx.image.elem
+	ltx.Misc.inline.class |=
+		( ltx.image.elem       # ltx:graphics
+		| ltx.linebreak.elem   # ltx:break
+		| ltx.error.elem       # ltx:ERROR
+		| svg                  # ltx:svg
+		)
+	## The same Misc renditions are context-free: they appear unchanged in
+	## block contexts (img directly inside div.ltx_para, br inside figure).
+	ltx.Misc.block.class |=
+		( ltx.image.elem
 		| ltx.linebreak.elem
-		| ltx.math.elem
+		| ltx.error.elem
 		| svg
 		)
+	ltx.Meta.class |=
+		( ltx.note.elem )      # ltx:note
 
 ## Inline Span: text, font, transform, contact, and tag spans
 	ltx.span.elem =
-		element span { ltx.inline.content & ltx.attrs.no-class & ltx.class.span }
+		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.span }
 
 ## Link or Cross Reference
 	ltx.anchor.elem =
-		( element a { ltx.inline.content & ltx.anchor.href.attrs & ltx.class.a }
-		| element a { ltx.inline.content & ltx.anchor.href.attrs }
-		| element a { ltx.inline.content & ltx.attrs.no-class & ltx.class.a }
-		| element a { ltx.inline.content & ltx.attrs.no-class }
+		( element a { ltx.Inline.model & ltx.anchor.href.attrs & ltx.class.a }
+		| element a { ltx.Inline.model & ltx.anchor.href.attrs }
+		| element a { ltx.Inline.model & ltx.attrs.no-class & ltx.class.a }
+		| element a { ltx.Inline.model & ltx.attrs.no-class }
 		)
 
 ## Emphasis
 	ltx.emphasis.elem =
-		element em { ltx.inline.content & em.attrs }
+		element em { ltx.Inline.model & em.attrs }
 
 ## Citation
 	ltx.cite.elem =
-		element cite { ltx.inline.content & ltx.attrs.no-class & ltx.class.cite }
+		element cite { ltx.Inline.model & ltx.attrs.no-class & ltx.class.cite }
+
+## Glossary Reference: acronym/glossary expansions from ltx:glossaryref;
+## the HTML transform picks abbr when the short form is shown, span otherwise
+	ltx.glossaryref.elem =
+		( element abbr { ltx.Inline.model & ltx.attrs.no-class & ltx.class.glossaryref }
+		| element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.glossaryref }
+		)
 
 ## Superscript
 	ltx.sup.elem =
-		element sup { ltx.inline.content & ltx.attrs.no-class & ltx.class.sup }
+		element sup { ltx.Inline.model & ltx.attrs.no-class & ltx.class.sup }
 
 ## Subscript
 	ltx.sub.elem =
-		element sub { ltx.inline.content & ltx.attrs.no-class & ltx.class.sub }
+		element sub { ltx.Inline.model & ltx.attrs.no-class & ltx.class.sub }
 
-## Note
+## Note: ltx:note is Meta.class — valid in every shared model, mirroring
+## the XML schema where Meta.class appears in Inline, Block, Para, and
+## Flow models alike.
 	ltx.note.elem =
-		element span { ltx.inline.content & ltx.attrs.no-class & ltx.class.note }
+		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.note }
 
-## Inline Image
+## Inline Image: ltx:graphics renders as img for bitmaps, or as an
+## object embed when the graphic is converted to SVG
 	ltx.image.elem =
+		( ltx.img.elem | ltx.object.elem )
+	ltx.img.elem =
 		element img { img.inner & ltx.image.attrs & ltx.class.img? }
+	ltx.object.elem =
+		element object { ltx.object.inner & ltx.object.attrs & ltx.class.img }
+	ltx.object.attrs =
+		( ltx.attrs.no-class
+		& object.attrs.data
+		& object.attrs.type?
+		& object.attrs.height?
+		& object.attrs.width?
+		)
+	ltx.object.inner =
+		( ltx.Inline.model )
+
+## Conversion Error: ltx:ERROR (Misc.class) — the engine's rendering of
+## an unrecoverable conversion problem, e.g. an undefined control
+## sequence shown as visible text.  Accepted as faithful LaTeXML output;
+## quality gates that want to reject such documents should check for the
+## ltx_ERROR token separately.
+	ltx.error.elem =
+		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.error }
 
 ## Line Break
 	ltx.linebreak.elem =

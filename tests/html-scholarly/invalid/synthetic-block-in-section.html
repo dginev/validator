@@ -1,0 +1,29 @@
+<!DOCTYPE html><html lang="zxx">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Synthetic: Block.class directly inside a section</title>
+<!-- Synthetic negative fixture: a table.ltx_equation (Block.class) as a
+     direct child of section.ltx_section.  The LaTeXML models require
+     Block.class content to live inside a logical paragraph (div.ltx_para,
+     Para.model); only Para.class units may appear directly in sections. -->
+</head>
+<body>
+<div class="ltx_page_main">
+<div class="ltx_page_content">
+<article class="ltx_document">
+<h1 class="ltx_title ltx_title_document">Synthetic Invalid Article</h1>
+<section id="S1" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">Section</h2>
+<table id="E1" class="ltx_equation ltx_eqn_table">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_td ltx_align_center ltx_eqn_cell"><math xmlns="http://www.w3.org/1998/Math/MathML" id="E1m1" class="ltx_Math" alttext="x=1" display="block"><mrow><mi>x</mi><mo>=</mo><mn>1</mn></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+</tr></tbody>
+</table>
+</section>
+</article>
+</div>
+</div>
+</body>
+</html>

@@ -1,18 +1,33 @@
 # #####################################################################
 ## Document Structure
 
-## Scholarly Document: article emitted from a LaTeX source
+## Scholarly Document: article emitted from a LaTeX source.
+## Mirrors document_model: front matter (with Meta.class interspersed,
+## e.g. MNRAS pubyear/pagerange notes), then body units at any sectional
+## level, plus BackMatter.
 	ltx.document.elem =
 		element article { ltx.document.inner & ltx.document.attrs }
 	ltx.document.attrs =
 		( ltx.attrs.no-class & ltx.class.document )
 	ltx.document.inner =
 		( text,
-		  ltx.document.front.elem*,
+		  ( ltx.document.front.elem | ltx.Meta.class )*,
 		  text,
-		  ltx.block.content*,
+		  ( ltx.document.body.class | ltx.backmatter.elem )*,
 		  text
 		)
+	ltx.document.body.class =
+		( ltx.Para.class
+		| ltx.Meta.class
+		| ltx.section.elem
+		| ltx.subsection.elem
+		| ltx.subsubsection.elem
+		| ltx.sectional.paragraph.elem
+		| ltx.subparagraph.elem
+		| ltx.appendix.elem
+		)
+	ltx.backmatter.elem =
+		( ltx.bibliography.elem )
 
 ## Document Front Matter: title, authors, dates, abstract, or class-specific header
 	ltx.document.front.elem =
@@ -39,23 +54,21 @@
 
 ## Creator: person or institutional contributor
 	ltx.creator.elem =
-		element span { ltx.inline.content & ltx.creator.attrs }
+		element span { ltx.Inline.model & ltx.creator.attrs }
 	ltx.creator.attrs =
 		( ltx.attrs.no-class & ltx.class.creator )
 
 ## Date List
 	ltx.date.list.elem =
-		element div { ltx.inline.content & ltx.attrs.no-class & ltx.class.dates }
+		element div { ltx.Inline.model & ltx.attrs.no-class & ltx.class.dates }
 
-## Abstract
+## Abstract: abstract_model = Block.model
 	ltx.abstract.elem =
 		element div { ltx.abstract.inner & ltx.attrs.no-class & ltx.class.abstract }
 	ltx.abstract.inner =
 		( text,
 		  ltx.abstract.title.elem?,
-		  text,
-		  ( ltx.paragraph.line.elem | ltx.block.content )*,
-		  text
+		  ltx.Block.model
 		)
 	ltx.abstract.title.elem =
 		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
@@ -69,9 +82,7 @@
 	ltx.frontmatter.block.inner =
 		( text,
 		  ltx.frontmatter.title.elem?,
-		  text,
-		  ltx.inline.elem*,
-		  text
+		  ltx.Inline.model
 		)
 	ltx.frontmatter.title.elem =
 		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
@@ -81,7 +92,8 @@
 		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
 		)
 
-## CV Header: custom header grid used by LaTeXML moderncv output
+## CV Header: custom header grid used by the LaTeXML moderncv binding —
+## a binding-introduced layout convention, not part of the core models
 	ltx.cv.header.elem =
 		element div { ltx.cv.header.inner & ltx.attrs.no-class & ltx.class.cv.header }
 	ltx.cv.header.inner =
@@ -93,7 +105,15 @@
 		element div { ltx.cv.header.column.inner & ltx.attrs.no-class & ltx.class.cv.column }
 	ltx.cv.header.column.inner =
 		( text,
-		  ( ltx.cv.heading.elem | ltx.heading.elem | ltx.block.content | ltx.inline.elem )*,
+		  ( ltx.cv.heading.elem
+		  | ltx.heading.elem
+		  | ltx.Para.class
+		  | ltx.Block.class
+		  | ltx.Inline.class
+		  | ltx.Misc.inline.class
+		  | ltx.Misc.block.class
+		  | ltx.Meta.class
+		  )*,
 		  text
 		)
 	ltx.cv.heading.elem =
@@ -105,15 +125,98 @@
 		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.cv.heading }
 		)
 
-## Section: recursive LaTeX sectional units
+# #####################################################################
+## Sectional Units: monotone descent, mirroring the LaTeXML sectional
+## models (section.body.class etc.) — each level admits Para.model plus
+## any strictly deeper sectional unit, never same-or-shallower.
+
+## Appendix: appendix.body.class = Para.model | any sectional level
+	ltx.appendix.elem =
+		element section { ltx.appendix.inner & ltx.attrs.no-class & ltx.class.appendix }
+	ltx.appendix.inner =
+		( text,
+		  ltx.section.title.elem?,
+		  text,
+		  ( ltx.Para.class
+		  | ltx.Meta.class
+		  | ltx.section.elem
+		  | ltx.subsection.elem
+		  | ltx.subsubsection.elem
+		  | ltx.sectional.paragraph.elem
+		  | ltx.subparagraph.elem
+		  )*,
+		  text
+		)
+
+## Section: section.body.class = Para.model | subsection and deeper
 	ltx.section.elem =
 		element section { ltx.section.inner & ltx.attrs.no-class & ltx.class.section }
 	ltx.section.inner =
 		( text,
 		  ltx.section.title.elem?,
 		  text,
-		  ltx.block.content*,
+		  ( ltx.Para.class
+		  | ltx.Meta.class
+		  | ltx.subsection.elem
+		  | ltx.subsubsection.elem
+		  | ltx.sectional.paragraph.elem
+		  | ltx.subparagraph.elem
+		  )*,
 		  text
+		)
+
+## Subsection
+	ltx.subsection.elem =
+		element section { ltx.subsection.inner & ltx.attrs.no-class & ltx.class.subsection }
+	ltx.subsection.inner =
+		( text,
+		  ltx.section.title.elem?,
+		  text,
+		  ( ltx.Para.class
+		  | ltx.Meta.class
+		  | ltx.subsubsection.elem
+		  | ltx.sectional.paragraph.elem
+		  | ltx.subparagraph.elem
+		  )*,
+		  text
+		)
+
+## Subsubsection
+	ltx.subsubsection.elem =
+		element section { ltx.subsubsection.inner & ltx.attrs.no-class & ltx.class.subsubsection }
+	ltx.subsubsection.inner =
+		( text,
+		  ltx.section.title.elem?,
+		  text,
+		  ( ltx.Para.class
+		  | ltx.Meta.class
+		  | ltx.sectional.paragraph.elem
+		  | ltx.subparagraph.elem
+		  )*,
+		  text
+		)
+
+## Sectional Paragraph: the formal, possibly labelled LaTeX \paragraph
+	ltx.sectional.paragraph.elem =
+		element section { ltx.sectional.paragraph.inner & ltx.attrs.no-class & ltx.class.sectional.paragraph }
+	ltx.sectional.paragraph.inner =
+		( text,
+		  ltx.section.title.elem?,
+		  text,
+		  ( ltx.Para.class
+		  | ltx.Meta.class
+		  | ltx.subparagraph.elem
+		  )*,
+		  text
+		)
+
+## Subparagraph: subparagraph.body.class = Para.model
+	ltx.subparagraph.elem =
+		element section { ltx.subparagraph.inner & ltx.attrs.no-class & ltx.class.subparagraph }
+	ltx.subparagraph.inner =
+		( text,
+		  ltx.section.title.elem?,
+		  ltx.Para.model
 		)
 
 ## Section Title: heading rank selected by LaTeXML from section depth
@@ -134,5 +237,4 @@
 		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
 		)
 	ltx.heading.inner =
-		( ltx.inline.content )
-
+		( ltx.Inline.model )

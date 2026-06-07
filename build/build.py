@@ -501,6 +501,7 @@ htmlSchemaDriverFiles = [
 
 scholarlySchemaModuleFiles = [
     "scholarly-ltx.rnc",
+    "scholarly-ltx-model.rnc",
     "scholarly-ltx-classes.rnc",
     "scholarly-ltx-inline.rnc",
     "scholarly-ltx-scaffold.rnc",

@@ -127,6 +127,8 @@
 		| "ltx_eqn_eqno"
 		| "ltx_eqn_center_padleft"
 		| "ltx_eqn_center_padright"
+		| "ltx_eqn_left_padleft"
+		| "ltx_eqn_left_padright"
 		| "ltx_eqn_eqnarray"
 		| "ltx_eqn_align"
 		| "ltx_eqn_gather"
@@ -173,6 +175,7 @@
 		| "ltx_mathvariant_bold-fraktur" )
 	ltx.class.reference.modifier =
 		( "ltx_citemacro_cite"
+		| "ltx_href"
 		| "ltx_refmacro_nameref"
 		| "ltx_ref_self"
 		| "ltx_ref_tag"
@@ -332,23 +335,25 @@
 		attribute class { list { ( "col-25" | "col-50" ), ltx.class.extra* } }
 
 	ltx.class.section =
-		attribute class {
-			list {
-				( "ltx_section"
-				| "ltx_subsection"
-				| "ltx_subsubsection"
-				| "ltx_paragraph"
-				| "ltx_subparagraph"
-				| "ltx_appendix" ),
-				ltx.class.extra*
-			}
-		}
+		attribute class { list { "ltx_section", ltx.class.extra* } }
+	ltx.class.subsection =
+		attribute class { list { "ltx_subsection", ltx.class.extra* } }
+	ltx.class.subsubsection =
+		attribute class { list { "ltx_subsubsection", ltx.class.extra* } }
+	ltx.class.sectional.paragraph =
+		attribute class { list { "ltx_paragraph", ltx.class.extra* } }
+	ltx.class.subparagraph =
+		attribute class { list { "ltx_subparagraph", ltx.class.extra* } }
+	ltx.class.appendix =
+		attribute class { list { "ltx_appendix", ltx.class.extra* } }
 	ltx.class.para =
 		attribute class { list { "ltx_para", ltx.class.extra* } }
 	ltx.class.p =
 		attribute class { list { "ltx_p", ltx.class.extra* } }
 	ltx.class.block =
 		attribute class { list { "ltx_block", ltx.class.extra* } }
+	ltx.class.logical-block =
+		attribute class { list { "ltx_logical-block", ltx.class.extra* } }
 	ltx.class.pagination =
 		attribute class { list { "ltx_pagination", ltx.class.extra* } }
 	ltx.class.theorem =
@@ -421,6 +426,7 @@
 				| "ltx_note_mark"
 				| "ltx_note_outer"
 				| "ltx_note_content"
+				| "ltx_note_type"
 				| "author-name"
 				| "author-title"
 				| "author-contact" ),
@@ -435,6 +441,10 @@
 		attribute class { list { "ltx_break", "ltx_break"?, ltx.class.extra* } }
 	ltx.class.cite =
 		attribute class { list { "ltx_cite", ltx.class.extra* } }
+	ltx.class.glossaryref =
+		attribute class { list { "ltx_glossaryref", ltx.class.inline.extra* } }
+	ltx.class.error =
+		attribute class { list { "ltx_ERROR", xsd:NMTOKEN* } }
 	ltx.class.sup =
 		attribute class { list { ( "ltx_sup" | "ltx_note_mark" ), ltx.class.inline.extra* } }
 	ltx.class.sub =

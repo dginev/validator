@@ -1,15 +1,30 @@
 # #####################################################################
 ## Floats, Equations, and Tables
 
-## Theorem-like Block: theorem, proof, definition, lemma, remark, and related environments
+## Class contributions (see scholarly-ltx-model.rnc).
+	ltx.Para.class |=
+		( ltx.theorem.elem         # ltx:theorem, ltx:proof
+		| ltx.figure.elem          # ltx:figure, ltx:table, ltx:float
+		)
+	ltx.Block.class |=
+		( ltx.equation.table.elem  # ltx:equation, ltx:equationgroup
+		| ltx.itemized.list.elem   # ltx:itemize
+		| ltx.enumerated.list.elem # ltx:enumerate
+		| ltx.description.list.elem # ltx:description
+		)
+	ltx.Misc.block.class |=
+		( ltx.tabular.elem         # ltx:tabular (block rendition)
+		| ltx.transform.outer.elem # transformed ltx:inline-block wrapper
+		)
+
+## Theorem-like Block: ltx:theorem / ltx:proof
+## (theorem_model = tags?, title?, Para.model)
 	ltx.theorem.elem =
 		element div { ltx.theorem.inner & ltx.attrs.no-class & ltx.class.theorem }
 	ltx.theorem.inner =
 		( text,
 		  ltx.theorem.title.elem?,
-		  text,
-		  ltx.block.content*,
-		  text
+		  ltx.Para.model
 		)
 	ltx.theorem.title.elem =
 		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
@@ -19,7 +34,8 @@
 		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
 		)
 
-## Bibliography
+## Bibliography: BackMatter — referenced from the document model, not a
+## member of the shared classes
 	ltx.bibliography.elem =
 		element section { ltx.bibliography.inner & ltx.attrs.no-class & ltx.class.bibliography }
 	ltx.bibliography.inner =
@@ -48,53 +64,36 @@
 	ltx.bibliography.item.inner =
 		( text,
 		  ( ltx.item.tag.elem
-		  | ltx.span.elem
-		  | ltx.inline.elem
+		  | ltx.Inline.class
+		  | ltx.Misc.inline.class
+		  | ltx.Meta.class
 		  | ltx.paragraph.line.elem
 		  )*,
 		  text
 		)
 
-## Float: figure or table float with optional caption
+## Float: ltx:figure / ltx:table / ltx:float
+## (figure_model = (tags? | figure | table | float | Block.model | Caption.class)*;
+## inline material appears directly via minipage serialization, so the
+## payload admits Inline.class as a documented deviation)
 	ltx.figure.elem =
 		element figure { ltx.figure.inner & ltx.attrs.no-class & ltx.class.figure }
 	ltx.figure.inner =
 		( text,
-		  ltx.caption.elem?,
-		  text,
-		  ( ltx.paragraph.line.elem
-		  | ltx.tabular.elem
-		  | ltx.equation.table.elem
-		  | ltx.figure.flex.elem
-		  | ltx.listing.elem
-		  | ltx.listing.line.elem
-		  | ltx.transform.outer.elem
-		  | ltx.block.elem
-		  | ltx.linebreak.elem
-		  | ltx.image.elem
-		  | ltx.inline.elem
+		  ( ltx.caption.elem
+		  | ltx.figure.elem
+		  | ltx.figure.body
 		  )*,
-		  text,
-		  ltx.caption.elem?,
 		  text
 		)
-
-## Figure Panel: figure body that contains generated visual/table material
 	ltx.figure.body =
-		( ltx.paragraph.line.elem
-		| ltx.tabular.elem
-		| ltx.equation.table.elem
+		( ltx.Block.class
+		| ltx.Misc.block.class
+		| ltx.Misc.inline.class
+		| ltx.Inline.class
+		| ltx.Meta.class
 		| ltx.figure.flex.elem
-		| ltx.listing.elem
 		| ltx.listing.line.elem
-		| ltx.transform.outer.elem
-		| ltx.itemized.list.elem
-		| ltx.enumerated.list.elem
-		| ltx.description.list.elem
-		| ltx.block.elem
-		| ltx.linebreak.elem
-		| ltx.image.elem
-		| ltx.inline.elem
 		)
 
 ## Figure Panel: generated flex grids used for algorithms and multi-panel figures
@@ -125,7 +124,10 @@
 	ltx.class.figure.flex.break =
 		attribute class { list { "ltx_flex_break", ltx.class.extra* } }
 
-## Transformed Table Wrapper: LaTeXML wraps scaled table material in CSS transforms
+## Transformed Table Wrapper: LaTeXML wraps scaled table material in CSS transforms.
+## The inner wrapper is hard-coded as span in the upstream XSLT even when it
+## carries block content (e.g. a rotated minipage rendered as figure), so the
+## span content model deliberately admits figures despite the HTML spec.
 	ltx.transform.outer.elem =
 		element div { ltx.transform.outer.inner & ltx.attrs.no-class & ltx.class.transform.outer }
 	ltx.class.transform.outer =
@@ -143,17 +145,21 @@
 		( text,
 		  ( ltx.tabular.elem
 		  | ltx.equation.table.elem
-		  | ltx.image.elem
-		  | ltx.inline.elem
+		  | ltx.figure.elem
+		  | ltx.Inline.class
+		  | ltx.Misc.inline.class
+		  | ltx.Meta.class
 		  )*,
 		  text
 		)
 
 ## Caption
 	ltx.caption.elem =
-		element figcaption { ltx.inline.content & ltx.attrs.no-class & ltx.class.caption }
+		element figcaption { ltx.Inline.model & ltx.attrs.no-class & ltx.class.caption }
 
-## Display Equation Table: LaTeXML equation number alignment scaffold
+## Display Equation Table: projection scaffolding — the transform lays
+## display equations out as a table of alignment pads, formula cells, and
+## equation-number cells.  Kept hand-rolled; not part of the shared models.
 	ltx.equation.table.elem =
 		element table { ltx.equation.table.inner & ltx.attrs.no-class & ltx.class.equation.table }
 	ltx.equation.table.inner =
@@ -186,14 +192,53 @@
 	ltx.equation.number.cell.inner =
 		( text,
 		  ( ltx.item.tag.elem
-		  | ltx.inline.elem
-		  | ltx.math.elem
+		  | ltx.Inline.class
+		  | ltx.Misc.inline.class
+		  | ltx.Meta.class
 		  | ltx.paragraph.line.elem
 		  )*,
 		  text
 		)
 
-## Tabular: table emitted for TeX tabular/array-like material
+## Inline Tabular: in inline context the transform serializes ltx:tabular
+## with span stand-ins for table/thead/tbody/tfoot/tr/td, same classes
+	ltx.Misc.inline.class |=
+		( ltx.inline.tabular.elem )   # ltx:tabular (inline rendition)
+	ltx.inline.tabular.elem =
+		element span { ltx.inline.tabular.inner & ltx.attrs.no-class & ltx.class.tabular }
+	ltx.inline.tabular.inner =
+		( text,
+		  ltx.inline.table.rowgroup.elem*,
+		  text
+		)
+	ltx.inline.table.rowgroup.elem =
+		element span { ltx.inline.table.rowgroup.inner & ltx.attrs.no-class & ( ltx.class.thead | ltx.class.tbody | ltx.class.tfoot ) }
+	ltx.inline.table.rowgroup.inner =
+		( text,
+		  ltx.inline.table.row.elem*,
+		  text
+		)
+	ltx.inline.table.row.elem =
+		element span { ltx.inline.table.row.inner & ltx.attrs.no-class & ltx.class.tr }
+	ltx.inline.table.row.inner =
+		( text,
+		  ltx.inline.table.cell.elem*,
+		  text
+		)
+	ltx.inline.table.cell.elem =
+		element span { ltx.inline.table.cell.inner & ltx.attrs.no-class & ltx.class.td }
+	ltx.inline.table.cell.inner =
+		( ltx.Inline.model )
+
+## Table Cell
+	ltx.table.cell.elem =
+		element td { ltx.table.cell.inner & ltx.table.cell.attrs & ltx.class.td }
+	ltx.table.header.cell.elem =
+		element th { ltx.table.cell.inner & ltx.table.cell.attrs & ltx.class.td }
+	ltx.table.cell.inner =
+		( ltx.Flow.model )
+
+## Tabular: ltx:tabular (block rendition)
 	ltx.tabular.elem =
 		element table { ltx.tabular.inner & ltx.attrs.no-class & ltx.class.tabular }
 	ltx.tabular.inner =
@@ -204,7 +249,7 @@
 		  text
 		)
 	ltx.table.caption.elem =
-		element caption { ltx.inline.content & ltx.attrs.no-class & ltx.class.caption }
+		element caption { ltx.Inline.model & ltx.attrs.no-class & ltx.class.caption }
 
 ## Table Row Group
 	ltx.table.rowgroup.elem =
@@ -227,30 +272,14 @@
 		  text
 		)
 
-## Table Cell
-	ltx.table.cell.elem =
-		element td { ltx.table.cell.inner & ltx.table.cell.attrs & ltx.class.td }
-	ltx.table.header.cell.elem =
-		element th { ltx.table.cell.inner & ltx.table.cell.attrs & ltx.class.td }
-	ltx.table.cell.inner =
-		( text,
-		  ( ltx.paragraph.line.elem
-		  | ltx.inline.elem
-		  | ltx.math.elem
-		  | ltx.block.elem
-		  | ltx.tabular.elem
-		  )*,
-		  text
-		)
-
 # #####################################################################
 ## Lists
 
-## Itemized List
+## Itemized List: ltx:itemize
 	ltx.itemized.list.elem =
 		element ul { ltx.list.inner & ltx.attrs.no-class & ltx.class.itemize }
 
-## Enumerated List
+## Enumerated List: ltx:enumerate
 	ltx.enumerated.list.elem =
 		element ol { ltx.list.inner & ltx.attrs.no-class & ltx.class.enumerate }
 
@@ -260,18 +289,16 @@
 		  text
 		)
 
-## List Item
+## List Item: ltx:item (item_model = tags?, Para.model)
 	ltx.list.item.elem =
 		element li { ltx.list.item.inner & ltx.attrs.no-class & ltx.class.item }
 	ltx.list.item.inner =
 		( text,
 		  ltx.item.tag.elem?,
-		  text,
-		  ltx.block.content*,
-		  text
+		  ltx.Para.model
 		)
 
-## Description List
+## Description List: ltx:description
 	ltx.description.list.elem =
 		element dl { ltx.description.list.inner & ltx.attrs.no-class & ltx.class.description }
 	ltx.description.list.inner =
@@ -281,16 +308,14 @@
 	ltx.description.term.elem =
 		element dt { ltx.description.term.inner & ltx.attrs.no-class & ltx.class.item }
 	ltx.description.term.inner =
-		( ltx.inline.content )
+		( ltx.Inline.model )
 	ltx.description.body.elem =
 		element dd { ltx.description.body.inner & ltx.attrs.no-class & ltx.class.item }
 	ltx.description.body.inner =
 		( text,
-		  ltx.block.content*,
-		  text
+		  ltx.Para.model
 		)
 
 ## Item Tag: visible label/bullet emitted outside native list numbering
 	ltx.item.tag.elem =
-		element span { ltx.inline.content & ltx.attrs.no-class & ltx.class.tag }
-
+		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.tag }

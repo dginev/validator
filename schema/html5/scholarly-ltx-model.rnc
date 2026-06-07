@@ -1,0 +1,67 @@
+# #####################################################################
+## LaTeXML Class System and Shared Content Models
+#
+# This module mirrors the architecture of LaTeXML's XML schema
+# (LaTeXML.rnc and its modules), where every element belongs to one of a
+# small set of content classes, and every container's content model is a
+# combination of four shared models built from those classes:
+#
+#     Inline.model = (text | Inline.class | Misc.class | Meta.class)*
+#     Block.model  = (Block.class | Misc.class | Meta.class)*
+#     Para.model   = (Para.class | Meta.class)*
+#     Flow.model   = (text | Inline.class | Block.class | Misc.class | Meta.class)*
+#
+# The HTML projection splits Misc.class in two: the XSLT serializes the
+# same XML element differently by context (f:blockelement), e.g.
+# ltx:tabular becomes table.ltx_tabular in block context but a
+# span.ltx_tabular stack inline.  Hence ltx.Misc.inline.class and
+# ltx.Misc.block.class below.
+#
+# Union members are contributed by the element modules with |= next to
+# each element definition, annotated with the ltx:* element it renders.
+# Exactly one base definition per union lives here (notAllowed); never
+# add a plain = definition for these names elsewhere.
+#
+# Shape rule: the inline model interleaves text with phrasing
+# (text & ...*); block-level models sequence text around element lists
+# (text, ...*, text).  RELAX NG forbids two text-bearing patterns in one
+# interleave, so these two shapes must not be merged.
+
+## Union bases — members contributed via |= from the element modules.
+	ltx.Inline.class = notAllowed
+	ltx.Block.class = notAllowed
+	ltx.Para.class = notAllowed
+	ltx.Misc.inline.class = notAllowed
+	ltx.Misc.block.class = notAllowed
+	ltx.Meta.class = notAllowed
+
+## Inline model: phrasing content of p, headings, captions, spans.
+	ltx.Inline.model =
+		( text
+		& ( ltx.Inline.class | ltx.Misc.inline.class | ltx.Meta.class )*
+		)
+
+## Block model: content of para, quote, abstract — physical blocks.
+	ltx.Block.model =
+		( text,
+		  ( ltx.Block.class | ltx.Misc.block.class | ltx.Meta.class )*,
+		  text
+		)
+
+## Para model: content of sections, theorems, list items — logical blocks.
+	ltx.Para.model =
+		( text,
+		  ( ltx.Para.class | ltx.Meta.class )*,
+		  text
+		)
+
+## Flow model: mixed inline and block content (note bodies, generic blocks).
+	ltx.Flow.model =
+		( text
+		& ( ltx.Inline.class
+		  | ltx.Block.class
+		  | ltx.Misc.inline.class
+		  | ltx.Misc.block.class
+		  | ltx.Meta.class
+		  )*
+		)

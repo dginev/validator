@@ -1,0 +1,1425 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Capture, Learning, and Synthesis of 3D Speaking Styles</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dginev/ar5iv-css@0.8.5/css/ar5iv.css" type="text/css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dginev/ar5iv-css@0.8.5/css/ar5iv-fonts.css" type="text/css">
+</head>
+<body>
+<div class="ltx_page_main">
+<div class="ltx_page_content">
+<article class="ltx_document ltx_authors_1line ltx_pruned_first">
+<h1 class="ltx_title ltx_title_document">Capture, Learning, and Synthesis of 3D Speaking Styles</h1>
+<div class="ltx_authors">
+<span class="ltx_creator ltx_role_author">
+<span class="ltx_personname">Daniel Cudeiro<sup id="id1" class="ltx_sup"><span id="id1.1" class="ltx_text ltx_font_italic">∗</span></sup><sup id="id2" class="ltx_sup">†</sup>   Timo Bolkart<sup id="id3" class="ltx_sup">∗</sup>   Cassidy Laidlaw 
+<br class="ltx_break">Anurag Ranjan   Michael J. Black
+<br class="ltx_break">Max Planck Institute for Intelligent Systems, Tübingen, Germany
+<br class="ltx_break"><span id="id4" class="ltx_text ltx_font_typewriter" style="font-size:90%;">{tbolkart, claidlaw, aranjan, black}@tuebingen.mpg.de</span>
+</span></span></div>
+
+<div class="ltx_abstract"><h6 class="ltx_title ltx_title_abstract">Abstract</h6>
+    
+<p id="id5" class="ltx_p">Audio-driven 3D facial animation has been widely explored, but achieving realistic, human-like performance is still unsolved.
+This is due to the lack of available 3D datasets, models, and standard evaluation metrics.
+To address this, we introduce a unique 4D face dataset with about 29 minutes of 4D scans captured at 60 fps and synchronized audio from 12 speakers.
+We then train a neural network on our dataset that factors identity from facial motion.
+The learned model, VOCA (Voice Operated Character Animation) takes any speech signal as input—even speech in languages other than English—and realistically animates a wide range of adult faces.
+Conditioning on subject labels during training allows the model to learn a variety of realistic speaking styles.
+VOCA also provides animator controls to alter speaking style, identity-dependent facial shape, and pose (i.e. head, jaw, and eyeball rotations) during animation.
+To our knowledge, VOCA is the only realistic 3D facial animation model that is readily applicable to unseen subjects without retargeting.
+This makes VOCA suitable for tasks like in-game video, virtual reality avatars, or any scenario in which the speaker, speech, or language is not known in advance.
+We make the dataset and model available for research purposes at <a href="http://voca.is.tue.mpg.de" title="" class="ltx_ref ltx_url ltx_font_typewriter">http://voca.is.tue.mpg.de</a>.
+<span id="footnote1" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">†</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">†</sup>
+          
+          
+        <sup id="footnote1.1" class="ltx_sup">∗</sup> Equal contribution</span></span></span><span id="footnote1a" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">†</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">†</sup>
+          
+          
+        <sup id="footnote1a.1" class="ltx_sup">†</sup> Deceased, December 5, 2018</span></span></span></p>
+  
+</div>
+<div id="id6" class="ltx_logical-block">
+    
+<div id="p1" class="ltx_para">
+<p id="p1.1" class="ltx_p ltx_align_center ltx_align_center"><span id="p1.1.1" class="ltx_text">
+<img src="audio1.png" id="g1" class="ltx_graphics ltx_img_square" width="90" height="78" alt="[Uncaptioned image]">
+<img src="churchill_template.png" id="g2" class="ltx_graphics ltx_img_portrait" width="72" height="105" alt="[Uncaptioned image]">
+   
+<img src="churchill_00000.png" id="g3" class="ltx_graphics ltx_img_portrait" width="72" height="105" alt="[Uncaptioned image]">
+<img src="churchill_00012.png" id="g4" class="ltx_graphics ltx_img_portrait" width="72" height="105" alt="[Uncaptioned image]">
+<img src="churchill_00094.png" id="g5" class="ltx_graphics ltx_img_portrait" width="72" height="105" alt="[Uncaptioned image]">
+<img src="churchill_00142.png" id="g6" class="ltx_graphics ltx_img_portrait" width="72" height="105" alt="[Uncaptioned image]">
+<img src="churchill_00190.png" id="g7" class="ltx_graphics ltx_img_portrait" width="72" height="105" alt="[Uncaptioned image]"></span></p>
+<p id="p1.2" class="ltx_p ltx_align_center ltx_align_center"><span id="p1.2.1" class="ltx_text">
+<img src="audio2.png" id="g8" class="ltx_graphics ltx_img_square" width="90" height="78" alt="[Uncaptioned image]">
+<img src="nvidia_template.png" id="g9" class="ltx_graphics ltx_img_portrait" width="72" height="105" alt="[Uncaptioned image]">
+   
+<img src="nvidia_00072.png" id="g10" class="ltx_graphics ltx_img_portrait" width="72" height="105" alt="[Uncaptioned image]">
+<img src="nvidia_00086.png" id="g11" class="ltx_graphics ltx_img_portrait" width="72" height="105" alt="[Uncaptioned image]">
+<img src="nvidia_00166.png" id="g12" class="ltx_graphics ltx_img_portrait" width="72" height="105" alt="[Uncaptioned image]">
+<img src="nvidia_00250.png" id="g13" class="ltx_graphics ltx_img_portrait" width="72" height="105" alt="[Uncaptioned image]">
+<img src="nvidia_00280.png" id="g14" class="ltx_graphics ltx_img_portrait" width="72" height="105" alt="[Uncaptioned image]"></span></p>
+<p id="p1.3" class="ltx_p ltx_align_center ltx_align_center"><span id="p1.3.1" class="ltx_text">
+<span id="p1.3.1.1" class="ltx_text ltx_font_bold">Input</span>: speech signal and 3D template
+         
+<span id="p1.3.1.2" class="ltx_text ltx_font_bold">Output</span>: 3D character animation
+         </span></p>
+</div>
+    
+<figure id="S0.F1" class="ltx_figure ltx_align_center">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span id="S0.F1.3" class="ltx_text" style="font-size:90%;">Figure 1</span>: </span><span id="S0.F1.4" class="ltx_text" style="font-size:90%;">Given an arbitrary speech signal
+and a static 3D face mesh as input (left), our model,
+VOCA outputs a realistic 3D
+character animation (right). Top: Winston
+Churchill. Bottom: Actor from Karras et
+al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib33" title="" class="ltx_ref">karras2017</a></cite>. See <span id="S0.F1.4.1" class="ltx_text ltx_font_bold">supplementary video</span>.</span></figcaption>
+</figure>
+  
+</div>
+<section id="S1" class="ltx_section">
+<h2 class="ltx_title ltx_title_section"><span class="ltx_tag ltx_tag_section">1 </span>Introduction</h2>
+
+<div id="S1.p1" class="ltx_para">
+<p id="S1.p1.1" class="ltx_p">Teaching computers to see and understand faces is critical for them to understand human behavior.
+There is an extensive literature on estimating 3D face shape, facial expressions, and facial motion from images and videos.
+Less attention has been paid to estimating 3D properties of faces from sound; however, many facial motions are caused directly by the production of speech.
+Understanding the correlation between speech and facial motion thus provides additional valuable information for analyzing humans, particularly if visual data are noisy, missing, or ambiguous.
+The relation between speech and facial motion has previously been used to separate audio-visual speech <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib22" title="" class="ltx_ref">Ephrat:Siggraph:2018</a></cite> and for audio-video driven facial animation  <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib38" title="" class="ltx_ref">Liu2015</a></cite>.
+Missing to date is a general and robust method that relates the speech of <span id="S1.p1.1.1" class="ltx_text ltx_font_italic">any</span> person in <span id="S1.p1.1.2" class="ltx_text ltx_font_italic">any</span> language to the 3D facial motion of <span id="S1.p1.1.3" class="ltx_text ltx_font_italic">any</span> face shape.
+Here we present <span id="S1.p1.1.4" class="ltx_text ltx_font_italic">VOCA (Voice Operated Character Animation)</span>, that takes a step towards this goal.</p>
+</div>
+<div id="S1.p2" class="ltx_para">
+<p id="S1.p2.1" class="ltx_p">While speech-driven 3D facial animation has been widely studied, speaker-independent modeling remains a challenging, unsolved task for several reasons.
+First, speech signals and facial motion are strongly correlated but lie in two very different spaces; thus, non-linear regression functions are needed to relate the two.
+One can exploit deep neural networks to address this problem.
+However, this means that significant amounts of training data are needed.
+Second, there exists a many-to-many mapping between phonemes and facial motion.
+This poses an even greater challenge when training across people and styles.
+Third, because we are especially sensitive to faces, particularly realistic faces, the animation must be realistic to avoid falling into the Uncanny Valley <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib39" title="" class="ltx_ref">Mori1970</a></cite>.
+Fourth, there is very limited training data relating speech to the 3D face shape of multiple speakers.
+Finally, while previous work has shown that models can be trained to create speaker-specific animations <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib14" title="" class="ltx_ref">Cao2005</a>; <a href="#bib.bib33" title="" class="ltx_ref">karras2017</a></cite>, there are no generic methods that are speaker independent and that capture a variety of speaking styles.</p>
+</div>
+<div id="S1.p3" class="ltx_para">
+<p id="S1.p3.1" class="ltx_p"><span id="S1.p3.1.1" class="ltx_text ltx_font_bold">VOCASET:</span> To address this, we collected a new dataset of 4D face scans together with speech.
+The dataset has 12 subjects and 480 sequences of about 3-4 seconds each with sentences chosen from an array of standard protocols that maximize phonetic diversity.
+The 4D scans are captured at 60fps and we align a common face template mesh to all the scans, bringing them into correspondence.
+This dataset, called <span id="S1.p3.1.2" class="ltx_text ltx_font_italic">VOCASET</span>, is unlike any existing public datasets.
+It allows training and testing of speech-to-animation models that can generalize to new data.</p>
+</div>
+<div id="S1.p4" class="ltx_para">
+<p id="S1.p4.1" class="ltx_p"><span id="S1.p4.1.1" class="ltx_text ltx_font_bold">VOCA:</span> Given such data, we train a deep neural network model, called <span id="S1.p4.1.2" class="ltx_text ltx_font_italic">VOCA</span> (Figure <a href="#S4.F2" title="Figure 2 ‣ 4 VOCA ‣ Capture, Learning, and Synthesis of 3D Speaking Styles" class="ltx_ref"><span class="ltx_text ltx_ref_tag">2</span></a>), that generalizes to new speakers (see Figure <a href="#S0.F1" title="Figure 1 ‣ Capture, Learning, and Synthesis of 3D Speaking Styles" class="ltx_ref"><span class="ltx_text ltx_ref_tag">1</span></a>).
+Recent work using deep networks has shown impressive results for the problem of regressing <span id="S1.p4.1.3" class="ltx_text ltx_font_italic">speaker-dependent</span> facial animation from speech <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib33" title="" class="ltx_ref">karras2017</a></cite>.
+Their work, however, captures the idiosyncrasies of an individual, making it inappropriate for generalization across characters.
+While deep learning is advancing the field quickly, even the best recent methods rely on some manual processes or focus only on the mouth <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib53" title="" class="ltx_ref">taylor2017deep</a></cite>, making them inappropriate for truly automatic full facial animation.</p>
+</div>
+<div id="S1.p5" class="ltx_para">
+<p id="S1.p5.1" class="ltx_p">The key problem with prior work is that facial motion and facial identity are confounded.
+Our key insight is to factor identity from facial motions and then learn a model relating speech to only the motions.
+Conditioning on subject labels during training allows us to combine data from many subjects in the training process, which enables the model both to generalize to new subjects not seen during training and to synthesize different speaker styles.
+Integrating DeepSpeech <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib29" title="" class="ltx_ref">hannun2014deep</a></cite> for audio feature extraction makes VOCA robust w.r.t. different audio sources and noise.
+Building on top of the expressive FLAME head model <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib37" title="" class="ltx_ref">flame2017</a></cite> allows us i) to model motions of the full face (i.e. including the neck), ii) to animate a wide range of adult faces, as FLAME can be used to reconstruct subject-specific templates from a scan or image, and iii) to edit identity-dependent shape and head pose during animation.
+VOCA and VOCASET are available for research purposes <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib58" title="" class="ltx_ref">VOCA_project</a></cite>.</p>
+</div>
+</section>
+<section id="S2" class="ltx_section">
+<h2 class="ltx_title ltx_title_section"><span class="ltx_tag ltx_tag_section">2 </span>Related work</h2>
+
+<div id="S2.p1" class="ltx_para">
+<p id="S2.p1.1" class="ltx_p">Facial animation has received significant attention in the literature. Related work in this area can be grouped into three categories: speech-based, text-based, and video- or performance-based.</p>
+</div>
+<div id="S2.p2" class="ltx_para">
+<p id="S2.p2.1" class="ltx_p"><span id="S2.p2.1.1" class="ltx_text ltx_font_bold">Speech-driven facial animation:</span> Due to the abundance of images and videos, many methods that attempt to realistically animate faces use monocular video <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib7" title="" class="ltx_ref">Brand1999</a>; <a href="#bib.bib8" title="" class="ltx_ref">Bregler1997</a>; <a href="#bib.bib16" title="" class="ltx_ref">Chen2018</a>; <a href="#bib.bib23" title="" class="ltx_ref">Ezzat2002</a>; <a href="#bib.bib51" title="" class="ltx_ref">obama2017</a>; <a href="#bib.bib59" title="" class="ltx_ref">Wang2011</a>; <a href="#bib.bib62" title="" class="ltx_ref">XieLiu2007</a></cite>.
+Bregler et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib8" title="" class="ltx_ref">Bregler1997</a></cite> transcribe speech with a  <span title="" class="ltx_glossaryref"></span> (<abbr title="" class="ltx_glossaryref"></abbr>) into phonetic labels and animate the mouth region in videos with an exemplar-based video warping.
+Brand <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib7" title="" class="ltx_ref">Brand1999</a></cite> uses a mix of  <span title="" class="ltx_glossaryref"></span> (<abbr title="" class="ltx_glossaryref"></abbr>) and RASTA-PLP <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib30" title="" class="ltx_ref">Hermansky1994</a></cite> audio features and an <abbr title="" class="ltx_glossaryref"></abbr> to output a sequence of facial motion vectors.
+Ezzat et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib23" title="" class="ltx_ref">Ezzat2002</a></cite> perform  <span title="" class="ltx_glossaryref"></span> (<abbr title="" class="ltx_glossaryref"></abbr>) on all images and use an example-based mapping between phonemes and trajectories of mouth shape and mouth texture parameters in the <abbr title="" class="ltx_glossaryref"></abbr> space.
+Xie and Liu <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib62" title="" class="ltx_ref">XieLiu2007</a></cite> model facial animation with a dynamic Bayesian network-based model.
+Wang et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib59" title="" class="ltx_ref">Wang2011</a></cite> use an <abbr title="" class="ltx_glossaryref"></abbr> to learn a mapping between  <span title="" class="ltx_glossaryref"></span> (<abbr title="" class="ltx_glossaryref"></abbr>) and <abbr title="" class="ltx_glossaryref"></abbr> model parameters.
+Zhang et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib67" title="" class="ltx_ref">Zhang2013</a></cite> combine the <abbr title="" class="ltx_glossaryref"></abbr>-based method of <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib59" title="" class="ltx_ref">Wang2011</a></cite> trained on audio and visual data of one actor with a deep neural network based encoder trained from hundreds of hours of speaker independent speech data to compute an embedding of the MFCC audio features.
+Shimba et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib48" title="" class="ltx_ref">shimba2015talking</a></cite> use a deep  <span title="" class="ltx_glossaryref"></span> (<abbr title="" class="ltx_glossaryref"></abbr>) network to regress  <span title="" class="ltx_glossaryref"></span> (<abbr title="" class="ltx_glossaryref"></abbr>) parameters from <abbr title="" class="ltx_glossaryref"></abbr> features.
+Chen et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib16" title="" class="ltx_ref">Chen2018</a></cite> correlate audio and image motion to synthesize lip motion of arbitrary identities.</p>
+</div>
+<div id="S2.p3" class="ltx_para">
+<p id="S2.p3.1" class="ltx_p">Suwajanakorn et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib51" title="" class="ltx_ref">obama2017</a></cite> use an  <span title="" class="ltx_glossaryref"></span> (<abbr title="" class="ltx_glossaryref"></abbr>) for synthesizing photorealistic mouth texture animations using audio from 1.9 million frames from Obama’s weekly addresses. However, their method does not generalize to unseen faces or viewpoints.
+In contrast to this, VOCA is trained across subjects sharing a common topology, which makes it possible to animate new faces from previously unseen viewpoints.
+Pham et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib42" title="" class="ltx_ref">Pham2017</a></cite> regress global transformation and blendshape coefficients <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib13" title="" class="ltx_ref">Cao2014_FaceWarehouse</a></cite> from MFCC audio features using an <abbr title="" class="ltx_glossaryref"></abbr> network. While their model is trained across subjects—similar to VOCA—they rely on model parameters regressed from 2D videos rather than using 3D scans, which limits their quality.</p>
+</div>
+<div id="S2.p4" class="ltx_para">
+<p id="S2.p4.1" class="ltx_p">A few methods use multi-view motion capture data <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib10" title="" class="ltx_ref">Busso2007</a>; <a href="#bib.bib14" title="" class="ltx_ref">Cao2005</a></cite> or high-resolution 3D scans <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib33" title="" class="ltx_ref">karras2017</a></cite>. Busso et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib10" title="" class="ltx_ref">Busso2007</a></cite> synthesize rigid head motion in expressive speech sequences. Cao et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib14" title="" class="ltx_ref">Cao2005</a></cite> segment the audio into phonemes and use an example-based graph method to select a matching mouth animation.
+Karras et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib33" title="" class="ltx_ref">karras2017</a></cite> propose a convolutional model for mapping <abbr title="" class="ltx_glossaryref"></abbr> audio features to 3D vertex displacements.
+However, their model is subject specific, and animating a new face would require 3D capture and processing of thousands of frames of subject data.
+Our model, VOCA factors identity from facial motion and is trained across subjects, which allows animation of a wide range of adult faces.</p>
+</div>
+<div id="S2.p5" class="ltx_para">
+<p id="S2.p5.1" class="ltx_p">Several works also aim at animating artist designed character rigs <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib20" title="" class="ltx_ref">Ding2015</a>; <a href="#bib.bib21" title="" class="ltx_ref">Edwards2016_JALI</a>; <a href="#bib.bib31" title="" class="ltx_ref">Hong2002</a>; <a href="#bib.bib32" title="" class="ltx_ref">kakumanu2001speech</a>; <a href="#bib.bib46" title="" class="ltx_ref">Salvi2009</a>; <a href="#bib.bib52" title="" class="ltx_ref">taylor2016audio</a>; <a href="#bib.bib53" title="" class="ltx_ref">taylor2017deep</a>; <a href="#bib.bib54" title="" class="ltx_ref">taylor2012dynamic</a>; <a href="#bib.bib70" title="" class="ltx_ref">Zhou2018</a></cite>.
+Taylor et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib53" title="" class="ltx_ref">taylor2017deep</a></cite> propose a deep-learning based speech-driven facial animation model using a sliding window approach on transcribed phoneme sequences that outperforms previous LSTM based methods <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib24" title="" class="ltx_ref">fan2015photo</a>; <a href="#bib.bib25" title="" class="ltx_ref">fan2016deep</a></cite>.
+While these models are similar to VOCA in that they animate a generic face from audio, our focus is animating a realistic face mesh, for which we train our model on high-resolution face-scans.</p>
+</div>
+<div id="S2.p6" class="ltx_para">
+<p id="S2.p6.1" class="ltx_p"><span id="S2.p6.1.1" class="ltx_text ltx_font_bold">Text-driven facial animation:</span>
+Some methods aim to animate faces directly from text. Sako et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib45" title="" class="ltx_ref">Sako2000</a></cite> use a hidden Markov model to animate lips in images from text. Anderson et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib4" title="" class="ltx_ref">Anderson2013</a></cite> use an extended hidden Markov text-to-speech model to drive a subject-specific active appearance model (AAM). In a follow-up, they extend this approach to animate the face of an actress in 3D. While our focus is not to animate faces from text, this is possible by animating our model with the output of a text-to-speech (TTS) system (e.g. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib56" title="" class="ltx_ref">WaveNet2016</a></cite>), similar to Karras et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib33" title="" class="ltx_ref">karras2017</a></cite>.</p>
+</div>
+<div id="S2.p7" class="ltx_para">
+<p id="S2.p7.1" class="ltx_p"><span id="S2.p7.1.1" class="ltx_text ltx_font_bold">Performance-based facial animation:</span> Most methods to animate digital avatars are based on visual data. Alexander et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib3" title="" class="ltx_ref">Alexander2009</a></cite>, Wu et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib61" title="" class="ltx_ref">Wu2016</a></cite>, and Laine et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib35" title="" class="ltx_ref">Laine2017</a></cite> build subject-specific face-rigs from high-resolution face scans and animate these rigs with video-based animation systems.</p>
+</div>
+<div id="S2.p8" class="ltx_para">
+<p id="S2.p8.1" class="ltx_p">Several methods build personalized face-rigs using generic face models from monocular videos to transfer and reenact facial performance between videos. Tensor-based multilinear face models <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib5" title="" class="ltx_ref">Bolkart2015</a>; <a href="#bib.bib11" title="" class="ltx_ref">Cao2015</a>; <a href="#bib.bib12" title="" class="ltx_ref">Cao2014</a>; <a href="#bib.bib19" title="" class="ltx_ref">Dale2011</a>; <a href="#bib.bib57" title="" class="ltx_ref">Vlasic2005</a>; <a href="#bib.bib63" title="" class="ltx_ref">Yang2012</a></cite> and linear models <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib55" title="" class="ltx_ref">Thies2016_Face2Face</a></cite> are widely used to build personalized face-rigs. Cao et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib11" title="" class="ltx_ref">Cao2015</a>; <a href="#bib.bib12" title="" class="ltx_ref">Cao2014</a></cite> use a regression-based face tracker to animate the face-rig and digital avatars, while Thies et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib55" title="" class="ltx_ref">Thies2016_Face2Face</a></cite> use a landmark-based face tracker and deformation transfer <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib50" title="" class="ltx_ref">SumnerPopovic2004</a></cite> to reenact monocular videos.</p>
+</div>
+<div id="S2.p9" class="ltx_para">
+<p id="S2.p9.1" class="ltx_p">Other methods that animate virtual avatars rely on RGB-D videos or 4D sequences to track and retarget facial performance.
+Li et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib36" title="" class="ltx_ref">Li2010</a></cite> and Weise et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib60" title="" class="ltx_ref">Weise2011</a></cite> capture example-based rigs in an offline calibration procedure to build personalized face-rigs, Bouaziz et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib6" title="" class="ltx_ref">Bouaziz2013</a></cite> use a generic identity model.
+Liu et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib38" title="" class="ltx_ref">Liu2015</a></cite> combine audio and video to robustly animate a generic face model from RGB-D video.
+Li et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib37" title="" class="ltx_ref">flame2017</a></cite> capture facial performance with a high-resolution scanner and animate static face meshes using an articulated generic head model.
+In contrast to these methods, our approach solely relies on audio to animate digital avatars.</p>
+</div>
+<div id="S2.p10" class="ltx_para">
+<p id="S2.p10.1" class="ltx_p"><span id="S2.p10.1.1" class="ltx_text ltx_font_bold">3D face datasets:</span> Several 3D face datasets have been released that focus on the analysis of static 3D facial shape and expression (e.g. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib13" title="" class="ltx_ref">Cao2014_FaceWarehouse</a>; <a href="#bib.bib47" title="" class="ltx_ref">Bosphorus2008</a>; <a href="#bib.bib65" title="" class="ltx_ref">BU-3DFE2006</a></cite>) or dynamic facial expressions (e.g. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib2" title="" class="ltx_ref">Alashkar2014</a>; <a href="#bib.bib15" title="" class="ltx_ref">Chang2005</a>; <a href="#bib.bib18" title="" class="ltx_ref">D3DFACS2011</a>; <a href="#bib.bib44" title="" class="ltx_ref">CoMA2018</a>; <a href="#bib.bib64" title="" class="ltx_ref">BU-4DFE2008</a>; <a href="#bib.bib68" title="" class="ltx_ref">BP4D-Spontaneous2014</a>; <a href="#bib.bib69" title="" class="ltx_ref">MMSE2016</a></cite>).
+Most of these datasets focus on emotional expressions and only a few datasets capture facial dynamics caused by speech.
+The recently published 4DFAB dataset <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib17" title="" class="ltx_ref">4DFAB2018</a></cite> contains 4D captures of 180 subjects, but with only nine word utterances per subject and lower mesh quality than VOCASET.</p>
+</div>
+<div id="S2.p11" class="ltx_para">
+<p id="S2.p11.1" class="ltx_p">The B3D(AC)ˆ2 dataset <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib26" title="" class="ltx_ref">B3D(AC)2010</a></cite> contains a large set of audio-4D scan pairs of 40 spoken English sentences. In contrast, VOCASET contains 255 unique sentences in total. To enable training on both a large number of sentences and subjects, some sentences are shared across subjects and some sentences are spoken by only one subject.
+The visible artifacts present in the raw B3D(AC)ˆ2 scans (i.e. holes and capture noise) mean that subtle facial motions may be lost; also, the registered template only covers the face, ignoring speech-related motions in the neck region. VOCASET, in comparison, provides higher-quality 3D scans as well as alignments of the entire head, including the neck.</p>
+</div>
+</section>
+<section id="S3" class="ltx_section">
+<h2 class="ltx_title ltx_title_section"><span class="ltx_tag ltx_tag_section">3 </span>Preliminaries</h2>
+
+<div id="S3.p1" class="ltx_para">
+<p id="S3.p1.1" class="ltx_p">Our goal for VOCA is to generalize well to arbitrary subjects not seen during training. Generalization across subjects involves both (i) generalization across different speakers in terms of the audio (variations in accent, speed, audio source, noise, environment, etc.) and (ii) generalization across different facial shapes and motion.</p>
+</div>
+<div id="S3.p2" class="ltx_para">
+<p id="S3.p2.1" class="ltx_p"><span id="S3.p2.1.1" class="ltx_text ltx_font_bold">DeepSpeech:</span> To gain robustness to different audio sources, regardless of noise, recording artifacts, or language, we integrate DeepSpeech <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib29" title="" class="ltx_ref">hannun2014deep</a></cite> into our model. DeepSpeech <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib29" title="" class="ltx_ref">hannun2014deep</a></cite> is an end-to-end deep learning model for  <span title="" class="ltx_glossaryref"></span> (<abbr title="" class="ltx_glossaryref"></abbr>).
+DeepSpeech uses a simple architecture consisting of five layers of hidden units, of which the first three layers are non-recurrent fully connected layers with ReLU activations. The fourth layer is a bi-directional <abbr title="" class="ltx_glossaryref"></abbr>, and the final layer is a fully connected layer with ReLU activation. The final layer of the network is fed to a softmax function whose output is a probability distribution over characters. The TensorFlow implementation provided by Mozilla <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib40" title="" class="ltx_ref">mozillaDeepSpeech</a></cite> slightly differs from the original paper in two ways: (i) the <abbr title="" class="ltx_glossaryref"></abbr> units are replaced by <abbr title="" class="ltx_glossaryref"></abbr> cells and (ii) 26 <abbr title="" class="ltx_glossaryref"></abbr> audio features are used instead of directly performing inference on the spectrogram. Please see <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib40" title="" class="ltx_ref">mozillaDeepSpeech</a></cite> for more details.</p>
+</div>
+<div id="S3.p3" class="ltx_para">
+<p id="S3.p3.1" class="ltx_p"><span id="S3.p3.1.1" class="ltx_text ltx_font_bold">FLAME:</span> Facial shape and head motion vary greatly across subjects. Furthermore, different people have different speaking styles. The large variability in facial shape, motion, and speaking style motivates using a common learning space. We address this problem by incorporating FLAME, a publicly available statistical head model, as part of our animation pipeline. FLAME uses linear transformations to describe identity and expression dependent shape variations, and standard linear blend skinning (LBS) to model neck, jaw, and eyeball rotations. Given a template <math id="S3.p3.m1" class="ltx_Math" alttext="\textbf{T}\in\mathbb{R}^{3N}" display="inline" intent=":literal"><mrow><mtext>T</mtext><mo>∈</mo><msup><mi>ℝ</mi><mrow><mn>3</mn><mo>⁢</mo><mi>N</mi></mrow></msup></mrow></math> in the “zero pose”, identity, pose, and expression blendshapes are modeled as vertex offsets from <span id="S3.p3.1.2" class="ltx_text ltx_markedasmath ltx_font_bold">T</span>. For more details we refer the reader to <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib37" title="" class="ltx_ref">flame2017</a></cite>.</p>
+</div>
+</section>
+<section id="S4" class="ltx_section">
+<h2 class="ltx_title ltx_title_section"><span class="ltx_tag ltx_tag_section">4 </span>VOCA</h2>
+
+<figure id="S4.F2" class="ltx_figure"><img src="network_architecture.png" id="S4.F2.g1" class="ltx_graphics ltx_centering ltx_img_landscape" width="481" height="198" alt="Refer to caption">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span id="S4.F2.2" class="ltx_text" style="font-size:90%;">Figure 2</span>: </span><span id="S4.F2.3" class="ltx_text" style="font-size:90%;">VOCA network architecture.</span></figcaption>
+</figure>
+<figure id="S4.T1" class="ltx_table">
+<table id="S4.T1.2" class="ltx_tabular ltx_align_middle">
+<tbody class="ltx_tbody">
+<tr id="S4.T1.2.1" class="ltx_tr">
+<td id="S4.T1.2.1.1" class="ltx_td ltx_align_left"><span id="S4.T1.2.1.1.1" class="ltx_text ltx_font_bold" style="font-size:80%;">Type</span></td>
+<td id="S4.T1.2.1.2" class="ltx_td ltx_align_center"><span id="S4.T1.2.1.2.1" class="ltx_text ltx_font_bold" style="font-size:80%;">Kernel</span></td>
+<td id="S4.T1.2.1.3" class="ltx_td ltx_align_center"><span id="S4.T1.2.1.3.1" class="ltx_text ltx_font_bold" style="font-size:80%;">Stride</span></td>
+<td id="S4.T1.2.1.4" class="ltx_td ltx_align_center"><span id="S4.T1.2.1.4.1" class="ltx_text ltx_font_bold" style="font-size:80%;">Output</span></td>
+<td id="S4.T1.2.1.5" class="ltx_td ltx_align_center"><span id="S4.T1.2.1.5.1" class="ltx_text ltx_font_bold" style="font-size:80%;">Activation</span></td></tr>
+<tr id="S4.T1.2.2" class="ltx_tr">
+<td id="S4.T1.2.2.1" class="ltx_td ltx_align_left ltx_border_t"><span id="S4.T1.2.2.1.1" class="ltx_text" style="font-size:80%;">DeepSpeech</span></td>
+<td id="S4.T1.2.2.2" class="ltx_td ltx_align_center ltx_border_t"><span id="S4.T1.2.2.2.1" class="ltx_text" style="font-size:80%;">-</span></td>
+<td id="S4.T1.2.2.3" class="ltx_td ltx_align_center ltx_border_t"><span id="S4.T1.2.2.3.1" class="ltx_text" style="font-size:80%;">-</span></td>
+<td id="S4.T1.2.2.4" class="ltx_td ltx_align_center ltx_border_t"><span id="S4.T1.2.2.4.1" class="ltx_text" style="font-size:80%;">16x1x29</span></td>
+<td id="S4.T1.2.2.5" class="ltx_td ltx_align_center ltx_border_t"><span id="S4.T1.2.2.5.1" class="ltx_text" style="font-size:80%;">-</span></td></tr>
+<tr id="S4.T1.2.3" class="ltx_tr">
+<td id="S4.T1.2.3.1" class="ltx_td ltx_align_left ltx_border_t"><span id="S4.T1.2.3.1.1" class="ltx_text" style="font-size:80%;">Identity concat</span></td>
+<td id="S4.T1.2.3.2" class="ltx_td ltx_align_center ltx_border_t"><span id="S4.T1.2.3.2.1" class="ltx_text" style="font-size:80%;">-</span></td>
+<td id="S4.T1.2.3.3" class="ltx_td ltx_align_center ltx_border_t"><span id="S4.T1.2.3.3.1" class="ltx_text" style="font-size:80%;">-</span></td>
+<td id="S4.T1.2.3.4" class="ltx_td ltx_align_center ltx_border_t"><span id="S4.T1.2.3.4.1" class="ltx_text" style="font-size:80%;">16x1x37</span></td>
+<td id="S4.T1.2.3.5" class="ltx_td ltx_align_center ltx_border_t"><span id="S4.T1.2.3.5.1" class="ltx_text" style="font-size:80%;">-</span></td></tr>
+<tr id="S4.T1.2.4" class="ltx_tr">
+<td id="S4.T1.2.4.1" class="ltx_td ltx_align_left"><span id="S4.T1.2.4.1.1" class="ltx_text" style="font-size:80%;">Convolution</span></td>
+<td id="S4.T1.2.4.2" class="ltx_td ltx_align_center"><span id="S4.T1.2.4.2.1" class="ltx_text" style="font-size:80%;">3x1</span></td>
+<td id="S4.T1.2.4.3" class="ltx_td ltx_align_center"><span id="S4.T1.2.4.3.1" class="ltx_text" style="font-size:80%;">2x1</span></td>
+<td id="S4.T1.2.4.4" class="ltx_td ltx_align_center"><span id="S4.T1.2.4.4.1" class="ltx_text" style="font-size:80%;">8x1x32</span></td>
+<td id="S4.T1.2.4.5" class="ltx_td ltx_align_center"><span id="S4.T1.2.4.5.1" class="ltx_text" style="font-size:80%;">ReLU</span></td></tr>
+<tr id="S4.T1.2.5" class="ltx_tr">
+<td id="S4.T1.2.5.1" class="ltx_td ltx_align_left"><span id="S4.T1.2.5.1.1" class="ltx_text" style="font-size:80%;">Convolution</span></td>
+<td id="S4.T1.2.5.2" class="ltx_td ltx_align_center"><span id="S4.T1.2.5.2.1" class="ltx_text" style="font-size:80%;">3x1</span></td>
+<td id="S4.T1.2.5.3" class="ltx_td ltx_align_center"><span id="S4.T1.2.5.3.1" class="ltx_text" style="font-size:80%;">2x1</span></td>
+<td id="S4.T1.2.5.4" class="ltx_td ltx_align_center"><span id="S4.T1.2.5.4.1" class="ltx_text" style="font-size:80%;">4x1x32</span></td>
+<td id="S4.T1.2.5.5" class="ltx_td ltx_align_center"><span id="S4.T1.2.5.5.1" class="ltx_text" style="font-size:80%;">ReLU</span></td></tr>
+<tr id="S4.T1.2.6" class="ltx_tr">
+<td id="S4.T1.2.6.1" class="ltx_td ltx_align_left"><span id="S4.T1.2.6.1.1" class="ltx_text" style="font-size:80%;">Convolution</span></td>
+<td id="S4.T1.2.6.2" class="ltx_td ltx_align_center"><span id="S4.T1.2.6.2.1" class="ltx_text" style="font-size:80%;">3x1</span></td>
+<td id="S4.T1.2.6.3" class="ltx_td ltx_align_center"><span id="S4.T1.2.6.3.1" class="ltx_text" style="font-size:80%;">2x1</span></td>
+<td id="S4.T1.2.6.4" class="ltx_td ltx_align_center"><span id="S4.T1.2.6.4.1" class="ltx_text" style="font-size:80%;">2x1x64</span></td>
+<td id="S4.T1.2.6.5" class="ltx_td ltx_align_center"><span id="S4.T1.2.6.5.1" class="ltx_text" style="font-size:80%;">ReLU</span></td></tr>
+<tr id="S4.T1.2.7" class="ltx_tr">
+<td id="S4.T1.2.7.1" class="ltx_td ltx_align_left"><span id="S4.T1.2.7.1.1" class="ltx_text" style="font-size:80%;">Convolution</span></td>
+<td id="S4.T1.2.7.2" class="ltx_td ltx_align_center"><span id="S4.T1.2.7.2.1" class="ltx_text" style="font-size:80%;">3x1</span></td>
+<td id="S4.T1.2.7.3" class="ltx_td ltx_align_center"><span id="S4.T1.2.7.3.1" class="ltx_text" style="font-size:80%;">2x1</span></td>
+<td id="S4.T1.2.7.4" class="ltx_td ltx_align_center"><span id="S4.T1.2.7.4.1" class="ltx_text" style="font-size:80%;">1x1x64</span></td>
+<td id="S4.T1.2.7.5" class="ltx_td ltx_align_center"><span id="S4.T1.2.7.5.1" class="ltx_text" style="font-size:80%;">ReLU</span></td></tr>
+<tr id="S4.T1.2.8" class="ltx_tr">
+<td id="S4.T1.2.8.1" class="ltx_td ltx_align_left ltx_border_t"><span id="S4.T1.2.8.1.1" class="ltx_text" style="font-size:80%;">Identity concat</span></td>
+<td id="S4.T1.2.8.2" class="ltx_td ltx_align_center ltx_border_t"><span id="S4.T1.2.8.2.1" class="ltx_text" style="font-size:80%;">-</span></td>
+<td id="S4.T1.2.8.3" class="ltx_td ltx_align_center ltx_border_t"><span id="S4.T1.2.8.3.1" class="ltx_text" style="font-size:80%;">-</span></td>
+<td id="S4.T1.2.8.4" class="ltx_td ltx_align_center ltx_border_t"><span id="S4.T1.2.8.4.1" class="ltx_text" style="font-size:80%;">72</span></td>
+<td id="S4.T1.2.8.5" class="ltx_td ltx_align_center ltx_border_t"><span id="S4.T1.2.8.5.1" class="ltx_text" style="font-size:80%;">-</span></td></tr>
+<tr id="S4.T1.2.9" class="ltx_tr">
+<td id="S4.T1.2.9.1" class="ltx_td ltx_align_left"><span id="S4.T1.2.9.1.1" class="ltx_text" style="font-size:80%;">Fully connected</span></td>
+<td id="S4.T1.2.9.2" class="ltx_td ltx_align_center"><span id="S4.T1.2.9.2.1" class="ltx_text" style="font-size:80%;">-</span></td>
+<td id="S4.T1.2.9.3" class="ltx_td ltx_align_center"><span id="S4.T1.2.9.3.1" class="ltx_text" style="font-size:80%;">-</span></td>
+<td id="S4.T1.2.9.4" class="ltx_td ltx_align_center"><span id="S4.T1.2.9.4.1" class="ltx_text" style="font-size:80%;">128</span></td>
+<td id="S4.T1.2.9.5" class="ltx_td ltx_align_center"><span id="S4.T1.2.9.5.1" class="ltx_text" style="font-size:80%;">tanh</span></td></tr>
+<tr id="S4.T1.2.10" class="ltx_tr">
+<td id="S4.T1.2.10.1" class="ltx_td ltx_align_left"><span id="S4.T1.2.10.1.1" class="ltx_text" style="font-size:80%;">Fully connected</span></td>
+<td id="S4.T1.2.10.2" class="ltx_td ltx_align_center"><span id="S4.T1.2.10.2.1" class="ltx_text" style="font-size:80%;">-</span></td>
+<td id="S4.T1.2.10.3" class="ltx_td ltx_align_center"><span id="S4.T1.2.10.3.1" class="ltx_text" style="font-size:80%;">-</span></td>
+<td id="S4.T1.2.10.4" class="ltx_td ltx_align_center"><span id="S4.T1.2.10.4.1" class="ltx_text" style="font-size:80%;">50</span></td>
+<td id="S4.T1.2.10.5" class="ltx_td ltx_align_center"><span id="S4.T1.2.10.5.1" class="ltx_text" style="font-size:80%;">linear</span></td></tr>
+<tr id="S4.T1.2.11" class="ltx_tr">
+<td id="S4.T1.2.11.1" class="ltx_td ltx_align_left ltx_border_t"><span id="S4.T1.2.11.1.1" class="ltx_text" style="font-size:80%;">Fully connected</span></td>
+<td id="S4.T1.2.11.2" class="ltx_td ltx_align_center ltx_border_t"><span id="S4.T1.2.11.2.1" class="ltx_text" style="font-size:80%;">-</span></td>
+<td id="S4.T1.2.11.3" class="ltx_td ltx_align_center ltx_border_t"><span id="S4.T1.2.11.3.1" class="ltx_text" style="font-size:80%;">-</span></td>
+<td id="S4.T1.2.11.4" class="ltx_td ltx_align_center ltx_border_t"><span id="S4.T1.2.11.4.1" class="ltx_text" style="font-size:80%;">5023x3</span></td>
+<td id="S4.T1.2.11.5" class="ltx_td ltx_align_center ltx_border_t"><span id="S4.T1.2.11.5.1" class="ltx_text" style="font-size:80%;">linear</span></td></tr>
+</tbody>
+</table>
+<figcaption class="ltx_caption" style="font-size:80%;"><span class="ltx_tag ltx_tag_table"><span id="S4.T1.5" class="ltx_text" style="font-size:113%;">Table 1</span>: </span><span id="S4.T1.6" class="ltx_text" style="font-size:113%;">Model architecture.</span></figcaption>
+</figure>
+<div id="S4.p1" class="ltx_para">
+<p id="S4.p1.1" class="ltx_p">This section describes the model architecture and provides details on how the input audio is processed.</p>
+</div>
+<div id="S4.p2" class="ltx_para">
+<p id="S4.p2.1" class="ltx_p"><span id="S4.p2.1.1" class="ltx_text ltx_font_bold">Overview:</span> VOCA receives as input a subject-specific template <span id="S4.p2.1.2" class="ltx_text ltx_markedasmath ltx_font_bold">T</span> and the raw audio signal, from which we extract features using DeepSpeech <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib29" title="" class="ltx_ref">hannun2014deep</a></cite>. The desired output is the target 3D mesh. VOCA acts as an encoder-decoder network (see Figure <a href="#S4.F2" title="Figure 2 ‣ 4 VOCA ‣ Capture, Learning, and Synthesis of 3D Speaking Styles" class="ltx_ref"><span class="ltx_text ltx_ref_tag">2</span></a> and Table <a href="#S4.T1" title="Table 1 ‣ 4 VOCA ‣ Capture, Learning, and Synthesis of 3D Speaking Styles" class="ltx_ref"><span class="ltx_text ltx_ref_tag">1</span></a>) where the encoder learns to transform audio features to a low-dimensional embedding and the decoder maps this embedding into a high-dimensional space of 3D vertex displacements</p>
+</div>
+<div id="S4.p3" class="ltx_para">
+<p id="S4.p3.1" class="ltx_p"><span id="S4.p3.1.1" class="ltx_text ltx_font_bold">Speech feature extraction:</span> Given an input audio clip of length <math id="S4.p3.m1" class="ltx_Math" alttext="T" display="inline" intent=":literal"><mi>T</mi></math> seconds, we use DeepSpeech to extract speech features. The outputs are unnormalized log probabilities of characters for frames of length 0.02 s (50 frames per second); thus, it is an array of size <math id="S4.p3.m2" class="ltx_Math" alttext="50T\times D" display="inline" intent=":literal"><mrow><mrow><mn>50</mn><mo>⁢</mo><mi>T</mi></mrow><mo lspace="0.222em" rspace="0.222em">×</mo><mi>D</mi></mrow></math>, where <math id="S4.p3.m3" class="ltx_Math" alttext="D" display="inline" intent=":literal"><mi>D</mi></math> is the number of characters in the alphabet plus one for a blank label. We resample the output to 60 fps using linear interpolation. In order to incorporate temporal information, we convert the audio frames to overlapping windows of size <math id="S4.p3.m4" class="ltx_Math" alttext="W\times D" display="inline" intent=":literal"><mrow><mi>W</mi><mo lspace="0.222em" rspace="0.222em">×</mo><mi>D</mi></mrow></math>, where <math id="S4.p3.m5" class="ltx_Math" alttext="W" display="inline" intent=":literal"><mi>W</mi></math> is the window size. The output is a three-dimensional array of dimensions <math id="S4.p3.m6" class="ltx_Math" alttext="60T\times W\times D" display="inline" intent=":literal"><mrow><mrow><mn>60</mn><mo>⁢</mo><mi>T</mi></mrow><mo lspace="0.222em" rspace="0.222em">×</mo><mi>W</mi><mo lspace="0.222em" rspace="0.222em">×</mo><mi>D</mi></mrow></math>.</p>
+</div>
+<div id="S4.p4" class="ltx_para">
+<p id="S4.p4.1" class="ltx_p"><span id="S4.p4.1.1" class="ltx_text ltx_font_bold">Encoder:</span> The encoder is composed of four convolutional layers and two fully connected layers. The speech features and the final convolutional layer are conditioned on the subject labels to learn subject-specific styles when trained across multiple subjects. For eight training subjects, each subject <math id="S4.p4.m1" class="ltx_Math" alttext="j" display="inline" intent=":literal"><mi>j</mi></math> is encoded as an one-hot-vector <math id="S4.p4.m2" class="ltx_Math" alttext="I_{j}=\left(\delta_{ij}\right)_{1\leq i\leq 8}" display="inline" intent=":literal"><mrow><msub><mi>I</mi><mi>j</mi></msub><mo>=</mo><msub><mrow><mo>(</mo><msub><mi>δ</mi><mrow><mi>i</mi><mo>⁢</mo><mi>j</mi></mrow></msub><mo>)</mo></mrow><mrow><mn>1</mn><mo mathsize="70%">≤</mo><mi>i</mi><mo mathsize="70%">≤</mo><mn>8</mn></mrow></msub></mrow></math>. This vector is concatenated to each <math id="S4.p4.m3" class="ltx_Math" alttext="D" display="inline" intent=":literal"><mi>D</mi></math>-dimensional speech feature vector (i.e. resulting in windows of dimension <math id="S4.p4.m4" class="ltx_Math" alttext="W\times(D+8)" display="inline" intent=":literal"><mrow><mi>W</mi><mo lspace="0.222em" rspace="0.222em">×</mo><mrow><mo stretchy="false">(</mo><mrow><mi>D</mi><mo>+</mo><mn>8</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></math>), and concatenated to the output of the final convolution layer.</p>
+</div>
+<div id="S4.p5" class="ltx_para">
+<p id="S4.p5.1" class="ltx_p">To learn temporal features and reduce the dimensionality of the input, each convolutional layer uses a kernel of dimension <math id="S4.p5.m1" class="ltx_Math" alttext="3\times 1" display="inline" intent=":literal"><mrow><mn>3</mn><mo lspace="0.222em" rspace="0.222em">×</mo><mn>1</mn></mrow></math> and stride <math id="S4.p5.m2" class="ltx_Math" alttext="2\times 1" display="inline" intent=":literal"><mrow><mn>2</mn><mo lspace="0.222em" rspace="0.222em">×</mo><mn>1</mn></mrow></math>. As the features extracted using DeepSpeech do not have any spatial correlation, we reshape the input window to have dimensions <math id="S4.p5.m3" class="ltx_Math" alttext="W\times 1\times(D+8)" display="inline" intent=":literal"><mrow><mi>W</mi><mo lspace="0.222em" rspace="0.222em">×</mo><mn>1</mn><mo lspace="0.222em" rspace="0.222em">×</mo><mrow><mo stretchy="false">(</mo><mrow><mi>D</mi><mo>+</mo><mn>8</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></math> and perform 1D convolutions over the temporal dimension. To avoid overfitting, we keep the number of parameters small and only learn 32 filters for the first two, and 64 filters for the last two convolutional layers.</p>
+</div>
+<div id="S4.p6" class="ltx_para">
+<p id="S4.p6.1" class="ltx_p">The concatenation of the final convolutional layer with the subject encoding is followed by two fully connected layers. The first has 128 units and a hyperbolic tangent activation function; the second is a linear layer with 50 units.</p>
+</div>
+<div id="S4.p7" class="ltx_para">
+<p id="S4.p7.1" class="ltx_p"><span id="S4.p7.1.1" class="ltx_text ltx_font_bold">Decoder:</span> The decoder of VOCA is a fully connected layer with linear activation function, outputting the <math id="S4.p7.m1" class="ltx_Math" alttext="5023\times 3" display="inline" intent=":literal"><mrow><mn>5023</mn><mo lspace="0.222em" rspace="0.222em">×</mo><mn>3</mn></mrow></math> dimensional array of vertex displacements from <span id="S4.p7.1.2" class="ltx_text ltx_markedasmath ltx_font_bold">T</span>. The weights of the layer are initialized by <math id="S4.p7.m3" class="ltx_Math" alttext="50" display="inline" intent=":literal"><mn>50</mn></math> PCA components computed over the vertex displacements of the training data; the bias is initialized with zeros.</p>
+</div>
+<div id="S4.p8" class="ltx_para">
+<p id="S4.p8.1" class="ltx_p"><span id="S4.p8.1.1" class="ltx_text ltx_font_bold">Animation control:</span> During inference, changing the eight-dimensional one-hot-vector alters the output speaking style. The output of VOCA is an expressed 3D face in “zero pose” with the same mesh topology as the FLAME face model <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib37" title="" class="ltx_ref">flame2017</a></cite>. VOCA’s compatibility with FLAME allows alteration of the identity-dependent facial shape by adding weighted shape blendshapes from FLAME. The face expression and pose (i.e. head, jaw, and eyeball rotations) can also be changed using the blendweights, joints, and pose blendshapes provided by FLAME.</p>
+</div>
+</section>
+<section id="S5" class="ltx_section">
+<h2 class="ltx_title ltx_title_section"><span class="ltx_tag ltx_tag_section">5 </span>Model training</h2>
+
+<div id="S5.p1" class="ltx_para">
+<p id="S5.p1.1" class="ltx_p">In this section we describe training relevant details.</p>
+</div>
+<div id="S5.p2" class="ltx_para">
+<p id="S5.p2.1" class="ltx_p"><span id="S5.p2.1.1" class="ltx_text ltx_font_bold">Training set-up:</span> We start from a large dataset of audio-4D scan pairs, denoted as <math id="S5.p2.m1" class="ltx_Math" alttext="\{(\textbf{x}_{i},\textbf{y}_{i})\}_{i=1}^{F}" display="inline" intent=":literal"><msubsup><mrow><mo stretchy="false">{</mo><mrow><mo stretchy="false">(</mo><msub><mtext>x</mtext><mi>i</mi></msub><mo>,</mo><msub><mtext>y</mtext><mi>i</mi></msub><mo stretchy="false">)</mo></mrow><mo stretchy="false">}</mo></mrow><mrow><mi>i</mi><mo mathsize="70%">=</mo><mn>1</mn></mrow><mi>F</mi></msubsup></math>. Here <math id="S5.p2.m2" class="ltx_Math" alttext="\textbf{x}_{i}\in\mathbb{R}^{W\times D}" display="inline" intent=":literal"><mrow><msub><mtext>x</mtext><mi>i</mi></msub><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>W</mi><mo lspace="0.222em" mathsize="70%" rspace="0.222em">×</mo><mi>D</mi></mrow></msup></mrow></math> is the input audio window centered at the <math id="S5.p2.m3" class="ltx_Math" alttext="i" display="inline" intent=":literal"><mi>i</mi></math>th video frame, <math id="S5.p2.m4" class="ltx_Math" alttext="\textbf{y}_{i}\in\mathbb{R}^{N\times 3}" display="inline" intent=":literal"><mrow><msub><mtext>y</mtext><mi>i</mi></msub><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>N</mi><mo lspace="0.222em" mathsize="70%" rspace="0.222em">×</mo><mn>3</mn></mrow></msup></mrow></math>. Further, let <math id="S5.p2.m5" class="ltx_Math" alttext="\textbf{f}_{i}\in\mathbb{R}^{N\times 3}" display="inline" intent=":literal"><mrow><msub><mtext>f</mtext><mi>i</mi></msub><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>N</mi><mo lspace="0.222em" mathsize="70%" rspace="0.222em">×</mo><mn>3</mn></mrow></msup></mrow></math> denote the output of VOCA for <math id="S5.p2.m6" class="ltx_Math" alttext="\textbf{x}_{i}" display="inline" intent=":literal"><msub><mtext>x</mtext><mi>i</mi></msub></math>.</p>
+</div>
+<div id="S5.p3" class="ltx_para">
+<p id="S5.p3.1" class="ltx_p">For training, we split the captured data into a training set (eight subjects), a validation set (two subjects), and a test set (two subjects). The training set consists of all 40 sentences of the eight subjects, i.e. in total 320 sentences.
+For validation and test data, we only select the 20 unique sentences that are not shared with any other subject, i.e. 40 sentences for validation and testing, respectively. Note that our training, validation, and test sets for all experiments are fully disjoint, i.e. no overlap of subjects or sentences exists.</p>
+</div>
+<div id="S5.p4" class="ltx_para">
+<p id="S5.p4.1" class="ltx_p"><span id="S5.p4.1.1" class="ltx_text ltx_font_bold">Loss function:</span> Our training loss function consists of two terms, a position term and a velocity term. The position term <math id="S5.p4.m1" class="ltx_math_unparsed" alttext="E_{p}=\|\textbf{y}_{i}-\textbf{f}_{i}\|_{F}^{2}" display="inline" intent=":literal"><mrow><mi>E</mi><msub><mrow></mrow><mi>p</mi></msub><mo>=</mo><mo rspace="0.167em">∥</mo><mtext>y</mtext><msub><mrow></mrow><mi>i</mi></msub><mo>−</mo><mtext>f</mtext><msub><mrow></mrow><mi>i</mi></msub><mo lspace="0em" rspace="0.167em">∥</mo><msub><mrow></mrow><mi>F</mi></msub><msup><mrow></mrow><mn>2</mn></msup></mrow></math> computes the distance between the predicted outputs and the training vertices. This position term encourages the model to match the ground truth performance. The velocity term <math id="S5.p4.m2" class="ltx_math_unparsed" alttext="E_{v}=\|(\textbf{y}_{i}-\textbf{y}_{i-1})-(\textbf{f}_{i}-\textbf{f}_{i-1})\|_{F}^{2}" display="inline" intent=":literal"><mrow><msub><mi>E</mi><mi>v</mi></msub><mo>=</mo><mo rspace="0.167em">∥</mo><mrow><mo stretchy="false">(</mo><msub><mtext>y</mtext><mi>i</mi></msub><mo>−</mo><msub><mtext>y</mtext><mrow><mi>i</mi><mo mathsize="70%">−</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow><mo>−</mo><mrow><mo stretchy="false">(</mo><msub><mtext>f</mtext><mi>i</mi></msub><mo>−</mo><msub><mtext>f</mtext><mrow><mi>i</mi><mo mathsize="70%">−</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow><msubsup><mo>∥</mo><mi>F</mi><mn>2</mn></msubsup></mrow></math> uses backward finite differences. It computes the distance between the differences of consecutive frames between predicted outputs and training vertices. This velocity term induces temporal stability.</p>
+</div>
+<div id="S5.p5" class="ltx_para">
+<p id="S5.p5.1" class="ltx_p"><span id="S5.p5.1.1" class="ltx_text ltx_font_bold">Training parameters:</span> We perform hyperparameter tuning on the held-out validation set. We train VOCA for 50 epochs with a constant learning rate of <math id="S5.p5.m1" class="ltx_Math" alttext="1e-4" display="inline" intent=":literal"><mrow><mrow><mn>1</mn><mo>⁢</mo><mi>e</mi></mrow><mo>−</mo><mn>4</mn></mrow></math>. The weights for the position and velocity terms are <math id="S5.p5.m2" class="ltx_Math" alttext="1.0" display="inline" intent=":literal"><mn>1.0</mn></math> and <math id="S5.p5.m3" class="ltx_Math" alttext="10.0" display="inline" intent=":literal"><mn>10.0</mn></math>, respectively. During training, we use batch normalization with a batch size of 64. We use a window size of <math id="S5.p5.m4" class="ltx_Math" alttext="W=16" display="inline" intent=":literal"><mrow><mi>W</mi><mo>=</mo><mn>16</mn></mrow></math> with <math id="S5.p5.m5" class="ltx_Math" alttext="D=29" display="inline" intent=":literal"><mrow><mi>D</mi><mo>=</mo><mn>29</mn></mrow></math> speech features.</p>
+</div>
+<div id="S5.p6" class="ltx_para">
+<p id="S5.p6.1" class="ltx_p"><span id="S5.p6.1.1" class="ltx_text ltx_font_bold">Implementation details: </span> VOCA is implemented in Python using TensorFlow <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib1" title="" class="ltx_ref">Abadi2016</a></cite>, and trained using Adam <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib34" title="" class="ltx_ref">kingma2014adam</a></cite>. Training one epoch takes about ten minutes on a single NVIDIA Tesla K20. We use a pre-trained DeepSpeech model <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib40" title="" class="ltx_ref">mozillaDeepSpeech</a></cite> which is kept fixed during training.</p>
+</div>
+</section>
+<section id="S6" class="ltx_section">
+<h2 class="ltx_title ltx_title_section"><span class="ltx_tag ltx_tag_section">6 </span>VOCASET</h2>
+
+<div id="S6.p1" class="ltx_para">
+<p id="S6.p1.1" class="ltx_p">This section introduces VOCASET and describes the capture setup and data processing.</p>
+</div>
+<div id="S6.p2" class="ltx_para">
+<p id="S6.p2.1" class="ltx_p"><span id="S6.p2.1.1" class="ltx_text ltx_font_bold">VOCASET:</span> Our dataset contains a collection of audio-4D scan pairs captured from 6 female and 6 male subjects. For each subject, we collect 40 sequences of a sentence spoken in English, each of length three to five seconds. The sentences were taken from an array of standard protocols and were selected to maximize phonetic diversity using the method described in <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib27" title="" class="ltx_ref">fisher1986</a></cite>. In particular, each subject spoke 27 sentences from the TIMIT corpus <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib28" title="" class="ltx_ref">timit1993</a></cite>, three pangrams used by <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib33" title="" class="ltx_ref">karras2017</a></cite>, and 10 questions from the Stanford Question Answering Dataset (SQuAD) <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib43" title="" class="ltx_ref">squad2016</a></cite>. The recorded sequences are distributed such that five sentences are shared across all subjects, 15 sentences are spoken by three to five subjects (50 unique sentences), and 20 sentences are spoken only by one or two subjects (200 unique sentences). We make VOCASET available to the research community.</p>
+</div>
+<figure id="S6.F3" class="ltx_figure">
+<div class="ltx_flex_figure">
+<div class="ltx_flex_cell ltx_flex_size_1">
+<p id="S6.F3.2" class="ltx_p ltx_align_center ltx_figure_panel"><span id="S6.F3.2.1" class="ltx_text">
+<img src="reg_subj1_00000.png" id="S6.F3.g1" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="reg_subj1_00023.png" id="S6.F3.g2" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="reg_subj1_00081.png" id="S6.F3.g3" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="reg_subj1_00132.png" id="S6.F3.g4" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption"></span></p></div><div class="ltx_flex_break"></div><div class="ltx_flex_cell ltx_flex_size_1">
+<p id="S6.F3.3" class="ltx_p ltx_align_center ltx_figure_panel"><span id="S6.F3.3.1" class="ltx_text"><img src="reg_subj2_00000.png" id="S6.F3.g5" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="reg_subj2_00013.png" id="S6.F3.g6" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="reg_subj2_00094.png" id="S6.F3.g7" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption"> <img src="reg_subj2_00189.png" id="S6.F3.g8" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption"></span></p></div></div>
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span id="S6.F3.4" class="ltx_text" style="font-size:90%;">Figure 3</span>: </span><span id="S6.F3.5" class="ltx_text" style="font-size:90%;">Sample meshes of two VOCASET subjects.</span></figcaption>
+</figure>
+<div id="S6.p3" class="ltx_para">
+<p id="S6.p3.1" class="ltx_p"><span id="S6.p3.1.1" class="ltx_text ltx_font_bold">Capture setup:</span> We use a multi-camera active stereo system (3dMD LLC, Atlanta) to capture high-quality 3D head scans and audio. The capture system consists of six pairs of gray-scale stereo cameras, six color cameras, five speckle pattern projectors, and six white light LED panels. The system captures 3D meshes at 60fps, each with about 120K vertices. The color images are used to generate UV texture maps for each scan. The audio, synchronized with the scanner, is captured with a sample rate of 22 kHz.</p>
+</div>
+<div id="S6.p4" class="ltx_para">
+<p id="S6.p4.1" class="ltx_p"><span id="S6.p4.1.1" class="ltx_text ltx_font_bold">Data processing:</span> The raw 3D head scans are registered with a sequential alignment method as described in <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib37" title="" class="ltx_ref">flame2017</a></cite> using the publicly available generic FLAME model. The image-based landmark prediction method of <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib9" title="" class="ltx_ref">BulatTzimiropoulos</a></cite> is used during alignment to add robustness while tracking fast facial motions. After alignment, each mesh consists of <math id="S6.p4.m1" class="ltx_Math" alttext="5023" display="inline" intent=":literal"><mn>5023</mn></math> 3D vertices. For all scans, we measure the absolute distance between each scan vertex and the closest point in the FLAME alignment surface: median (0.09mm), mean (0.13mm), and standard deviation (0.14mm). Thus, the alignments faithfully represent the raw data.</p>
+</div>
+<div id="S6.p5" class="ltx_para">
+<p id="S6.p5.1" class="ltx_p">All meshes are then unposed; i.e. effects of global rotation, translation, and head rotation around the neck are removed. After unposing, all meshes are in “zero pose”. For each sequence, the neck boundary and the ears are automatically fixed, and the region around the eyes is smoothed using Gaussian filtering to remove capture noise. Note that no smoothing is applied to the mouth region so as to preserve subtle motions. Figure <a href="#S6.F3" title="Figure 3 ‣ 6 VOCASET ‣ Capture, Learning, and Synthesis of 3D Speaking Styles" class="ltx_ref"><span class="ltx_text ltx_ref_tag">3</span></a> shows sample alignments of two VOCASET subjects. The supplementary video shows sequences of all subjects.</p>
+</div>
+</section>
+<section id="S7" class="ltx_section">
+<h2 class="ltx_title ltx_title_section"><span class="ltx_tag ltx_tag_section">7 </span>Experiments</h2>
+
+<div id="S7.p1" class="ltx_para">
+<p id="S7.p1.1" class="ltx_p">Quantitative metrics, such as the norm on the prediction error, are not suitable for evaluating animation quality. This is because facial visemes form many-to-many mappings with speech utterances. A wide range of plausible facial motions exists for the same speech sequence, which makes quantitative evaluation intractable. Instead, we perform perceptual and qualitative evaluations. Further, our trained model is available for research purposes for direct comparisons <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib58" title="" class="ltx_ref">VOCA_project</a></cite>.</p>
+</div>
+<section id="S7.SS1" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection"><span class="ltx_tag ltx_tag_subsection">7.1 </span>Perceptual evaluation</h3>
+
+<div id="S7.SS1.p1" class="ltx_para">
+<p id="S7.SS1.p1.1" class="ltx_p"><span id="S7.SS1.p1.1.1" class="ltx_text ltx_font_bold">User study:</span> We conduct three  <span title="" class="ltx_glossaryref"></span> (<abbr title="" class="ltx_glossaryref"></abbr>) blind user studies: i) a binary comparison between held-out test sequences and our model conditioned on all training subjects, ii) an ablation study to assess the effectiveness of the DeepSpeech features, and iii) a study to investigate the correlation between style, content, and identity. All experiments are performed on sequences and subjects fully disjoint from our training and validation set.</p>
+</div>
+<div id="S7.SS1.p2" class="ltx_para">
+<p id="S7.SS1.p2.1" class="ltx_p">For binary comparisons, two videos with the same animated subject and audio clip are shown side by side. For each video pair, the participant is asked to choose the talking head that moves more naturally and in accordance with the audio. To avoid any selection bias, the order (left/right) of all methods for comparison is random for each pair.</p>
+</div>
+<div id="S7.SS1.p3" class="ltx_para">
+<p id="S7.SS1.p3.1" class="ltx_p">Style comparisons are used to evaluate the learned speaking styles. Here, Turkers see three videos: one reference and two predictions. The task is to determine which of the two predictions is more similar to the reference video.</p>
+</div>
+<div id="S7.SS1.p4" class="ltx_para">
+<p id="S7.SS1.p4.1" class="ltx_p">To ensure the quality of the study and remove potential outliers, we require Turkers to pass a simple qualification test before they are allowed to submit HITs. The qualification task is a simplified version of the following user study, where we show three comparisons with an obvious answer, i.e. one ground-truth sequence and one sequence with completely mismatched video and audio.</p>
+</div>
+<div id="S7.SS1.p5" class="ltx_para">
+<p id="S7.SS1.p5.1" class="ltx_p"><span id="S7.SS1.p5.1.1" class="ltx_text ltx_font_bold">Comparison to recorded performance:</span> We compare captured and processed test sequences with VOCA predictions conditioned on all eight speaker styles.
+In total, Turkers (<math id="S7.SS1.p5.m1" class="ltx_Math" alttext="400" display="inline" intent=":literal"><mn>400</mn></math> HITs) perceived the recorded performance more natural (<math id="S7.SS1.p5.m2" class="ltx_Math" alttext="83\pm 9\%" display="inline" intent=":literal"><mrow><mn>83</mn><mo>±</mo><mrow><mn>9</mn><mo>%</mo></mrow></mrow></math>) than the predictions (<math id="S7.SS1.p5.m3" class="ltx_Math" alttext="17\pm 9\%" display="inline" intent=":literal"><mrow><mn>17</mn><mo>±</mo><mrow><mn>9</mn><mo>%</mo></mrow></mrow></math>), across all conditions.
+While VOCA results in realistic facial motion for the unseen subjects, it is unable to synthesize the idiosyncrasies of these subjects.
+As such, these subtle subject-specific details make the recorded sequences look more natural than the predictions.</p>
+</div>
+<div id="S7.SS1.p6" class="ltx_para">
+<p id="S7.SS1.p6.1" class="ltx_p"><span id="S7.SS1.p6.1.1" class="ltx_text ltx_font_bold">Speech feature ablation:</span> We replace the DeepSpeech features by Mel-filterbank energy features (fbank) and train a model for <math id="S7.SS1.p6.m1" class="ltx_Math" alttext="50" display="inline" intent=":literal"><mn>50</mn></math> epochs (the same as for VOCA). Turkers (<math id="S7.SS1.p6.m2" class="ltx_Math" alttext="400" display="inline" intent=":literal"><mn>400</mn></math> HITs) perceived the performance of VOCA with DeepSpeech more natural (<math id="S7.SS1.p6.m3" class="ltx_Math" alttext="78\pm 16\%" display="inline" intent=":literal"><mrow><mn>78</mn><mo>±</mo><mrow><mn>16</mn><mo>%</mo></mrow></mrow></math>) than with fbank features (<math id="S7.SS1.p6.m4" class="ltx_Math" alttext="22\pm 16\%" display="inline" intent=":literal"><mrow><mn>22</mn><mo>±</mo><mrow><mn>16</mn><mo>%</mo></mrow></mrow></math>) across all conditions. That indicates that VOCA with DeepSpeech features generalizes better to unseen audio sequences than with fbank features.</p>
+</div>
+<div id="S7.SS1.p7" class="ltx_para">
+<p id="S7.SS1.p7.1" class="ltx_p"><span id="S7.SS1.p7.1.1" class="ltx_text ltx_font_bold">Style comparisons:</span> Speech-driven facial performance varies greatly across subjects.
+However, it is difficult to separate between style (facial motion of a subject), identity (facial shape of a subject), and content (the words being said), and how these different factors influence perception.
+The goal of this user study is to evaluate the speech-driven facial motion independently from identity-dependent face shape in order to understand if people can recognize the styles learned by our model.</p>
+</div>
+<div id="S7.SS1.p8" class="ltx_para">
+<p id="S7.SS1.p8.1" class="ltx_p">To accomplish this, we subtract the personalized template (neutral face) from all sequences to obtain “displacements”, then add these displacements to a single common template (randomly sampled from the FLAME shape space).
+Then, for several reference sequences from the training data, we compare two VOCA predictions (on audio from the test set): one conditioned on the reference subject and one conditioned on another randomly selected subject.
+We ask Turkers to select which predicted sequence is more similar in speaking style to the reference.</p>
+</div>
+<div id="S7.SS1.p9" class="ltx_para">
+<p id="S7.SS1.p9.1" class="ltx_p">To explore the influence of content, we perform the experiment twice, once where the reference video and the predictions share the same sentence (spoken by different subjects) and once with different sentences.
+Figure <a href="#S7.F4" title="Figure 4 ‣ 7.1 Perceptual evaluation ‣ 7 Experiments ‣ Capture, Learning, and Synthesis of 3D Speaking Styles" class="ltx_ref"><span class="ltx_text ltx_ref_tag">4</span></a> shows the results for this experiment. Results varied greatly across conditions. For some conditions, Turkers could consistently pick the sequence with the matching style (e.g. conditions 3, 4, and 5); for others, their choices were no better or worse than chance. The impact of the content was not significant for most conditions.
+More research is needed to understand which factors are important for people to recognize different speaking styles, and to develop new models that more efficiently disentangle facial shape and motion.</p>
+</div>
+<figure id="S7.F4" class="ltx_figure"><span class="ltx_inline-block"><svg id="S7.F4.pic1" class="ltx_picture ltx_centering" height="297.64" overflow="visible" version="1.1" viewBox="0 0 319.38 297.64" width="319.38"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="translate(0,297.64) matrix(1 0 0 -1 0 0) translate(49.27,0) translate(0,39.86) matrix(1.0 0.0 0.0 1.0 -49.27 -39.86)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(49.27,0) translate(0,39.86)"><g style="--ltx-stroke-color:#BFBFBF;" stroke="#BFBFBF"><g style="--ltx-fill-color:#BFBFBF;--ltx-fg-color:#BFBFBF;" color="#BFBFBF" fill="#BFBFBF" stroke-width="0.4pt"><path style="fill:none" d="M 0 22.42 L 269.83 22.42 M 0 44.83 L 269.83 44.83 M 0 67.25 L 269.83 67.25 M 0 89.66 L 269.83 89.66 M 0 112.08 L 269.83 112.08 M 0 134.5 L 269.83 134.5 M 0 156.91 L 269.83 156.91 M 0 179.33 L 269.83 179.33 M 0 201.74 L 269.83 201.74"></path></g><path style="fill:none" d="M 0 0 L 0 224.16 L 269.83 224.16 L 269.83 0 L 0 0 Z"></path><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 26.78 -18.48)"><foreignObject style="--ltx-fo-width:0.5em;--ltx-fo-height:0.64em;--ltx-fo-depth:0em;" height="8.15" overflow="visible" transform="matrix(1 0 0 -1 0 8.15)" width="6.4"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.1" class="ltx_text ltx_font_sansserif" style="font-size:90%;">1</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 56.76 -18.48)"><foreignObject style="--ltx-fo-width:0.5em;--ltx-fo-height:0.64em;--ltx-fo-depth:0em;" height="8.15" overflow="visible" transform="matrix(1 0 0 -1 0 8.15)" width="6.4"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.2" class="ltx_text ltx_font_sansserif" style="font-size:90%;">2</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 86.74 -18.48)"><foreignObject style="--ltx-fo-width:0.5em;--ltx-fo-height:0.64em;--ltx-fo-depth:0em;" height="8.15" overflow="visible" transform="matrix(1 0 0 -1 0 8.15)" width="6.4"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.3" class="ltx_text ltx_font_sansserif" style="font-size:90%;">3</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 116.73 -18.48)"><foreignObject style="--ltx-fo-width:0.5em;--ltx-fo-height:0.64em;--ltx-fo-depth:0em;" height="8.15" overflow="visible" transform="matrix(1 0 0 -1 0 8.15)" width="6.4"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.4" class="ltx_text ltx_font_sansserif" style="font-size:90%;">4</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 146.71 -18.48)"><foreignObject style="--ltx-fo-width:0.5em;--ltx-fo-height:0.64em;--ltx-fo-depth:0em;" height="8.15" overflow="visible" transform="matrix(1 0 0 -1 0 8.15)" width="6.4"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.5" class="ltx_text ltx_font_sansserif" style="font-size:90%;">5</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 176.69 -18.48)"><foreignObject style="--ltx-fo-width:0.5em;--ltx-fo-height:0.64em;--ltx-fo-depth:0em;" height="8.15" overflow="visible" transform="matrix(1 0 0 -1 0 8.15)" width="6.4"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.6" class="ltx_text ltx_font_sansserif" style="font-size:90%;">6</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 206.67 -18.48)"><foreignObject style="--ltx-fo-width:0.5em;--ltx-fo-height:0.64em;--ltx-fo-depth:0em;" height="8.15" overflow="visible" transform="matrix(1 0 0 -1 0 8.15)" width="6.4"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.7" class="ltx_text ltx_font_sansserif" style="font-size:90%;">7</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 236.65 -18.48)"><foreignObject style="--ltx-fo-width:0.5em;--ltx-fo-height:0.64em;--ltx-fo-depth:0em;" height="8.15" overflow="visible" transform="matrix(1 0 0 -1 0 8.15)" width="6.4"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.8" class="ltx_text ltx_font_sansserif" style="font-size:90%;">8</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 -27.89 18.09)"><foreignObject style="--ltx-fo-width:1.83em;--ltx-fo-height:0.73em;--ltx-fo-depth:0.05em;" height="10.03" overflow="visible" transform="matrix(1 0 0 -1 0 9.34)" width="23.47"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.9" class="ltx_text ltx_font_sansserif" style="font-size:90%;">10%</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 -27.89 40.51)"><foreignObject style="--ltx-fo-width:1.83em;--ltx-fo-height:0.73em;--ltx-fo-depth:0.05em;" height="10.03" overflow="visible" transform="matrix(1 0 0 -1 0 9.34)" width="23.47"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.10" class="ltx_text ltx_font_sansserif" style="font-size:90%;">20%</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 -27.89 62.92)"><foreignObject style="--ltx-fo-width:1.83em;--ltx-fo-height:0.73em;--ltx-fo-depth:0.05em;" height="10.03" overflow="visible" transform="matrix(1 0 0 -1 0 9.34)" width="23.47"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.11" class="ltx_text ltx_font_sansserif" style="font-size:90%;">30%</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 -27.89 85.34)"><foreignObject style="--ltx-fo-width:1.83em;--ltx-fo-height:0.73em;--ltx-fo-depth:0.05em;" height="10.03" overflow="visible" transform="matrix(1 0 0 -1 0 9.34)" width="23.47"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.12" class="ltx_text ltx_font_sansserif" style="font-size:90%;">40%</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 -27.89 107.76)"><foreignObject style="--ltx-fo-width:1.83em;--ltx-fo-height:0.73em;--ltx-fo-depth:0.05em;" height="10.03" overflow="visible" transform="matrix(1 0 0 -1 0 9.34)" width="23.47"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.13" class="ltx_text ltx_font_sansserif" style="font-size:90%;">50%</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 -27.89 130.17)"><foreignObject style="--ltx-fo-width:1.83em;--ltx-fo-height:0.73em;--ltx-fo-depth:0.05em;" height="10.03" overflow="visible" transform="matrix(1 0 0 -1 0 9.34)" width="23.47"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.14" class="ltx_text ltx_font_sansserif" style="font-size:90%;">60%</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 -27.89 152.59)"><foreignObject style="--ltx-fo-width:1.83em;--ltx-fo-height:0.73em;--ltx-fo-depth:0.05em;" height="10.03" overflow="visible" transform="matrix(1 0 0 -1 0 9.34)" width="23.47"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.15" class="ltx_text ltx_font_sansserif" style="font-size:90%;">70%</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 -27.89 175)"><foreignObject style="--ltx-fo-width:1.83em;--ltx-fo-height:0.73em;--ltx-fo-depth:0.05em;" height="10.03" overflow="visible" transform="matrix(1 0 0 -1 0 9.34)" width="23.47"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.16" class="ltx_text ltx_font_sansserif" style="font-size:90%;">80%</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 -27.89 197.42)"><foreignObject style="--ltx-fo-width:1.83em;--ltx-fo-height:0.73em;--ltx-fo-depth:0.05em;" height="10.03" overflow="visible" transform="matrix(1 0 0 -1 0 9.34)" width="23.47"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.17" class="ltx_text ltx_font_sansserif" style="font-size:90%;">90%</span></span></span></foreignObject></g><clipPath id="pgfcp1"><path d="M 0 0 L 269.83 0 L 269.83 224.16 L 0 224.16 Z"></path></clipPath><g clip-path="url(#pgfcp1)"><g style="--ltx-fill-color:#1E78B2;" fill="#1E78B2"><g stroke-opacity="0"><path d="M 20.3 0 h 9.69 v 56.04 h -9.69 Z M 50.28 0 h 9.69 v 107.6 h -9.69 Z M 80.26 0 h 9.69 v 195.02 h -9.69 Z M 110.24 0 h 9.69 v 152.43 h -9.69 Z M 140.22 0 h 9.69 v 179.33 h -9.69 Z M 170.2 0 h 9.69 v 107.6 h -9.69 Z M 200.18 0 h 9.69 v 123.29 h -9.69 Z M 230.16 0 h 9.69 v 33.62 h -9.69 Z"></path></g><g style="--ltx-stroke-color:#000000;" stroke="#000000" stroke-opacity="1" stroke-width="0.4pt"><path d="M 25.14 56.04 L 25.14 86.08"></path><g transform="matrix(0.0 1.0 -1.0 0.0 27.91 86.08)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 25.14 56.04 L 25.14 26"></path><g transform="matrix(0.0 -1.0 1.0 0.0 22.37 26)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 55.12 107.6 L 55.12 135.84"></path><g transform="matrix(0.0 1.0 -1.0 0.0 57.89 135.84)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 55.12 107.6 L 55.12 79.35"></path><g transform="matrix(0.0 -1.0 1.0 0.0 52.35 79.35)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 85.1 195.02 L 85.1 214.3"></path><g transform="matrix(0.0 1.0 -1.0 0.0 87.87 214.3)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 85.1 195.02 L 85.1 175.74"></path><g transform="matrix(0.0 -1.0 1.0 0.0 82.33 175.74)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 115.08 152.43 L 115.08 184.93"></path><g transform="matrix(0.0 1.0 -1.0 0.0 117.85 184.93)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 115.08 152.43 L 115.08 119.92"></path><g transform="matrix(0.0 -1.0 1.0 0.0 112.31 119.92)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 145.06 179.33 L 145.06 201.97"></path><g transform="matrix(0.0 1.0 -1.0 0.0 147.83 201.97)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 145.06 179.33 L 145.06 156.69"></path><g transform="matrix(0.0 -1.0 1.0 0.0 142.3 156.69)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 175.04 107.6 L 175.04 135.84"></path><g transform="matrix(0.0 1.0 -1.0 0.0 177.81 135.84)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 175.04 107.6 L 175.04 79.35"></path><g transform="matrix(0.0 -1.0 1.0 0.0 172.28 79.35)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 205.03 123.29 L 205.03 151.53"></path><g transform="matrix(0.0 1.0 -1.0 0.0 207.79 151.53)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 205.03 123.29 L 205.03 95.04"></path><g transform="matrix(0.0 -1.0 1.0 0.0 202.26 95.04)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 235.01 33.62 L 235.01 53.8"></path><g transform="matrix(0.0 1.0 -1.0 0.0 237.77 53.8)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 235.01 33.62 L 235.01 13.45"></path><g transform="matrix(0.0 -1.0 1.0 0.0 232.24 13.45)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g></g></g><g></g><g style="--ltx-fill-color:#FD7F28;" fill="#FD7F28"><g stroke-opacity="0"><path d="M 29.98 0 h 9.69 v 100.87 h -9.69 Z M 59.96 0 h 9.69 v 76.21 h -9.69 Z M 89.94 0 h 9.69 v 206.23 h -9.69 Z M 119.93 0 h 9.69 v 150.19 h -9.69 Z M 149.91 0 h 9.69 v 170.36 h -9.69 Z M 179.89 0 h 9.69 v 58.28 h -9.69 Z M 209.87 0 h 9.69 v 123.29 h -9.69 Z M 239.85 0 h 9.69 v 31.38 h -9.69 Z"></path></g><g style="--ltx-stroke-color:#000000;" stroke="#000000" stroke-opacity="1" stroke-width="0.4pt"><path d="M 34.82 100.87 L 34.82 120.82"></path><g transform="matrix(0.0 1.0 -1.0 0.0 37.59 120.82)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 34.82 100.87 L 34.82 80.92"></path><g transform="matrix(0.0 -1.0 1.0 0.0 32.06 80.92)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 64.81 76.21 L 64.81 98.18"></path><g transform="matrix(0.0 1.0 -1.0 0.0 67.57 98.18)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 64.81 76.21 L 64.81 54.25"></path><g transform="matrix(0.0 -1.0 1.0 0.0 62.04 54.25)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 94.79 206.23 L 94.79 216.76"></path><g transform="matrix(0.0 1.0 -1.0 0.0 97.55 216.76)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 94.79 206.23 L 94.79 195.69"></path><g transform="matrix(0.0 -1.0 1.0 0.0 92.02 195.69)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 124.77 150.19 L 124.77 169.02"></path><g transform="matrix(0.0 1.0 -1.0 0.0 127.54 169.02)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 124.77 150.19 L 124.77 131.36"></path><g transform="matrix(0.0 -1.0 1.0 0.0 122 131.36)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 154.75 170.36 L 154.75 187.62"></path><g transform="matrix(0.0 1.0 -1.0 0.0 157.52 187.62)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 154.75 170.36 L 154.75 153.1"></path><g transform="matrix(0.0 -1.0 1.0 0.0 151.98 153.1)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 184.73 58.28 L 184.73 75.77"></path><g transform="matrix(0.0 1.0 -1.0 0.0 187.5 75.77)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 184.73 58.28 L 184.73 40.8"></path><g transform="matrix(0.0 -1.0 1.0 0.0 181.96 40.8)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 214.71 123.29 L 214.71 145.7"></path><g transform="matrix(0.0 1.0 -1.0 0.0 217.48 145.7)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 214.71 123.29 L 214.71 100.87"></path><g transform="matrix(0.0 -1.0 1.0 0.0 211.94 100.87)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 244.69 31.38 L 244.69 46.85"></path><g transform="matrix(0.0 1.0 -1.0 0.0 247.46 46.85)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g><path d="M 244.69 31.38 L 244.69 15.92"></path><g transform="matrix(0.0 -1.0 1.0 0.0 241.93 15.92)"><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_nestedsvg" fill="#000000" stroke="#000000" stroke-width="0.4pt" transform="matrix(1 0 0 1 0 0) translate(0,2.77)"><path style="fill:none" d="M 0 2.77 L 0 -2.77"></path></g></g></g></g><g></g></g></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 109.14 -35.71)"><foreignObject style="--ltx-fo-width:4.03em;--ltx-fo-height:0.68em;--ltx-fo-depth:0em;" height="8.65" overflow="visible" transform="matrix(1 0 0 -1 0 8.65)" width="51.54"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.18" class="ltx_text ltx_font_sansserif" style="font-size:90%;">Condition</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" fill="#000000" stroke="#000000" transform="matrix(0.0 1.0 -1.0 0.0 -36.47 11.81)"><foreignObject style="--ltx-fo-width:15.7em;--ltx-fo-height:0.68em;--ltx-fo-depth:0em;" height="8.65" overflow="visible" transform="matrix(1 0 0 -1 0 8.65)" width="200.9"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.19" class="ltx_text ltx_font_sansserif" style="font-size:90%;">Percent of reference condition chosen</span></span></span></foreignObject></g><g style="--ltx-stroke-color:#BFBFBF;--ltx-fill-color:#FFFFFF;" fill="#FFFFFF" stroke="#BFBFBF"><path d="M 24.41 235.92 h 221 v 21.59 h -221 Z"></path></g><g style="--ltx-stroke-color:#BFBFBF;--ltx-fill-color:#FFFFFF;" fill="#FFFFFF" stroke="#BFBFBF" transform="matrix(1.0 0.0 0.0 1.0 28.56 246.71)"><g class="ltx_tikzmatrix" transform="matrix(1 0 0 -1 0 16.06)"><g class="ltx_tikzmatrix_row" transform="matrix(1 0 0 1 0 8.03)"><g style="--ltx-fill-color:#1E78B2;" class="ltx_tikzmatrix_col ltx_nopad_l ltx_nopad_r" fill="#1E78B2" stroke-opacity="0" transform="matrix(1 0 0 -1 0 0) translate(0.28,0)"><path d="M 0 -3.11 M 0 -3.11 L 0 6.85 L 7.47 6.85 L 7.47 -3.11 Z M 7.47 6.85"></path></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_tikzmatrix_col ltx_nopad_l ltx_nopad_r" fill="#000000" stroke="#000000" transform="matrix(1 0 0 -1 8.03 0) translate(44.66,0) matrix(1.0 0.0 0.0 1.0 -41.9 -3.39)"><foreignObject style="--ltx-fo-width:6.55em;--ltx-fo-height:0.68em;--ltx-fo-depth:0em;" height="8.65" overflow="visible" transform="matrix(1 0 0 -1 0 8.65)" width="83.79"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.20" class="ltx_text ltx_font_sansserif" style="font-size:90%;">Same sentences</span></span></span></foreignObject></g><g style="--ltx-fill-color:#FD7F28;" class="ltx_tikzmatrix_col ltx_nopad_l ltx_nopad_r" fill="#FD7F28" stroke-opacity="0" transform="matrix(1 0 0 -1 97.35 0) translate(0.28,0)"><path d="M 0 -3.11 M 0 -3.11 L 0 6.85 L 7.47 6.85 L 7.47 -3.11 Z M 7.47 6.85"></path></g><g style="--ltx-stroke-color:#000000;--ltx-fill-color:#000000;" class="ltx_tikzmatrix_col ltx_nopad_l ltx_nopad_r" fill="#000000" stroke="#000000" transform="matrix(1 0 0 -1 105.38 0) translate(53.66,0) matrix(1.0 0.0 0.0 1.0 -50.89 -3.39)"><foreignObject style="--ltx-fo-width:7.95em;--ltx-fo-height:0.68em;--ltx-fo-depth:0em;" height="8.65" overflow="visible" transform="matrix(1 0 0 -1 0 8.65)" width="101.79"><span class="ltx_foreignobject_container"><span class="ltx_foreignobject_content"><span id="S7.F4.pic1.21" class="ltx_text ltx_font_sansserif" style="font-size:90%;">Different sentences</span></span></span></foreignObject></g></g></g></g></g></g></svg></span>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span id="S7.F4.2" class="ltx_text" style="font-size:90%;">Figure 4</span>: </span><span id="S7.F4.3" class="ltx_text" style="font-size:90%;">AMT study of styles. The bars show the percentage of Turkers choosing the reference condition when the same sentence was being shown for reference and prediction, and with difference sentences.</span></figcaption>
+</figure>
+</section>
+<section id="S7.SS2" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection"><span class="ltx_tag ltx_tag_subsection">7.2 </span>Qualitative evaluation</h3>
+
+<div id="S7.SS2.p1" class="ltx_para">
+<p id="S7.SS2.p1.1" class="ltx_p"><span id="S7.SS2.p1.1.1" class="ltx_text ltx_font_bold">Generalization across subjects:</span> Factoring identity from facial motion allows us to animate a wide range of adult faces. To show the generalization capabilities of VOCA, we select, align and pose-normalize multiple neutral scans from the BU-3DFE database <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib66" title="" class="ltx_ref">BU-3DFE_2006</a></cite>, with large shape variations. Figure <a href="#S7.F5" title="Figure 5 ‣ 7.2 Qualitative evaluation ‣ 7 Experiments ‣ Capture, Learning, and Synthesis of 3D Speaking Styles" class="ltx_ref"><span class="ltx_text ltx_ref_tag">5</span></a> shows the static template (left) and some VOCA animation frames, driven by the same audio sequence.</p>
+</div>
+<figure id="S7.F5" class="ltx_figure">
+<div class="ltx_flex_figure">
+<div class="ltx_flex_cell ltx_flex_size_1">
+<p id="S7.F5.2" class="ltx_p ltx_align_center ltx_figure_panel"><span id="S7.F5.2.1" class="ltx_text">
+<img src="F0002_NE00BL_RAW_template.png" id="S7.F5.g1" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="F0002_NE00BL_RAW_sentence21_00023.png" id="S7.F5.g2" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="F0002_NE00BL_RAW_sentence21_00168.png" id="S7.F5.g3" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="F0002_NE00BL_RAW_sentence21_00190.png" id="S7.F5.g4" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption"></span></p></div><div class="ltx_flex_break"></div><div class="ltx_flex_cell ltx_flex_size_1">
+<p id="S7.F5.3" class="ltx_p ltx_align_center ltx_figure_panel"><span id="S7.F5.3.1" class="ltx_text">
+<img src="M0003_NE00WH_RAW_template.png" id="S7.F5.g5" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="M0003_NE00WH_RAW_sentence21_00023.png" id="S7.F5.g6" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="M0003_NE00WH_RAW_sentence21_00168.png" id="S7.F5.g7" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="M0003_NE00WH_RAW_sentence21_00190.png" id="S7.F5.g8" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption"></span></p></div><div class="ltx_flex_break"></div><div class="ltx_flex_cell ltx_flex_size_1">
+<p id="S7.F5.4" class="ltx_p ltx_align_center ltx_figure_panel"><span id="S7.F5.4.1" class="ltx_text">
+template
+       animation frames
+     </span></p></div></div>
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span id="S7.F5.5" class="ltx_text" style="font-size:90%;">Figure 5</span>: </span><span id="S7.F5.6" class="ltx_text" style="font-size:90%;">VOCA generalizes across face shapes. Each row shows the template of a subject selected from the static BU-3DFE face database <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib66" title="" class="ltx_ref">BU-3DFE_2006</a></cite> (left), and three randomly selected animation frames, driven by the same audio input (right).</span></figcaption>
+</figure>
+<div id="S7.SS2.p2" class="ltx_para">
+<p id="S7.SS2.p2.1" class="ltx_p"><span id="S7.SS2.p2.1.1" class="ltx_text ltx_font_bold">Generalization across languages:</span> The video shows the VOCA output for different languages. This indicates that VOCA can generalize to non-English sentences.</p>
+</div>
+<div id="S7.SS2.p3" class="ltx_para">
+<p id="S7.SS2.p3.1" class="ltx_p"><span id="S7.SS2.p3.1.1" class="ltx_text ltx_font_bold">Speaker styles:</span> Conditioning on different subjects during inference results in different speaking styles. Stylistic differences include variation in lip articulation. Figure <a href="#S7.F6" title="Figure 6 ‣ 7.2 Qualitative evaluation ‣ 7 Experiments ‣ Capture, Learning, and Synthesis of 3D Speaking Styles" class="ltx_ref"><span class="ltx_text ltx_ref_tag">6</span></a> shows the distance between lower and upper lip as a function of time for VOCA predictions for a random audio sequence and different conditions. This indicates that the convex combination of styles provides a wide range of different mouth amplitudes.</p>
+</div>
+<div id="S7.SS2.p4" class="ltx_para">
+<p id="S7.SS2.p4.1" class="ltx_p">We generate new intermediate speaking styles by convex combinations of conditions. Due to the linearity of the decoder, performing this convex combination in the 3D vertex space or in the 50-dimensional encoding space is equivalent. The supplementary video shows that combining styles offers animation control to synthesize a range of varying speaking styles. This is potentially useful for matching the speaking performance of a subject not seen during training. In the future, this could be estimated from video.</p>
+</div>
+<figure id="S7.F6" class="ltx_figure"><img src="convex_range.png" id="S7.F6.g1" class="ltx_graphics ltx_img_landscape" width="227" height="171" alt="Refer to caption">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span id="S7.F6.2" class="ltx_text" style="font-size:90%;">Figure 6</span>: </span><span id="S7.F6.3" class="ltx_text" style="font-size:90%;">Distance between lower and upper lip for VOCA predictions conditioned on different subjects. The shaded region represents the space of convex combinations of the different conditions.</span></figcaption>
+</figure>
+<div id="S7.SS2.p5" class="ltx_para">
+<p id="S7.SS2.p5.1" class="ltx_p"><span id="S7.SS2.p5.1.1" class="ltx_text ltx_font_bold">Robustness to noise:</span> To demonstrate robustness to noise, we combine a speech signal with different levels of noise and use the noisy signal as VOCA input. As a noise source, we use a realistic street noise sequence <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib49" title="" class="ltx_ref">soundible</a></cite> added with negative gain of <math id="S7.SS2.p5.m1" class="ltx_Math" alttext="36" display="inline" intent=":literal"><mn>36</mn></math>dB (low), <math id="S7.SS2.p5.m2" class="ltx_Math" alttext="24" display="inline" intent=":literal"><mn>24</mn></math>dB (medium), <math id="S7.SS2.p5.m3" class="ltx_Math" alttext="18" display="inline" intent=":literal"><mn>18</mn></math>dB (slightly high), and <math id="S7.SS2.p5.m4" class="ltx_Math" alttext="12" display="inline" intent=":literal"><mn>12</mn></math>dB (high). Only the high noise level leads to a damped facial motion, but despite the noise, the facial animations remain plausible.</p>
+</div>
+<div id="S7.SS2.p6" class="ltx_para">
+<p id="S7.SS2.p6.1" class="ltx_p"><span id="S7.SS2.p6.1.1" class="ltx_text ltx_font_bold">Comparison to Karras et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib33" title="" class="ltx_ref">karras2017</a></cite>:</span> We compare VOCA to Karras et al. <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib33" title="" class="ltx_ref">karras2017</a></cite>, the state-of-the-art in realistic subject-specific audio-driven facial animation. The results are shown in the supplementary video. For comparison, the authors provided us with a static mesh, to which we aligned the FLAME topology. We then use eight audio sequences from their supplementary video (including singing, spoken Chinese, an excerpt of a Barack Obama speech, and different sequences of the actor), to animate their static mesh. The supplementary video shows that, while their model produces more natural and detailed results, we can still reproduce similar facial animation without using any of their subject-specific training data. Further, Karras et al. use professional actors capable of simulating emotional speech. This enables them to add more realism in the upper face by modeling motions (i.e. eyes and eyebrows) that are more correlated with emotions than speech.</p>
+</div>
+<div id="S7.SS2.p7" class="ltx_para">
+<p id="S7.SS2.p7.1" class="ltx_p"><span id="S7.SS2.p7.1.1" class="ltx_text ltx_font_bold">Animation control:</span> Figure <a href="#S7.F7" title="Figure 7 ‣ 7.2 Qualitative evaluation ‣ 7 Experiments ‣ Capture, Learning, and Synthesis of 3D Speaking Styles" class="ltx_ref"><span class="ltx_text ltx_ref_tag">7</span></a> demonstrates the possibility of changing the identity dependent shape (top) and head pose (bottom) during animation. Both rows are driven by the same audio sequence. Despite the varying shape or pose, the facial animation looks realistic.</p>
+</div>
+<figure id="S7.F7" class="ltx_figure">
+<div class="ltx_flex_figure">
+<div class="ltx_flex_cell ltx_flex_size_1">
+<p id="S7.F7.2" class="ltx_p ltx_align_center ltx_figure_panel"><span id="S7.F7.2.1" class="ltx_text">
+<img src="shape_variation_00000.png" id="S7.F7.g1" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="shape_variation_00069.png" id="S7.F7.g2" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="shape_variation_00138.png" id="S7.F7.g3" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="shape_variation_00208.png" id="S7.F7.g4" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption"></span></p></div><div class="ltx_flex_break"></div><div class="ltx_flex_cell ltx_flex_size_1">
+<p id="S7.F7.3" class="ltx_p ltx_align_center ltx_figure_panel"><span id="S7.F7.3.1" class="ltx_text">
+<img src="pose_variation_00000.png" id="S7.F7.g5" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="pose_variation_00069.png" id="S7.F7.g6" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="pose_variation_00138.png" id="S7.F7.g7" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption">
+<img src="pose_variation_00208.png" id="S7.F7.g8" class="ltx_graphics ltx_img_portrait" width="58" height="83" alt="Refer to caption"></span></p></div></div>
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span id="S7.F7.4" class="ltx_text" style="font-size:90%;">Figure 7</span>: </span><span id="S7.F7.5" class="ltx_text" style="font-size:90%;">Animation control. Top: varying the first identity shape components to plus two (second column) and minus two (last column) standard deviations. Bottom: varying the head pose to minus 30 degrees (second column) and plus 30 degrees (last column).</span></figcaption>
+</figure>
+</section>
+</section>
+<section id="S8" class="ltx_section">
+<h2 class="ltx_title ltx_title_section"><span class="ltx_tag ltx_tag_section">8 </span>Discussion</h2>
+
+<div id="S8.p1" class="ltx_para">
+<p id="S8.p1.1" class="ltx_p">While VOCA can be used to realistically animate a wide range of adults faces from speech, it still lacks some of the details needed for conversational realism.
+Upper face motions (i.e. eyes and eyebrows) are not strongly correlated with the audio <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib33" title="" class="ltx_ref">karras2017</a></cite>. The causal factor is emotion, which is absent in our data due the inherent difficulty of simulating emotional speech in a controlled capture environment. Thus, VOCA learns the causal facial motions from speech, which are mostly present in the lower face.</p>
+</div>
+<div id="S8.p2" class="ltx_para">
+<p id="S8.p2.1" class="ltx_p">Non-verbal communication cues, such as head motion, are weakly correlated with the audio signal and hence are not modeled well by audio-driven techniques.
+VOCA offers animators and developers the possibility to include head motion, but does not infer it from data.
+A speech independent model for head motion could be used to simulate realistic results. Application specific techniques, such as dyadic interactions between animated assistants and humans require attention mechanisms that consider spatial features, such as eye tracking.
+Learning richer conversation models with expressive bodies <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib41" title="" class="ltx_ref">SMPLEx2019</a></cite> is future research.</p>
+</div>
+<div id="S8.p3" class="ltx_para">
+<p id="S8.p3.1" class="ltx_p">Conditioning on subject labels is one of the key aspects of VOCA that allows training across subjects. This allows a user to alter the speaking style during inference. Using data from more subjects to increase the number of different speaking styles remains a task for future work. Further experiments on mitigating or amplifying different speaking styles, or combining characteristics of different subjects also remain for future work.</p>
+</div>
+</section>
+<section id="S9" class="ltx_section">
+<h2 class="ltx_title ltx_title_section"><span class="ltx_tag ltx_tag_section">9 </span>Conclusion</h2>
+
+<div id="S9.p1" class="ltx_para">
+<p id="S9.p1.1" class="ltx_p">We have presented VOCA, a simple and generic speech-driven facial
+animation framework that works across a range of identities. Given an arbitrary speech
+signal and a static character mesh, VOCA fully automatically outputs a realistic character animation.
+VOCA leverages recent advances in speech processing and 3D face modeling in order to be subject independent.
+We train our model on a self-captured multi-subject 4D face dataset (VOCASET).
+The key insights of VOCA are to factor identity from facial motion, which allows us to animate a wide range of adult faces, and to condition on subject labels, which enables us to train VOCA across multiple subjects, and to synthesize different speaker styles during test time.
+VOCA generalizes well across various speech sources, languages, and 3D face templates.
+We provide optional animation control parameters to vary the speaking style and to alter the identity dependent shape and head pose during animation.
+The dataset, trained model, and code are available for research purposes <cite class="ltx_cite ltx_citemacro_cite"><a href="#bib.bib58" title="" class="ltx_ref">VOCA_project</a></cite>.</p>
+</div>
+</section>
+<section id="Sx1" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">Acknowledgement</h2>
+
+<div id="Sx1.p1" class="ltx_para">
+<p id="Sx1.p1.1" class="ltx_p">We thank T. Alexiadis and J. Márquez for the data acquisition, B. Pellkofer for hardware support, A. Quiros-Ramires for support with MTurk, A. Osman for support with Tensorflow, and S. Pujades for help with finalizing the paper. We further thank Karras et al. for providing us with a static face mesh for comparison.</p>
+</div>
+<div id="Sx1.p2" class="ltx_para">
+<p id="Sx1.p2.1" class="ltx_p">MJB has received research gift funds from Intel, Nvidia, Adobe, Facebook, and Amazon. While MJB is a part-time employee of Amazon, his research was performed solely at, and funded solely by, MPI. MJB has financial interests in Amazon and Meshcapade GmbH.</p>
+</div>
+<div id="Sx1.p3" class="ltx_para">
+<p id="Sx1.p3.1" class="ltx_p"><span id="Sx1.p3.1.1" class="ltx_text ltx_font_bold">In loving memory of Daniel Cudeiro</span>.</p>
+</div>
+</section>
+<section id="bib" class="ltx_bibliography">
+<h2 class="ltx_title ltx_title_bibliography" style="font-size:90%;">References</h2>
+
+<ul class="ltx_biblist">
+      
+<li id="bib.bib1" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib1.2" class="ltx_text" style="font-size:90%;">(1)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib1.4" class="ltx_text" style="font-size:90%;">
+M. Abadi, A. Agarwal, P. Barham, E. Brevdo, Z. Chen, C. Citro, G. S. Corrado,
+A. Davis, J. Dean, M. Devin, et al.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib1.5" class="ltx_text" style="font-size:90%;">Tensorflow: Large-scale machine learning on heterogeneous distributed
+systems.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib1.6" class="ltx_text ltx_font_italic" style="font-size:90%;">arXiv preprint arXiv:1603.04467</span><span id="bib.bib1.7" class="ltx_text" style="font-size:90%;">, 2016.
+</span>
+</span></li>
+      
+<li id="bib.bib2" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib2.2" class="ltx_text" style="font-size:90%;">(2)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib2.4" class="ltx_text" style="font-size:90%;">
+T. Alashkar, B. Ben Amor, M. Daoudi, and S. Berretti.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib2.5" class="ltx_text" style="font-size:90%;">A 3D dynamic database for unconstrained face recognition.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib2.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib2.7" class="ltx_text ltx_font_italic" style="font-size:90%;">International Conference and Exhibition on 3D Body Scanning
+Technologies</span><span id="bib.bib2.8" class="ltx_text" style="font-size:90%;">, 2014.
+</span>
+</span></li>
+      
+<li id="bib.bib3" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib3.2" class="ltx_text" style="font-size:90%;">(3)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib3.4" class="ltx_text" style="font-size:90%;">
+O. Alexander, M. Rogers, W. Lambeth, M. Chiang, and P. Debevec.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib3.5" class="ltx_text" style="font-size:90%;">The digital emily project: Photoreal facial modeling and animation.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib3.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib3.7" class="ltx_text ltx_font_italic" style="font-size:90%;">SIGGRAPH 2009 Courses</span><span id="bib.bib3.8" class="ltx_text" style="font-size:90%;">, pages 12:1–12:15, 2009.
+</span>
+</span></li>
+      
+<li id="bib.bib4" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib4.2" class="ltx_text" style="font-size:90%;">(4)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib4.4" class="ltx_text" style="font-size:90%;">
+R. Anderson, B. Stenger, V. Wan, and R. Cipolla.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib4.5" class="ltx_text" style="font-size:90%;">Expressive visual text-to-speech using active appearance models.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib4.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib4.7" class="ltx_text ltx_font_italic" style="font-size:90%;">Conference on Computer Vision and Pattern Recognition</span><span id="bib.bib4.8" class="ltx_text" style="font-size:90%;">, pages
+3382–3389, 2013.
+</span>
+</span></li>
+      
+<li id="bib.bib5" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib5.2" class="ltx_text" style="font-size:90%;">(5)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib5.4" class="ltx_text" style="font-size:90%;">
+T. Bolkart and S. Wuhrer.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib5.5" class="ltx_text" style="font-size:90%;">A groupwise multilinear correspondence optimization for 3D faces.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib5.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib5.7" class="ltx_text ltx_font_italic" style="font-size:90%;">International Conference on Computer Vision</span><span id="bib.bib5.8" class="ltx_text" style="font-size:90%;">, pages
+3604–3612, 2015.
+</span>
+</span></li>
+      
+<li id="bib.bib6" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib6.2" class="ltx_text" style="font-size:90%;">(6)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib6.4" class="ltx_text" style="font-size:90%;">
+S. Bouaziz, Y. Wang, and M. Pauly.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib6.5" class="ltx_text" style="font-size:90%;">Online modeling for realtime facial animation.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib6.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics</span><span id="bib.bib6.7" class="ltx_text" style="font-size:90%;">, 32(4):40, 2013.
+</span>
+</span></li>
+      
+<li id="bib.bib7" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib7.2" class="ltx_text" style="font-size:90%;">(7)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib7.4" class="ltx_text" style="font-size:90%;">
+M. Brand.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib7.5" class="ltx_text" style="font-size:90%;">Voice puppetry.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib7.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib7.7" class="ltx_text ltx_font_italic" style="font-size:90%;">SIGGRAPH</span><span id="bib.bib7.8" class="ltx_text" style="font-size:90%;">, pages 21–28, 1999.
+</span>
+</span></li>
+      
+<li id="bib.bib8" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib8.2" class="ltx_text" style="font-size:90%;">(8)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib8.4" class="ltx_text" style="font-size:90%;">
+C. Bregler, M. Covell, and M. Slaney.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib8.5" class="ltx_text" style="font-size:90%;">Video rewrite: Driving visual speech with audio.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib8.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib8.7" class="ltx_text ltx_font_italic" style="font-size:90%;">SIGGRAPH</span><span id="bib.bib8.8" class="ltx_text" style="font-size:90%;">, pages 353–360, 1997.
+</span>
+</span></li>
+      
+<li id="bib.bib9" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib9.2" class="ltx_text" style="font-size:90%;">(9)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib9.4" class="ltx_text" style="font-size:90%;">
+A. Bulat and G. Tzimiropoulos.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib9.5" class="ltx_text" style="font-size:90%;">How far are we from solving the 2D &amp; 3D face alignment
+problem? (and a dataset of 230,000 3D facial landmarks).
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib9.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib9.7" class="ltx_text ltx_font_italic" style="font-size:90%;">International Conference on Computer Vision</span><span id="bib.bib9.8" class="ltx_text" style="font-size:90%;">, pages
+1021–1030, 2017.
+</span>
+</span></li>
+      
+<li id="bib.bib10" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib10.2" class="ltx_text" style="font-size:90%;">(10)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib10.4" class="ltx_text" style="font-size:90%;">
+C. Busso, Z. Deng, M. Grimm, U. Neumann, and S. Narayanan.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib10.5" class="ltx_text" style="font-size:90%;">Rigid head motion in expressive speech animation: Analysis and
+synthesis.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib10.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Audio, Speech, and Language Processing</span><span id="bib.bib10.7" class="ltx_text" style="font-size:90%;">,
+15(3):1075–1086, 2007.
+</span>
+</span></li>
+      
+<li id="bib.bib11" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib11.2" class="ltx_text" style="font-size:90%;">(11)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib11.4" class="ltx_text" style="font-size:90%;">
+C. Cao, D. Bradley, K. Zhou, and T. Beeler.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib11.5" class="ltx_text" style="font-size:90%;">Real-time high-fidelity facial performance capture.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib11.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics (Proceedings of SIGGRAPH)</span><span id="bib.bib11.7" class="ltx_text" style="font-size:90%;">,
+34(4):46:1–46:9, 2015.
+</span>
+</span></li>
+      
+<li id="bib.bib12" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib12.2" class="ltx_text" style="font-size:90%;">(12)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib12.4" class="ltx_text" style="font-size:90%;">
+C. Cao, Q. Hou, and K. Zhou.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib12.5" class="ltx_text" style="font-size:90%;">Displaced dynamic expression regression for real-time facial tracking
+and animation.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib12.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics (Proceedings of SIGGRAPH)</span><span id="bib.bib12.7" class="ltx_text" style="font-size:90%;">,
+33(4):43:1–43:10, 2014.
+</span>
+</span></li>
+      
+<li id="bib.bib13" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib13.2" class="ltx_text" style="font-size:90%;">(13)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib13.4" class="ltx_text" style="font-size:90%;">
+C. Cao, Y. Weng, S. Zhou, Y. Tong, and K. Zhou.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib13.5" class="ltx_text" style="font-size:90%;">Facewarehouse: A 3D facial expression database for visual
+computing.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib13.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Visualization and Computer Graphics</span><span id="bib.bib13.7" class="ltx_text" style="font-size:90%;">,
+20(3):413–425, 2014.
+</span>
+</span></li>
+      
+<li id="bib.bib14" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib14.2" class="ltx_text" style="font-size:90%;">(14)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib14.4" class="ltx_text" style="font-size:90%;">
+Y. Cao, W. C. Tien, P. Faloutsos, and F. Pighin.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib14.5" class="ltx_text" style="font-size:90%;">Expressive speech-driven facial animation.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib14.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics</span><span id="bib.bib14.7" class="ltx_text" style="font-size:90%;">, 24(4):1283–1302, 2005.
+</span>
+</span></li>
+      
+<li id="bib.bib15" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib15.2" class="ltx_text" style="font-size:90%;">(15)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib15.4" class="ltx_text" style="font-size:90%;">
+Y. Chang, M. Vieira, M. Turk, and L. Velho.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib15.5" class="ltx_text" style="font-size:90%;">Automatic 3D facial expression analysis in videos.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib15.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib15.7" class="ltx_text ltx_font_italic" style="font-size:90%;">Analysis and Modelling of Faces and Gestures</span><span id="bib.bib15.8" class="ltx_text" style="font-size:90%;">, pages
+293–307, 2005.
+</span>
+</span></li>
+      
+<li id="bib.bib16" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib16.2" class="ltx_text" style="font-size:90%;">(16)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib16.4" class="ltx_text" style="font-size:90%;">
+L. Chen, Z. Li, R. K. Maddox, Z. Duan, and C. Xu.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib16.5" class="ltx_text" style="font-size:90%;">Lip movements generation at a glance.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib16.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib16.7" class="ltx_text ltx_font_italic" style="font-size:90%;">European Confence on Computer Vision</span><span id="bib.bib16.8" class="ltx_text" style="font-size:90%;">, pages 538–553, 2018.
+</span>
+</span></li>
+      
+<li id="bib.bib17" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib17.2" class="ltx_text" style="font-size:90%;">(17)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib17.4" class="ltx_text" style="font-size:90%;">
+S. Cheng, I. Kotsia, M. Pantic, and S. Zafeiriou.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib17.5" class="ltx_text" style="font-size:90%;">4DFAB: A large scale 4d database for facial expression analysis and
+biometric applications.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib17.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib17.7" class="ltx_text ltx_font_italic" style="font-size:90%;">CVPR</span><span id="bib.bib17.8" class="ltx_text" style="font-size:90%;">, 2018.
+</span>
+</span></li>
+      
+<li id="bib.bib18" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib18.2" class="ltx_text" style="font-size:90%;">(18)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib18.4" class="ltx_text" style="font-size:90%;">
+D. Cosker, E. Krumhuber, and A. Hilton.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib18.5" class="ltx_text" style="font-size:90%;">A FACS valid 3D dynamic action unit database with applications to
+3D dynamic morphable facial modeling.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib18.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib18.7" class="ltx_text ltx_font_italic" style="font-size:90%;">International Conference on Computer Vision</span><span id="bib.bib18.8" class="ltx_text" style="font-size:90%;">, pages
+2296–2303, 2011.
+</span>
+</span></li>
+      
+<li id="bib.bib19" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib19.2" class="ltx_text" style="font-size:90%;">(19)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib19.4" class="ltx_text" style="font-size:90%;">
+K. Dale, K. Sunkavalli, M. K. Johnson, D. Vlasic, W. Matusik, and H. Pfister.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib19.5" class="ltx_text" style="font-size:90%;">Video face replacement.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib19.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics (Proceedings of SIGGRAPH Asia)</span><span id="bib.bib19.7" class="ltx_text" style="font-size:90%;">,
+30(6):130:1–10, 2011.
+</span>
+</span></li>
+      
+<li id="bib.bib20" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib20.2" class="ltx_text" style="font-size:90%;">(20)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib20.4" class="ltx_text" style="font-size:90%;">
+C. Ding, L. Xie, and P. Zhu.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib20.5" class="ltx_text" style="font-size:90%;">Head motion synthesis from speech using deep neural networks.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib20.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Multimedia Tools and Applications</span><span id="bib.bib20.7" class="ltx_text" style="font-size:90%;">, 74(22):9871–9888, 2015.
+</span>
+</span></li>
+      
+<li id="bib.bib21" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib21.2" class="ltx_text" style="font-size:90%;">(21)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib21.4" class="ltx_text" style="font-size:90%;">
+P. Edwards, C. Landreth, E. Fiume, and K. Singh.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib21.5" class="ltx_text" style="font-size:90%;">JALI: An animator-centric viseme model for expressive lip
+synchronization.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib21.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics (Proc. SIGGRAPH)</span><span id="bib.bib21.7" class="ltx_text" style="font-size:90%;">, 35(4):127:1–127:11,
+2016.
+</span>
+</span></li>
+      
+<li id="bib.bib22" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib22.2" class="ltx_text" style="font-size:90%;">(22)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib22.4" class="ltx_text" style="font-size:90%;">
+A. Ephrat, I. Mosseri, O. Lang, T. Dekel, K. Wilson, A. Hassidim, W. T.
+Freeman, and M. Rubinstein.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib22.5" class="ltx_text" style="font-size:90%;">Looking to listen at the cocktail party: A speaker-independent
+audio-visual model for speech separation.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib22.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics</span><span id="bib.bib22.7" class="ltx_text" style="font-size:90%;">, 37(4):112:1–112:11, 2018.
+</span>
+</span></li>
+      
+<li id="bib.bib23" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib23.2" class="ltx_text" style="font-size:90%;">(23)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib23.4" class="ltx_text" style="font-size:90%;">
+T. Ezzat, G. Geiger, and T. Poggio.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib23.5" class="ltx_text" style="font-size:90%;">Trainable videorealistic speech animation.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib23.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics (Proc. SIGGRAPH)</span><span id="bib.bib23.7" class="ltx_text" style="font-size:90%;">, 21(3):388–398,
+2002.
+</span>
+</span></li>
+      
+<li id="bib.bib24" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib24.2" class="ltx_text" style="font-size:90%;">(24)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib24.4" class="ltx_text" style="font-size:90%;">
+B. Fan, L. Wang, F. K. Soong, and L. Xie.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib24.5" class="ltx_text" style="font-size:90%;">Photo-real talking head with deep bidirectional LSTM.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib24.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib24.7" class="ltx_text ltx_font_italic" style="font-size:90%;">International Conference on Acoustics, Speech and Signal
+Processing</span><span id="bib.bib24.8" class="ltx_text" style="font-size:90%;">, pages 4884–4888, 2015.
+</span>
+</span></li>
+      
+<li id="bib.bib25" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib25.2" class="ltx_text" style="font-size:90%;">(25)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib25.4" class="ltx_text" style="font-size:90%;">
+B. Fan, L. Xie, S. Yang, L. Wang, and F. K. Soong.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib25.5" class="ltx_text" style="font-size:90%;">A deep bidirectional LSTM approach for video-realistic talking
+head.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib25.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Multimedia Tools and Applications</span><span id="bib.bib25.7" class="ltx_text" style="font-size:90%;">, 75(9):5287–5309, 2016.
+</span>
+</span></li>
+      
+<li id="bib.bib26" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib26.2" class="ltx_text" style="font-size:90%;">(26)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib26.4" class="ltx_text" style="font-size:90%;">
+Gabrielle Fanelli, Jürgen Gall, Harald Romsdorfer, Thibaut Weise, and Luc
+van Gool.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib26.5" class="ltx_text" style="font-size:90%;">A 3D audio-visual corpus of affective communication.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib26.6" class="ltx_text ltx_font_italic" style="font-size:90%;">IEEE MultiMedia</span><span id="bib.bib26.7" class="ltx_text" style="font-size:90%;">, 12(6):591 – 598, 2010.
+</span>
+</span></li>
+      
+<li id="bib.bib27" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib27.2" class="ltx_text" style="font-size:90%;">(27)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib27.4" class="ltx_text" style="font-size:90%;">
+W. M. Fisher, G. R. Doddington, and K. M. Goudie-Marshall.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib27.5" class="ltx_text" style="font-size:90%;">The DARPA speech recognition research database: Specifications and
+status.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib27.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib27.7" class="ltx_text ltx_font_italic" style="font-size:90%;">DARPA Speech Recognition Workshop</span><span id="bib.bib27.8" class="ltx_text" style="font-size:90%;">, 1986.
+</span>
+</span></li>
+      
+<li id="bib.bib28" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib28.2" class="ltx_text" style="font-size:90%;">(28)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib28.4" class="ltx_text" style="font-size:90%;">
+J. S. Garofolo, L. F. Lamel, W. M. Fisher, J. G. Fiscus, D. S. Pallett, and
+N. L. Dahlgren.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib28.5" class="ltx_text" style="font-size:90%;">Darpa timit acoustic phonetic continuous speech corpus cdrom, 1993.
+</span>
+</span></li>
+      
+<li id="bib.bib29" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib29.2" class="ltx_text" style="font-size:90%;">(29)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib29.4" class="ltx_text" style="font-size:90%;">
+A. Hannun, C. Case, J. Casper, B. Catanzaro, G. Diamos, E. Elsen, R. Prenger,
+S. Satheesh, S. Sengupta, A. Coates, et al.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib29.5" class="ltx_text" style="font-size:90%;">Deep speech: Scaling up end-to-end speech recognition.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib29.6" class="ltx_text ltx_font_italic" style="font-size:90%;">arXiv preprint arXiv:1412.5567</span><span id="bib.bib29.7" class="ltx_text" style="font-size:90%;">, 2014.
+</span>
+</span></li>
+      
+<li id="bib.bib30" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib30.2" class="ltx_text" style="font-size:90%;">(30)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib30.4" class="ltx_text" style="font-size:90%;">
+H. Hermansky and N. Morgan.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib30.5" class="ltx_text" style="font-size:90%;">RASTA processing of speech.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib30.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Speech and Audio Processing</span><span id="bib.bib30.7" class="ltx_text" style="font-size:90%;">, 2(4):578–589,
+1994.
+</span>
+</span></li>
+      
+<li id="bib.bib31" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib31.2" class="ltx_text" style="font-size:90%;">(31)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib31.4" class="ltx_text" style="font-size:90%;">
+P. Hong, Z. Wen, and T. S. Huang.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib31.5" class="ltx_text" style="font-size:90%;">Real-time speech-driven face animation with expressions using neural
+networks.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib31.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Neural Networks</span><span id="bib.bib31.7" class="ltx_text" style="font-size:90%;">, 13(4):916–927, 2002.
+</span>
+</span></li>
+      
+<li id="bib.bib32" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib32.2" class="ltx_text" style="font-size:90%;">(32)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib32.4" class="ltx_text" style="font-size:90%;">
+P. Kakumanu, R. Gutierrez-Osuna, A. Esposito, R. Bryll, A. Goshtasby, and O.
+Garcia.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib32.5" class="ltx_text" style="font-size:90%;">Speech driven facial animation.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib32.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib32.7" class="ltx_text ltx_font_italic" style="font-size:90%;">Proceedings of the 2001 workshop on Perceptive user
+interfaces</span><span id="bib.bib32.8" class="ltx_text" style="font-size:90%;">, pages 1–5, 2001.
+</span>
+</span></li>
+      
+<li id="bib.bib33" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib33.2" class="ltx_text" style="font-size:90%;">(33)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib33.4" class="ltx_text" style="font-size:90%;">
+T. Karras, T. Aila, S. Laine, A. Herva, and J. Lehtinen.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib33.5" class="ltx_text" style="font-size:90%;">Audio-driven facial animation by joint end-to-end learning of pose
+and emotion.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib33.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics (Proc. SIGGRAPH)</span><span id="bib.bib33.7" class="ltx_text" style="font-size:90%;">, 36(4):94, 2017.
+</span>
+</span></li>
+      
+<li id="bib.bib34" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib34.2" class="ltx_text" style="font-size:90%;">(34)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib34.4" class="ltx_text" style="font-size:90%;">
+D. Kingma and J. Ba.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib34.5" class="ltx_text" style="font-size:90%;">Adam: A method for stochastic optimization.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib34.6" class="ltx_text ltx_font_italic" style="font-size:90%;">arXiv preprint arXiv:1412.6980</span><span id="bib.bib34.7" class="ltx_text" style="font-size:90%;">, 2014.
+</span>
+</span></li>
+      
+<li id="bib.bib35" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib35.2" class="ltx_text" style="font-size:90%;">(35)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib35.4" class="ltx_text" style="font-size:90%;">
+S. Laine, T. Karras, T. Aila, A. Herva, S. Saito, R. Yu, H. Li, and J.
+Lehtinen.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib35.5" class="ltx_text" style="font-size:90%;">Production-level facial performance capture using deep convolutional
+neural networks.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib35.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib35.7" class="ltx_text ltx_font_italic" style="font-size:90%;">SIGGRAPH / Eurographics Symposium on Computer Animation</span><span id="bib.bib35.8" class="ltx_text" style="font-size:90%;">,
+pages 10:1–10:10, 2017.
+</span>
+</span></li>
+      
+<li id="bib.bib36" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib36.2" class="ltx_text" style="font-size:90%;">(36)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib36.4" class="ltx_text" style="font-size:90%;">
+H. Li, T. Weise, and M. Pauly.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib36.5" class="ltx_text" style="font-size:90%;">Example-based facial rigging.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib36.6" class="ltx_text" style="font-size:90%;">29(4):32, 2010.
+</span>
+</span></li>
+      
+<li id="bib.bib37" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib37.2" class="ltx_text" style="font-size:90%;">(37)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib37.4" class="ltx_text" style="font-size:90%;">
+T. Li, T. Bolkart, M. J. Black, H. Li, and J. Romero.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib37.5" class="ltx_text" style="font-size:90%;">Learning a model of facial shape and expression from 4D scans.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib37.6" class="ltx_text ltx_font_italic" style="font-size:90%;">ACM Transactions on Graphics</span><span id="bib.bib37.7" class="ltx_text" style="font-size:90%;">, 36(6), 2017.
+</span>
+</span></li>
+      
+<li id="bib.bib38" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib38.2" class="ltx_text" style="font-size:90%;">(38)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib38.4" class="ltx_text" style="font-size:90%;">
+Y. Liu, F. Xu, J. Chai, X. Tong, L. Wang, and Q. Huo.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib38.5" class="ltx_text" style="font-size:90%;">Video-audio driven real-time facial animation.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib38.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics (Proc. SIGGRAPH Asia)</span><span id="bib.bib38.7" class="ltx_text" style="font-size:90%;">,
+34(6):182:1–182:10, 2015.
+</span>
+</span></li>
+      
+<li id="bib.bib39" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib39.2" class="ltx_text" style="font-size:90%;">(39)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib39.4" class="ltx_text" style="font-size:90%;">
+M. Mori.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib39.5" class="ltx_text" style="font-size:90%;">Bukimi no tani [the uncanny valley].
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib39.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Energy</span><span id="bib.bib39.7" class="ltx_text" style="font-size:90%;">, 7:33–35, 1970.
+</span>
+</span></li>
+      
+<li id="bib.bib40" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib40.2" class="ltx_text" style="font-size:90%;">(40)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib40.4" class="ltx_text" style="font-size:90%;">
+Mozilla.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib40.5" class="ltx_text" style="font-size:90%;">Project DeepSpeech.
+</span>
+</span>
+<span class="ltx_bibblock"><a href="https://github.com/mozilla/DeepSpeech" title="" class="ltx_ref ltx_url ltx_font_typewriter" style="font-size:90%;">https://github.com/mozilla/DeepSpeech</a><span id="bib.bib40.6" class="ltx_text" style="font-size:90%;">, 2017.
+</span>
+</span></li>
+      
+<li id="bib.bib41" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib41.2" class="ltx_text" style="font-size:90%;">(41)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib41.4" class="ltx_text" style="font-size:90%;">
+G. Pavlakos, V. Choutas, N. Ghorbani, T. Bolkart, A. A. A. Osman, D. Tzionas,
+and M. J. Black.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib41.5" class="ltx_text" style="font-size:90%;">Expressive body capture: 3d hands, face, and body from a single
+image.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib41.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib41.7" class="ltx_text ltx_font_italic" style="font-size:90%;">Computer Vision and Pattern Recognition</span><span id="bib.bib41.8" class="ltx_text" style="font-size:90%;">, 2019.
+</span>
+</span></li>
+      
+<li id="bib.bib42" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib42.2" class="ltx_text" style="font-size:90%;">(42)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib42.4" class="ltx_text" style="font-size:90%;">
+H. Pham and V. Pavlovic.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib42.5" class="ltx_text" style="font-size:90%;">Speech-driven 3D facial animation with implicit emotional
+awareness: A deep learning approach.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib42.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib42.7" class="ltx_text ltx_font_italic" style="font-size:90%;">Conference on Computer Vision and Pattern Recognition
+Workshop</span><span id="bib.bib42.8" class="ltx_text" style="font-size:90%;">, 2017.
+</span>
+</span></li>
+      
+<li id="bib.bib43" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib43.2" class="ltx_text" style="font-size:90%;">(43)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib43.4" class="ltx_text" style="font-size:90%;">
+P. Rajpurkar, J. Zhang, K. Lopyrev, and P. Liang.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib43.5" class="ltx_text" style="font-size:90%;">Squad: 100,000+ questions for machine comprehension of text.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib43.6" class="ltx_text" style="font-size:90%;">2016.
+</span>
+</span></li>
+      
+<li id="bib.bib44" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib44.2" class="ltx_text" style="font-size:90%;">(44)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib44.4" class="ltx_text" style="font-size:90%;">
+A. Ranjan, T. Bolkart, S. Sanyal, and M. J. Black.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib44.5" class="ltx_text" style="font-size:90%;">Generating 3D faces using convolutional mesh autoencoders.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib44.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib44.7" class="ltx_text ltx_font_italic" style="font-size:90%;">European Confence on Computer Vision</span><span id="bib.bib44.8" class="ltx_text" style="font-size:90%;">, pages 725–741, 2018.
+</span>
+</span></li>
+      
+<li id="bib.bib45" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib45.2" class="ltx_text" style="font-size:90%;">(45)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib45.4" class="ltx_text" style="font-size:90%;">
+S. Sako, K. Tokuda, T. Masuko, T. Kobayashi, and T. Kitamura.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib45.5" class="ltx_text" style="font-size:90%;">HMM-based text-to-audio-visual speech synthesis.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib45.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib45.7" class="ltx_text ltx_font_italic" style="font-size:90%;">International Conference on Spoken Language Processing</span><span id="bib.bib45.8" class="ltx_text" style="font-size:90%;">,
+pages 25–28, 2000.
+</span>
+</span></li>
+      
+<li id="bib.bib46" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib46.2" class="ltx_text" style="font-size:90%;">(46)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib46.4" class="ltx_text" style="font-size:90%;">
+G. Salvi, J. Beskow, S. Al Moubayed, and B. Granström.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib46.5" class="ltx_text" style="font-size:90%;">Synface—speech-driven facial animation for virtual speech-reading
+support.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib46.6" class="ltx_text ltx_font_italic" style="font-size:90%;">EURASIP Journal on Audio, Speech, and Music Processing</span><span id="bib.bib46.7" class="ltx_text" style="font-size:90%;">,
+2009(1), 2009.
+</span>
+</span></li>
+      
+<li id="bib.bib47" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib47.2" class="ltx_text" style="font-size:90%;">(47)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib47.4" class="ltx_text" style="font-size:90%;">
+A. Savran, N. Alyuöz, H. Dibeklioglu, O. Celiktutan, B. Gökberk, B.
+Sankur, and L. Akarun.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib47.5" class="ltx_text" style="font-size:90%;">Bosphorus database for 3D face analysis.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib47.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib47.7" class="ltx_text ltx_font_italic" style="font-size:90%;">Biometrics and Identity Management</span><span id="bib.bib47.8" class="ltx_text" style="font-size:90%;">, pages 47–56, 2008.
+</span>
+</span></li>
+      
+<li id="bib.bib48" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib48.2" class="ltx_text" style="font-size:90%;">(48)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib48.4" class="ltx_text" style="font-size:90%;">
+T. Shimba, R. Sakurai, H. Yamazoe, and J.-H. Lee.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib48.5" class="ltx_text" style="font-size:90%;">Talking heads synthesis from audio with deep neural networks.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib48.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib48.7" class="ltx_text ltx_font_italic" style="font-size:90%;">System Integration</span><span id="bib.bib48.8" class="ltx_text" style="font-size:90%;">, pages 100–105, 2015.
+</span>
+</span></li>
+      
+<li id="bib.bib49" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib49.2" class="ltx_text" style="font-size:90%;">(49)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib49.4" class="ltx_text" style="font-size:90%;">
+soundible.com.
+</span>
+</span>
+<span class="ltx_bibblock"><a href="http://soundbible.com/tags-city.html" title="" class="ltx_ref ltx_url ltx_font_typewriter" style="font-size:90%;">http://soundbible.com/tags-city.html</a><span id="bib.bib49.5" class="ltx_text" style="font-size:90%;">.
+</span>
+</span></li>
+      
+<li id="bib.bib50" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib50.2" class="ltx_text" style="font-size:90%;">(50)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib50.4" class="ltx_text" style="font-size:90%;">
+R.W. Sumner and J. Popović.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib50.5" class="ltx_text" style="font-size:90%;">Deformation transfer for triangle meshes.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib50.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics (Proceedings of SIGGRAPH)</span><span id="bib.bib50.7" class="ltx_text" style="font-size:90%;">,
+23(3):399–405, 2004.
+</span>
+</span></li>
+      
+<li id="bib.bib51" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib51.2" class="ltx_text" style="font-size:90%;">(51)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib51.4" class="ltx_text" style="font-size:90%;">
+S. Suwajanakorn, S. M. Seitz, and I. Kemelmacher-Shlizerman.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib51.5" class="ltx_text" style="font-size:90%;">Synthesizing Obama: learning lip sync from audio.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib51.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics (Proc. SIGGRAPH)</span><span id="bib.bib51.7" class="ltx_text" style="font-size:90%;">, 36(4):95, 2017.
+</span>
+</span></li>
+      
+<li id="bib.bib52" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib52.2" class="ltx_text" style="font-size:90%;">(52)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib52.4" class="ltx_text" style="font-size:90%;">
+S. Taylor, A. Kato, B. Milner, and I. Matthews.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib52.5" class="ltx_text" style="font-size:90%;">Audio-to-visual speech conversion using deep neural networks.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib52.6" class="ltx_text" style="font-size:90%;">2016.
+</span>
+</span></li>
+      
+<li id="bib.bib53" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib53.2" class="ltx_text" style="font-size:90%;">(53)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib53.4" class="ltx_text" style="font-size:90%;">
+S. Taylor, T. Kim, Y. Yue, M. Mahler, J. Krahe, A. G. Rodriguez, J. Hodgins,
+and I. Matthews.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib53.5" class="ltx_text" style="font-size:90%;">A deep learning approach for generalized speech animation.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib53.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics</span><span id="bib.bib53.7" class="ltx_text" style="font-size:90%;">, 36(4):93, 2017.
+</span>
+</span></li>
+      
+<li id="bib.bib54" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib54.2" class="ltx_text" style="font-size:90%;">(54)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib54.4" class="ltx_text" style="font-size:90%;">
+S. L. Taylor, M. Mahler, B.-J. Theobald, and I. Matthews.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib54.5" class="ltx_text" style="font-size:90%;">Dynamic units of visual speech.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib54.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib54.7" class="ltx_text ltx_font_italic" style="font-size:90%;">SIGGRAPH/Eurographics conference on Computer Animation</span><span id="bib.bib54.8" class="ltx_text" style="font-size:90%;">,
+pages 275–284, 2012.
+</span>
+</span></li>
+      
+<li id="bib.bib55" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib55.2" class="ltx_text" style="font-size:90%;">(55)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib55.4" class="ltx_text" style="font-size:90%;">
+J. Thies, M. Zollhöfer, M. Stamminger, C. Theobalt, and M. Nießner.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib55.5" class="ltx_text" style="font-size:90%;">Face2Face: Real-time Face Capture and Reenactment of RGB Videos.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib55.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib55.7" class="ltx_text ltx_font_italic" style="font-size:90%;">Computer Vision and Pattern Recognition</span><span id="bib.bib55.8" class="ltx_text" style="font-size:90%;">, 2016.
+</span>
+</span></li>
+      
+<li id="bib.bib56" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib56.2" class="ltx_text" style="font-size:90%;">(56)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib56.4" class="ltx_text" style="font-size:90%;">
+A. van den Oord, S. Dieleman, H. Zen, . Simonyan, O. Vinyals, A. Graves, N.
+Kalchbrenner, A. Senior, and . Kavukcuoglu.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib56.5" class="ltx_text" style="font-size:90%;">Wavenet: A generative model for raw audio.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib56.6" class="ltx_text ltx_font_italic" style="font-size:90%;">CoRR</span><span id="bib.bib56.7" class="ltx_text" style="font-size:90%;">, abs/1609.03499, 2016.
+</span>
+</span></li>
+      
+<li id="bib.bib57" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib57.2" class="ltx_text" style="font-size:90%;">(57)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib57.4" class="ltx_text" style="font-size:90%;">
+D. Vlasic, M. Brand, H. Pfister, and J. Popović.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib57.5" class="ltx_text" style="font-size:90%;">Face transfer with multilinear models.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib57.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics (Proceedings of SIGGRAPH)</span><span id="bib.bib57.7" class="ltx_text" style="font-size:90%;">,
+24(3):426–433, 2005.
+</span>
+</span></li>
+      
+<li id="bib.bib58" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib58.2" class="ltx_text" style="font-size:90%;">(58)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib58.4" class="ltx_text" style="font-size:90%;">
+VOCA.
+</span>
+</span>
+<span class="ltx_bibblock"><a href="http://voca.is.tue.mpg.de" title="" class="ltx_ref ltx_url ltx_font_typewriter" style="font-size:90%;">http://voca.is.tue.mpg.de</a><span id="bib.bib58.5" class="ltx_text" style="font-size:90%;">, 2019.
+</span>
+</span></li>
+      
+<li id="bib.bib59" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib59.2" class="ltx_text" style="font-size:90%;">(59)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib59.4" class="ltx_text" style="font-size:90%;">
+L. Wang, W. Han, F. Soong, and Q. Huo.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib59.5" class="ltx_text" style="font-size:90%;">Text driven 3d photo-realistic talking head.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib59.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib59.7" class="ltx_text ltx_font_italic" style="font-size:90%;">Conference of the International Speech Communication
+Association, INTERSPEECH</span><span id="bib.bib59.8" class="ltx_text" style="font-size:90%;">, pages 3307–3308, 2011.
+</span>
+</span></li>
+      
+<li id="bib.bib60" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib60.2" class="ltx_text" style="font-size:90%;">(60)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib60.4" class="ltx_text" style="font-size:90%;">
+T. Weise, S. Bouaziz, H. Li, and M. Pauly.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib60.5" class="ltx_text" style="font-size:90%;">Realtime performance-based facial animation.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib60.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics (Proceedings of SIGGRAPH)</span><span id="bib.bib60.7" class="ltx_text" style="font-size:90%;">,
+30(4):77:1–77:10, 2011.
+</span>
+</span></li>
+      
+<li id="bib.bib61" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib61.2" class="ltx_text" style="font-size:90%;">(61)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib61.4" class="ltx_text" style="font-size:90%;">
+C. Wu, D. Bradley, M. Gross, and T. Beeler.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib61.5" class="ltx_text" style="font-size:90%;">An anatomically-constrained local deformation model for monocular
+face capture.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib61.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics (Proc. SIGGRAPH)</span><span id="bib.bib61.7" class="ltx_text" style="font-size:90%;">, 2016.
+</span>
+</span></li>
+      
+<li id="bib.bib62" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib62.2" class="ltx_text" style="font-size:90%;">(62)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib62.4" class="ltx_text" style="font-size:90%;">
+L. Xie and Z.-Q. Liu.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib62.5" class="ltx_text" style="font-size:90%;">Realistic mouth-synching for speech-driven talking face using
+articulatory modelling.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib62.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Multimedia</span><span id="bib.bib62.7" class="ltx_text" style="font-size:90%;">, 9(3):500–510, 2007.
+</span>
+</span></li>
+      
+<li id="bib.bib63" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib63.2" class="ltx_text" style="font-size:90%;">(63)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib63.4" class="ltx_text" style="font-size:90%;">
+F. Yang, L. Bourdev, J. Wang, E. Shechtman, and D. Metaxas.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib63.5" class="ltx_text" style="font-size:90%;">Facial expression editing in video using a temporally-smooth
+factorization.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib63.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib63.7" class="ltx_text ltx_font_italic" style="font-size:90%;">Conference on Computer Vision and Pattern Recognition</span><span id="bib.bib63.8" class="ltx_text" style="font-size:90%;">, pages
+861–868, 2012.
+</span>
+</span></li>
+      
+<li id="bib.bib64" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib64.2" class="ltx_text" style="font-size:90%;">(64)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib64.4" class="ltx_text" style="font-size:90%;">
+L. Yin, X. Chen, Y. Sun, T. Worm, and M. Reale.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib64.5" class="ltx_text" style="font-size:90%;">A high-resolution 3D dynamic facial expression database.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib64.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib64.7" class="ltx_text ltx_font_italic" style="font-size:90%;">International Conference on Automatic Face and Gesture
+Recognition</span><span id="bib.bib64.8" class="ltx_text" style="font-size:90%;">, pages 1–6, 2008.
+</span>
+</span></li>
+      
+<li id="bib.bib65" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib65.2" class="ltx_text" style="font-size:90%;">(65)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib65.4" class="ltx_text" style="font-size:90%;">
+L. Yin, X. Wei, Y. Sun, J. Wang, and M. J. Rosato.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib65.5" class="ltx_text" style="font-size:90%;">A 3D facial expression database for facial behavior research.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib65.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib65.7" class="ltx_text ltx_font_italic" style="font-size:90%;">International Conference on Automatic Face and Gesture
+Recognition</span><span id="bib.bib65.8" class="ltx_text" style="font-size:90%;">, pages 211–216, 2006.
+</span>
+</span></li>
+      
+<li id="bib.bib66" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib66.2" class="ltx_text" style="font-size:90%;">(66)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib66.4" class="ltx_text" style="font-size:90%;">
+L. Yin, X. Wei, Y. Sun, J. Wang, and M. J. Rosato.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib66.5" class="ltx_text" style="font-size:90%;">A 3D facial expression database for facial behavior research.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib66.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib66.7" class="ltx_text ltx_font_italic" style="font-size:90%;">International Conference on Automatic Face and Gesture
+Recognition</span><span id="bib.bib66.8" class="ltx_text" style="font-size:90%;">, pages 211–216, 2006.
+</span>
+</span></li>
+      
+<li id="bib.bib67" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib67.2" class="ltx_text" style="font-size:90%;">(67)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib67.4" class="ltx_text" style="font-size:90%;">
+X. Zhang, L. Wang, G. Li, F. Seide, and F. K. Soong.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib67.5" class="ltx_text" style="font-size:90%;">A new language independent, photo-realistic talking head driven by
+voice only.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib67.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib67.7" class="ltx_text ltx_font_italic" style="font-size:90%;">INTERSPEECH</span><span id="bib.bib67.8" class="ltx_text" style="font-size:90%;">, pages 2743–2747, 2013.
+</span>
+</span></li>
+      
+<li id="bib.bib68" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib68.2" class="ltx_text" style="font-size:90%;">(68)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib68.4" class="ltx_text" style="font-size:90%;">
+X. Zhang, L. Yin, J. F. Cohn, S. Canavan, M. Reale, A. Horowitz, P. Liu, and
+J. M. Girard.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib68.5" class="ltx_text" style="font-size:90%;">BP4D-spontaneous: a high-resolution spontaneous 3D dynamic facial
+expression database.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib68.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Image and Vision Computing</span><span id="bib.bib68.7" class="ltx_text" style="font-size:90%;">, 32(10):692 – 706, 2014.
+</span>
+</span></li>
+      
+<li id="bib.bib69" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib69.2" class="ltx_text" style="font-size:90%;">(69)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib69.4" class="ltx_text" style="font-size:90%;">
+Z. Zhang, J. M. Girard, Y. Wu, X. Zhang, P. Liu, U. Ciftci, S. Canavan, M.
+Reale, A. Horowitz, H. Yang, J. F. Cohn, Q. Ji, and L. Yin.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib69.5" class="ltx_text" style="font-size:90%;">Multimodal spontaneous emotion corpus for human behavior analysis.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib69.6" class="ltx_text" style="font-size:90%;">In </span><span id="bib.bib69.7" class="ltx_text ltx_font_italic" style="font-size:90%;">CVPR</span><span id="bib.bib69.8" class="ltx_text" style="font-size:90%;">, pages 3438–3446, 2016.
+</span>
+</span></li>
+      
+<li id="bib.bib70" class="ltx_bibitem"><span class="ltx_tag ltx_role_refnum ltx_tag_bibitem"><span id="bib.bib70.2" class="ltx_text" style="font-size:90%;">(70)</span></span>
+<span class="ltx_bibblock"><span id="bib.bib70.4" class="ltx_text" style="font-size:90%;">
+Y. Zhou, Y. Xu, C. Landreth, E. Kalogerakis, S. Maji, and K. Singh.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib70.5" class="ltx_text" style="font-size:90%;">Visemenet: Audio-driven animator-centric speech animation.
+</span>
+</span>
+<span class="ltx_bibblock"><span id="bib.bib70.6" class="ltx_text ltx_font_italic" style="font-size:90%;">Transactions on Graphics</span><span id="bib.bib70.7" class="ltx_text" style="font-size:90%;">, 37(4):161:1–161:10, 2018.
+</span>
+</span></li>
+    
+</ul>
+</section>
+</article>
+</div>
+<footer class="ltx_page_footer">
+<div class="ltx_page_logo">Generated  by <a href="http://dlmf.nist.gov/LaTeXML/" class="ltx_LaTeXML_logo"><span style="letter-spacing:-0.2em; margin-right:0.1em;">L<span class="ltx_font_smallcaps" style="position:relative; bottom:2.2pt;">a</span>T<span class="ltx_font_smallcaps" style="font-size:120%;position:relative; bottom:-0.2ex;">e</span></span><span style="font-size:90%; position:relative; bottom:-0.2ex;">XML</span><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAOCAYAAAD5YeaVAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wKExQZLWTEaOUAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAdpJREFUKM9tkL+L2nAARz9fPZNCKFapUn8kyI0e4iRHSR1Kb8ng0lJw6FYHFwv2LwhOpcWxTjeUunYqOmqd6hEoRDhtDWdA8ApRYsSUCDHNt5ul13vz4w0vWCgUnnEc975arX6ORqN3VqtVZbfbTQC4uEHANM3jSqXymFI6yWazP2KxWAXAL9zCUa1Wy2tXVxheKA9YNoR8Pt+aTqe4FVVVvz05O6MBhqUIBGk8Hn8HAOVy+T+XLJfLS4ZhTiRJgqIoVBRFIoric47jPnmeB1mW/9rr9ZpSSn3Lsmir1fJZlqWlUonKsvwWwD8ymc/nXwVBeLjf7xEKhdBut9Hr9WgmkyGEkJwsy5eHG5vN5g0AKIoCAEgkEkin0wQAfN9/cXPdheu6P33fBwB4ngcAcByHJpPJl+fn54mD3Gg0NrquXxeLRQAAwzAYj8cwTZPwPH9/sVg8PXweDAauqqr2cDjEer1GJBLBZDJBs9mE4zjwfZ85lAGg2+06hmGgXq+j3+/DsixYlgVN03a9Xu8jgCNCyIegIAgx13Vfd7vdu+FweG8YRkjXdWy329+dTgeSJD3ieZ7RNO0VAXAPwDEAO5VKndi2fWrb9jWl9Esul6PZbDY9Go1OZ7PZ9z/lyuD3OozU2wAAAABJRU5ErkJggg==" alt="Mascot Sammy"></a> (oxide)</div></footer>
+</div>
+</body>
+</html>
