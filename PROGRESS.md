@@ -295,6 +295,41 @@ Two synthetic negative fixtures lock in the tightenings:
 `invalid/synthetic-block-in-section.html`,
 `invalid/synthetic-inverted-sections.html`.
 
+## 2026-06-06 (book round): Analysis of Boolean Functions
+
+Converted O'Donnell's AoBF book (gsm-l-odonnell.cls, ~8 MB HTML, 14
+chapters, index, TOC) with latexml-oxide master and drove the profile
+from 1243 errors to 0.  First book-class source the profile has seen:
+
+- chapter sectional level (`section.ltx_chapter`, `ltx_title_chapter`),
+  admitting all deeper units plus hoisted BackMatter (bibliography and
+  index land inside chapters in book classes);
+- index family per the XML models (`index.body.class = Para.model |
+  indexlist`, `indexentry_model = indexphrase, indexrefs?, indexlist?`):
+  section.ltx_index > ul.ltx_indexlist > li.ltx_indexentry with nested
+  sublists;
+- in-document TOC: `nav.ltx_TOC` is Para.class (the XML schema's
+  `Para.class |= TOC`), `TOC_model = title?, toclist?`; `toc` and `list`
+  prefixes added to the generated-token pattern for `ltx_toc_toc` /
+  `ltx_list_toc`;
+- `ltx:anchor` renders as `a.ltx_anchor` with a legacy `name` attribute
+  alongside `id` — obsolete in HTML5 but deliberate upstream output;
+  accepted as a documented deviation;
+- `ltx:bibblock` is Inline.model in the XML schema, which includes
+  Misc.class; the transform emits the block rendition (table) for
+  tabular material inside the bibblock span — accepted, documented;
+- bare rows in tabular_model: the parser inserts an implicit class-less
+  tbody, so the tbody class token is optional;
+- `ltx_align_top`/`ltx_align_bottom` layout modifiers;
+- heading-rank skips (h3→h5) suppressed in the scholarly checker mode:
+  LaTeXML assigns rank by sectional type and its models permit
+  skip-level nesting (\paragraph under \section), so outline-skip
+  complaints are generic-profile-only now.
+
+The `\ell@`-undefined conversion error in the book exercised the new
+`span.ltx_ERROR` acceptance end-to-end.  Not added as a fixture (8 MB);
+the structures it introduced are all model-cited above.
+
 ## Binding-Introduced Extension Vocabularies (audit, 2026-06-06)
 
 LaTeXML bindings (`*.sty.ltxml` / `*_sty.rs`) introduce their own attribute

@@ -94,13 +94,26 @@
 	ltx.arxiv.infobox.elem =
 		element div { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.arxiv.infobox }
 
-## Table of Contents: generated navigation for hosted LaTeXML pages
+## Table of Contents: ltx:TOC — both the hosted-page navbar TOC and the
+## in-document \tableofcontents (TOC is Para.class in the LaTeXML model,
+## so it may appear in article content; TOC_model = title?, toclist?)
+	ltx.Para.class |=
+		( ltx.toc.elem )   # ltx:TOC
 	ltx.toc.elem =
 		element nav { ltx.toc.inner & ltx.attrs.no-class & ltx.class.toc }
 	ltx.toc.inner =
 		( text,
-		  ltx.toc.list.elem,
+		  ltx.toc.title.elem?,
+		  text,
+		  ltx.toc.list.elem?,
 		  text
+		)
+	ltx.toc.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
 		)
 	ltx.toc.list.elem =
 		element ol { ltx.toc.list.inner & ltx.attrs.no-class & ltx.class.toclist }

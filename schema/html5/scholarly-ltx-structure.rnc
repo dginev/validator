@@ -19,6 +19,7 @@
 	ltx.document.body.class =
 		( ltx.Para.class
 		| ltx.Meta.class
+		| ltx.chapter.elem
 		| ltx.section.elem
 		| ltx.subsection.elem
 		| ltx.subsubsection.elem
@@ -27,7 +28,9 @@
 		| ltx.appendix.elem
 		)
 	ltx.backmatter.elem =
-		( ltx.bibliography.elem )
+		( ltx.bibliography.elem
+		| ltx.index.elem
+		)
 
 ## Document Front Matter: title, authors, dates, abstract, or class-specific header
 	ltx.document.front.elem =
@@ -144,6 +147,27 @@
 		  | ltx.subsubsection.elem
 		  | ltx.sectional.paragraph.elem
 		  | ltx.subparagraph.elem
+		  )*,
+		  text
+		)
+
+## Chapter: chapter.body.class = Para.model | section and deeper.
+## Book backmatter (bibliography, index) is hoisted into chapters by the
+## book classes, so BackMatter is admitted here as well.
+	ltx.chapter.elem =
+		element section { ltx.chapter.inner & ltx.attrs.no-class & ltx.class.chapter }
+	ltx.chapter.inner =
+		( text,
+		  ltx.section.title.elem?,
+		  text,
+		  ( ltx.Para.class
+		  | ltx.Meta.class
+		  | ltx.section.elem
+		  | ltx.subsection.elem
+		  | ltx.subsubsection.elem
+		  | ltx.sectional.paragraph.elem
+		  | ltx.subparagraph.elem
+		  | ltx.backmatter.elem
 		  )*,
 		  text
 		)

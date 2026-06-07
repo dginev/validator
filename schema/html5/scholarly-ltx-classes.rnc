@@ -105,6 +105,8 @@
 		( "ltx_align_left"
 		| "ltx_align_center"
 		| "ltx_align_right"
+		| "ltx_align_top"
+		| "ltx_align_bottom"
 		| "ltx_align_middle"
 		| "ltx_align_baseline"
 		| "ltx_centering"
@@ -216,7 +218,7 @@
 	ltx.class.generated.modifier =
 		xsd:NMTOKEN {
 			pattern =
-				"ltx_(title|tag|tocentry|toclist|theorem|float|img|bib|glossary|role|border|th|framed|cv|affiliation|ulem|math|unit|svg|tikzmatrix|inline-quote|outerquote|innerquote|citation|ccitation|textquote|blockquote|displayquote|ast)_[A-Za-z0-9_.:]+(-[A-Za-z0-9_.:]+)*"
+				"ltx_(title|tag|tocentry|toclist|toc|list|theorem|float|img|bib|glossary|role|border|th|framed|cv|affiliation|ulem|math|unit|svg|tikzmatrix|inline-quote|outerquote|innerquote|citation|ccitation|textquote|blockquote|displayquote|ast)_[A-Za-z0-9_.:]+(-[A-Za-z0-9_.:]+)*"
 		}
 
 	ltx.class.page.main =
@@ -311,12 +313,15 @@
 	ltx.class.title.section =
 		attribute class { list { "ltx_title", ltx.class.extra*, ltx.class.title.section.kind, ltx.class.extra* } }
 	ltx.class.title.section.kind =
-		( "ltx_title_section"
+		( "ltx_title_chapter"
+		| "ltx_title_section"
 		| "ltx_title_subsection"
 		| "ltx_title_subsubsection"
 		| "ltx_title_paragraph"
 		| "ltx_title_subparagraph"
-		| "ltx_title_appendix" )
+		| "ltx_title_appendix"
+		| "ltx_title_index"
+		| "ltx_title_contents" )
 	ltx.class.cv.heading =
 		attribute class { list { ( "author-name" | "author-title" | "author-contact" ), ltx.class.extra* } }
 	ltx.class.authors =
@@ -334,6 +339,8 @@
 	ltx.class.cv.column =
 		attribute class { list { ( "col-25" | "col-50" ), ltx.class.extra* } }
 
+	ltx.class.chapter =
+		attribute class { list { "ltx_chapter", ltx.class.extra* } }
 	ltx.class.section =
 		attribute class { list { "ltx_section", ltx.class.extra* } }
 	ltx.class.subsection =
@@ -434,7 +441,7 @@
 				}
 			}
 	ltx.class.a =
-		attribute class { list { ( "ltx_ref" | "ltx_url" | "ltx_LaTeXML_logo" ), ltx.class.inline.extra* } }
+		attribute class { list { ( "ltx_ref" | "ltx_url" | "ltx_anchor" | "ltx_LaTeXML_logo" ), ltx.class.inline.extra* } }
 	ltx.class.img =
 		attribute class { list { ( "ltx_graphics" | "ltx_img" | "ltx_orcidlogo" ), ltx.class.extra* } }
 	ltx.class.break =

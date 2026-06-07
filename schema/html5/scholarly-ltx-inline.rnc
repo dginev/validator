@@ -34,12 +34,17 @@
 	ltx.span.elem =
 		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.span }
 
-## Link or Cross Reference
+## Link or Cross Reference.  The last variant covers ltx:anchor, which
+## the transform emits with a legacy name attribute alongside id —
+## obsolete in HTML5, but deliberate upstream output for old-style
+## fragment anchors.
 	ltx.anchor.elem =
 		( element a { ltx.Inline.model & ltx.anchor.href.attrs & ltx.class.a }
 		| element a { ltx.Inline.model & ltx.anchor.href.attrs }
 		| element a { ltx.Inline.model & ltx.attrs.no-class & ltx.class.a }
 		| element a { ltx.Inline.model & ltx.attrs.no-class }
+		| element a { ltx.Inline.model & ltx.attrs.no-class & ltx.class.a
+		            & attribute name { text } }
 		)
 
 ## Emphasis

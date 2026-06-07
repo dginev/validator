@@ -166,8 +166,12 @@ public class HeadingHierarchyChecker extends Checker {
                 hasTopLevelHeading = true;
             }
 
-            // Check for skipped levels
-            if (previousHeading != null) {
+            // Check for skipped levels. LaTeXML assigns heading rank by
+            // sectional type (chapter=h2, section=h3, ...) and its document
+            // model permits skip-level nesting (e.g. \paragraph directly
+            // under \section), so rank skips are intent-legitimate in the
+            // scholarly profile and only flagged in the generic profiles.
+            if (previousHeading != null && !allowLatexmlGeneratedHeadings) {
                 int prevLevel = previousHeading.computedLevel;
                 int currLevel = heading.computedLevel;
 
