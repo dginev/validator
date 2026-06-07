@@ -5,84 +5,51 @@ default namespace = "http://www.w3.org/1999/xhtml"
 ##  LaTeXML scholarly HTML profile                                    #
 # #####################################################################
 
-## This profile validates the HTML5 dialect that LaTeXML emits for
-## scholarly documents -- arXiv articles, ar5iv pages, and book-length
-## conversions.  It is a faithful HTML-side mirror of LaTeXML's own XML
-## schema: every LaTeXML XML element (\code{ltx:section}, \code{ltx:para},
-## \code{ltx:text}, ...) becomes an HTML element carrying a deterministic
-## class token, normally \code{ltx_} plus the XML local name
-## (\code{ltx:section} becomes \code{section.ltx_section},
-## \code{ltx:text} becomes \code{span.ltx_text}).
+## This schema validates the HTML5 that LaTeXML emits for scholarly
+## documents: arXiv articles, ar5iv pages, and full books.  It mirrors
+## LaTeXML's own XML schema.  Each XML element becomes an HTML element
+## carrying a class token -- \code{ltx_} plus the XML name -- so
+## \code{ltx:section} becomes \code{section.ltx_section} and
+## \code{ltx:text} becomes \code{span.ltx_text}.
 ##
-## The design has three abstraction levels.  Level one, the projection
-## primitives in \moduleref{scholarly-ltx-classes}: shared attribute
-## contracts and the class-token buckets that project LaTeXML's
-## attribute families into HTML (Fontable attributes surface as
-## \attrval{ltx_font_} tokens, Positionable as alignment tokens, open
-## binding vocabularies as generated-token patterns).  Level two, the
-## element renditions: each LaTeXML element's concrete HTML shape, with
-## dual block and inline renditions where the transform serializes by
-## context.  Level three, the class system in
-## \moduleref{scholarly-ltx-model}: the renditions are grouped into the
-## same content classes the XML schema uses
-## (\patternref{ltx.Inline.class}, \patternref{ltx.Block.class},
-## \patternref{ltx.Para.class}, the Misc renditions, and
-## \patternref{ltx.Meta.class}), and every container is built from four
-## shared models (\patternref{ltx.Inline.model},
-## \patternref{ltx.Block.model}, \patternref{ltx.Para.model},
-## \patternref{ltx.Flow.model}).
+## Start reading in \moduleref{scholarly-ltx-model}.  Every element
+## belongs to one of a few content classes -- Inline, Block, Para,
+## Misc, and Meta, the same classes the XML schema uses -- and every
+## container is built from four shared models over those classes.  The
+## concrete element shapes live in \moduleref{scholarly-ltx-inline},
+## \moduleref{scholarly-ltx-blocks}, \moduleref{scholarly-ltx-floats},
+## and \moduleref{scholarly-ltx-structure}; the attribute and
+## class-token contracts in \moduleref{scholarly-ltx-classes}.
+## Hosted-page chrome (the arXiv and ar5iv shells) is kept apart in
+## \moduleref{scholarly-ltx-scaffold}, so page furniture cannot leak
+## into article content.
 ##
-## The modules follow one-concern-per-file: the vocabulary spine in
-## \moduleref{scholarly-ltx-model}; attribute and token contracts in
-## \moduleref{scholarly-ltx-classes}; phrasing-level renditions in
-## \moduleref{scholarly-ltx-inline}; block-level prose in
-## \moduleref{scholarly-ltx-blocks}; floats, equations, tables, lists,
-## bibliography, and index in \moduleref{scholarly-ltx-floats}; the
-## document, front matter, and sectional hierarchy in
-## \moduleref{scholarly-ltx-structure}.  Hosted-page chrome (the arXiv
-## and ar5iv shells) is deliberately quarantined in
-## \moduleref{scholarly-ltx-scaffold}, outside the article model, so
-## page furniture can never leak into publication content.
+## Where the emitted HTML deliberately deviates from the XML model or
+## from the HTML specification, the deviation is accepted and
+## documented at the pattern that carries it: this schema describes
+## what LaTeXML actually emits.
 ##
-## Methodology -- the strategic considerations behind every decision in
-## this profile:
-## (1) Intent first: LaTeXML's XML schema defines what a construct
-## means; the XSLT transform defines how it projects to HTML; this
-## profile mirrors that intent rather than merely enumerating observed
-## output, so each pattern cites the XML model it renders.
-## (2) Empirical grounding: arXiv is heterogeneous, so every constraint
-## is corpus-tested -- converted articles, hosted pages, and full books
-## serve as regression fixtures, and a tightening lands only when the
-## intent citation and a zero-violation corpus census agree.
-## (3) Faithful output: where the transform deliberately deviates from
-## the XML model or the HTML specification (a span wrapper carrying
-## block content, a legacy \attr{name} on anchors, conversion-error
-## spans), the deviation is accepted and documented at the pattern that
-## carries it.
-## (4) Loosen uniformly, tighten pointwise: permissions flow through the
-## shared models (notes valid wherever Meta.class is), while
-## restrictions attach to the specific pattern with the transform
-## citation that justifies them (the abstract title is exactly h6
-## because the transform hard-codes that rank).
-## (5) Separate worlds: the article model, the hosted-page chrome, and
-## the open binding-introduced vocabularies (per-package token families
-## such as \cs{newtheorem} names) are kept in distinct compartments
-## with explicit interfaces.
-## (6) Errors name intent: pattern granularity is chosen so a
-## validation failure reports the publication concept that failed --
-## an author span, a note mark, an equation cell -- not merely the HTML
-## element that happened to carry it.
-## (7) Track upstream mechanically: the union-base and contribution
-## structure mirrors the XML schema's own extension idiom, so upstream
-## schema changes translate into local, reviewable contributions.
+## The methodology, in brief:
+## (1) Intent first -- the XML schema defines meaning, the transform
+## defines projection; each pattern cites the model it renders.
+## (2) Empirical grounding -- every constraint is corpus-tested against
+## converted articles and books before it lands.
+## (3) Faithful output -- deliberate deviations are documented, never
+## silently patched.
+## (4) Loosen uniformly, tighten pointwise -- permissions flow through
+## the shared models; restrictions attach to specific patterns with a
+## transform citation.
+## (5) Separate worlds -- article model, page chrome, and per-package
+## vocabularies stay in distinct compartments.
+## (6) Errors name intent -- a failure reports the publication concept
+## that broke, not just the HTML element.
+## (7) Track upstream -- the union structure mirrors the XML schema's
+## own extension idiom, so upstream changes port mechanically.
 
-## Entry point for HTML documents emitted by LaTeXML.
-##
-## LaTeXML serializes a document as a page shell containing one article
-## and an optional generated footer.  The definitions below keep that
-## shell distinct from the document-level publication model so validation
-## errors name the intent that failed instead of only the concrete HTML
-## element that happened to carry it.
+## Entry point: LaTeXML serializes a document as a page shell holding
+## one article and an optional generated footer; this start pattern
+## keeps that shell distinct from the publication model, so validation
+## errors name the intent that failed.
 
 	ltx.content.start =
 		( ltx.page.elem | ltx.arxiv.body | ltx.ar5iv.body )
