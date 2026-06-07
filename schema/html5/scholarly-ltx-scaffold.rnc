@@ -94,7 +94,7 @@
 	ltx.arxiv.infobox.elem =
 		element div { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.arxiv.infobox }
 
-## Table of Contents: ltx:TOC — both the hosted-page navbar TOC and the
+## Table of Contents: ltx:TOC -- both the hosted-page navbar TOC and the
 ## in-document \tableofcontents (TOC is Para.class in the LaTeXML model,
 ## so it may appear in article content; TOC_model = title?, toclist?)
 	ltx.Para.class |=

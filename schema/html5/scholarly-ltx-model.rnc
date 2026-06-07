@@ -1,61 +1,98 @@
 # #####################################################################
 ## LaTeXML Class System and Shared Content Models
-#
-# This module mirrors the architecture of LaTeXML's XML schema
-# (LaTeXML.rnc and its modules), where every element belongs to one of a
-# small set of content classes, and every container's content model is a
-# combination of four shared models built from those classes:
-#
-#     Inline.model = (text | Inline.class | Misc.class | Meta.class)*
-#     Block.model  = (Block.class | Misc.class | Meta.class)*
-#     Para.model   = (Para.class | Meta.class)*
-#     Flow.model   = (text | Inline.class | Block.class | Misc.class | Meta.class)*
-#
-# The HTML projection splits Misc.class in two: the XSLT serializes the
-# same XML element differently by context (f:blockelement), e.g.
-# ltx:tabular becomes table.ltx_tabular in block context but a
-# span.ltx_tabular stack inline.  Hence ltx.Misc.inline.class and
-# ltx.Misc.block.class below.
-#
-# Union members are contributed by the element modules with |= next to
-# each element definition, annotated with the ltx:* element it renders.
-# Exactly one base definition per union lives here (notAllowed); never
-# add a plain = definition for these names elsewhere.
-#
-# Shape rule: the inline model interleaves text with phrasing
-# (text & ...*); block-level models sequence text around element lists
-# (text, ...*, text).  RELAX NG forbids two text-bearing patterns in one
-# interleave, so these two shapes must not be merged.
 
-## Union bases — members contributed via |= from the element modules.
+## This module mirrors the architecture of LaTeXML's XML schema
+## (LaTeXML.rnc and its modules), where every element belongs to one of
+## a small set of content classes, and every container's content model
+## is a combination of four shared models built from those classes:
+## \code{Inline.model}, \code{Block.model}, \code{Para.model}, and
+## \code{Flow.model}.
+##
+## The HTML projection splits Misc.class in two: the transform
+## serializes the same XML element differently by context, e.g.
+## \code{ltx:tabular} becomes \code{table.ltx_tabular} in block context
+## but a \code{span.ltx_tabular} stack inline.  Hence
+## \patternref{ltx.Misc.inline.class} and
+## \patternref{ltx.Misc.block.class} below.
+##
+## Union members are contributed by the element modules with
+## \code{|=} next to each element definition.  Exactly one base
+## definition per union lives here; never add a plain \code{=}
+## definition for these names elsewhere.
+##
+## Shape rule: the inline model interleaves text with phrasing; the
+## block-level models sequence text around element lists.  RELAX NG
+## forbids two text-bearing patterns in one interleave, so these two
+## shapes must not be merged.
+
+## Inline-class elements: the renditions of LaTeXML's Inline.class
+## (\code{ltx:text}, \code{ltx:emph}, \code{ltx:sub}, \code{ltx:sup},
+## \code{ltx:glossaryref}, \code{ltx:anchor}, \code{ltx:ref},
+## \code{ltx:cite}, \code{ltx:bibref}, \code{ltx:Math}) -- phrasing
+## content that lives inside prose.
 	ltx.Inline.class = notAllowed
+
+## Block-class elements: the renditions of LaTeXML's Block.class
+## (\code{ltx:p}, \code{ltx:equation}, \code{ltx:equationgroup},
+## \code{ltx:quote}, \code{ltx:block}, \code{ltx:listing},
+## \code{ltx:itemize}, \code{ltx:enumerate}, \code{ltx:description},
+## \code{ltx:pagination}) -- physical blocks that live inside a logical
+## paragraph.
 	ltx.Block.class = notAllowed
+
+## Para-class elements: the renditions of LaTeXML's Para.class
+## (\code{ltx:para}, \code{ltx:logical-block}, \code{ltx:theorem},
+## \code{ltx:proof}, \code{ltx:figure}, \code{ltx:table},
+## \code{ltx:float}, \code{ltx:pagination}, \code{ltx:rule},
+## \code{ltx:TOC}) -- logical block units that live directly inside
+## sectional units.
 	ltx.Para.class = notAllowed
+
+## Misc-class elements, inline rendition: context-free material
+## (\code{ltx:graphics}, \code{ltx:break}, \code{ltx:ERROR},
+## \code{ltx:svg}) plus the span serializations the transform picks in
+## inline context (the \code{span.ltx_tabular} stack).
 	ltx.Misc.inline.class = notAllowed
+
+## Misc-class elements, block rendition: the same context-free material
+## plus the block serializations (\code{table.ltx_tabular}, transformed
+## inline-block wrappers).
 	ltx.Misc.block.class = notAllowed
+
+## Meta-class elements: metadata that may appear in any model
+## (\code{ltx:note}; the other Meta.class members -- \code{ltx:rdf},
+## \code{ltx:indexmark}, \code{ltx:declare} -- are consumed or
+## head-hoisted by the transform and never reach article content).
 	ltx.Meta.class = notAllowed
 
-## Inline model: phrasing content of p, headings, captions, spans.
+## Inline model: phrasing content of paragraphs, headings, captions,
+## and spans -- text interleaved with Inline, inline-Misc, and Meta
+## elements.  Mirrors \code{Inline.model} in the XML schema.
 	ltx.Inline.model =
 		( text
 		& ( ltx.Inline.class | ltx.Misc.inline.class | ltx.Meta.class )*
 		)
 
-## Block model: content of para, quote, abstract — physical blocks.
+## Block model: content of \code{ltx:para}, \code{ltx:quote}, and the
+## abstract -- physical blocks.  Mirrors \code{Block.model}; the text
+## padding tolerates the pretty-printed whitespace between block
+## siblings.
 	ltx.Block.model =
 		( text,
 		  ( ltx.Block.class | ltx.Misc.block.class | ltx.Meta.class )*,
 		  text
 		)
 
-## Para model: content of sections, theorems, list items — logical blocks.
+## Para model: content of sectional units, theorems, and list items --
+## logical block units.  Mirrors \code{Para.model}.
 	ltx.Para.model =
 		( text,
 		  ( ltx.Para.class | ltx.Meta.class )*,
 		  text
 		)
 
-## Flow model: mixed inline and block content (note bodies, generic blocks).
+## Flow model: mixed inline and block content (note bodies, generic
+## blocks, table cells).  Mirrors \code{Flow.model}.
 	ltx.Flow.model =
 		( text
 		& ( ltx.Inline.class

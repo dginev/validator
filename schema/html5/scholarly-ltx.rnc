@@ -5,6 +5,36 @@ default namespace = "http://www.w3.org/1999/xhtml"
 ##  LaTeXML scholarly HTML profile                                    #
 # #####################################################################
 
+## This profile validates the HTML5 dialect that LaTeXML emits for
+## scholarly documents -- arXiv articles, ar5iv pages, and book-length
+## conversions.  It is a faithful HTML-side mirror of LaTeXML's own XML
+## schema: every LaTeXML XML element (\code{ltx:section}, \code{ltx:para},
+## \code{ltx:text}, ...) becomes an HTML element carrying a deterministic
+## class token, normally \code{ltx_} plus the XML local name
+## (\code{ltx:section} becomes \code{section.ltx_section},
+## \code{ltx:text} becomes \code{span.ltx_text}).
+##
+## How to read this schema, starting from \moduleref{scholarly-ltx-model}:
+## every element belongs to one of a small set of content classes
+## (\patternref{ltx.Inline.class}, \patternref{ltx.Block.class},
+## \patternref{ltx.Para.class}, the Misc renditions, and
+## \patternref{ltx.Meta.class}), and every container is built from four
+## shared models (\patternref{ltx.Inline.model},
+## \patternref{ltx.Block.model}, \patternref{ltx.Para.model},
+## \patternref{ltx.Flow.model}).  The element renditions live in
+## \moduleref{scholarly-ltx-inline}, \moduleref{scholarly-ltx-blocks},
+## \moduleref{scholarly-ltx-floats}, and
+## \moduleref{scholarly-ltx-structure}; the attribute and class-token
+## contracts live in \moduleref{scholarly-ltx-classes}; hosted-page
+## chrome (arXiv and ar5iv shells) is quarantined in
+## \moduleref{scholarly-ltx-scaffold}.
+##
+## Where the emitted HTML deliberately deviates from the XML model or
+## from the HTML specification (a span wrapper carrying block content, a
+## legacy \attr{name} attribute on anchors), the deviation is accepted
+## and documented at the pattern that carries it: the schema describes
+## what LaTeXML actually emits.
+
 ## Entry point for HTML documents emitted by LaTeXML.
 ##
 ## LaTeXML serializes a document as a page shell containing one article

@@ -51,7 +51,11 @@
 		element div { ltx.author.list.inner & ltx.attrs.no-class & ltx.class.authors }
 	ltx.author.list.inner =
 		( text,
-		  ( ltx.creator.elem | ltx.span.elem )*,
+		  ( ltx.creator.elem
+		  | ltx.author.span.elem
+		  | ltx.note.elem
+		  | ltx.span.elem
+		  )*,
 		  text
 		)
 
@@ -95,7 +99,7 @@
 		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
 		)
 
-## CV Header: custom header grid used by the LaTeXML moderncv binding —
+## CV Header: custom header grid used by the LaTeXML moderncv binding --
 ## a binding-introduced layout convention, not part of the core models
 	ltx.cv.header.elem =
 		element div { ltx.cv.header.inner & ltx.attrs.no-class & ltx.class.cv.header }
@@ -128,12 +132,12 @@
 		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.cv.heading }
 		)
 
-# #####################################################################
-## Sectional Units: monotone descent, mirroring the LaTeXML sectional
-## models (section.body.class etc.) — each level admits Para.model plus
-## any strictly deeper sectional unit, never same-or-shallower.
+# ====================================================================
+# Sectional Units: monotone descent, mirroring the LaTeXML sectional
+# models (section.body.class etc.) -- each level admits Para.model plus
+# any strictly deeper sectional unit, never same-or-shallower.
 
-## Appendix: appendix.body.class = Para.model | any sectional level
+## Appendix: \code{appendix.body.class} = Para.model or any sectional level
 	ltx.appendix.elem =
 		element section { ltx.appendix.inner & ltx.attrs.no-class & ltx.class.appendix }
 	ltx.appendix.inner =
@@ -151,7 +155,7 @@
 		  text
 		)
 
-## Chapter: chapter.body.class = Para.model | section and deeper.
+## Chapter: \code{chapter.body.class} = Para.model or section and deeper.
 ## Book backmatter (bibliography, index) is hoisted into chapters by the
 ## book classes, so BackMatter is admitted here as well.
 	ltx.chapter.elem =
@@ -172,7 +176,7 @@
 		  text
 		)
 
-## Section: section.body.class = Para.model | subsection and deeper
+## Section: \code{section.body.class} = Para.model or subsection and deeper
 	ltx.section.elem =
 		element section { ltx.section.inner & ltx.attrs.no-class & ltx.class.section }
 	ltx.section.inner =

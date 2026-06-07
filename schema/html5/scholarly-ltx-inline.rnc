@@ -5,6 +5,9 @@
 ## annotated with the LaTeXML XML element it renders.
 	ltx.Inline.class |=
 		( ltx.span.elem        # ltx:text (and inline span renditions)
+		| ltx.note.part.elem   # note scaffolding spans (mark/outer/content/type)
+		| ltx.author.span.elem # creator/contact metadata spans
+		| ltx.item.tag.elem    # ltx:tag (caption and item labels)
 		| ltx.anchor.elem      # ltx:ref, ltx:anchor, ltx:bibref
 		| ltx.emphasis.elem    # ltx:emph
 		| ltx.cite.elem        # ltx:cite
@@ -30,12 +33,22 @@
 	ltx.Meta.class |=
 		( ltx.note.elem )      # ltx:note
 
-## Inline Span: text, font, transform, contact, and tag spans
+## Inline Span: prose-level text spans (ltx:text and kin)
 	ltx.span.elem =
 		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.span }
 
+## Note Scaffolding Spans: the mark/outer/content/type wrappers the
+## transform synthesizes around ltx:note content
+	ltx.note.part.elem =
+		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.span.note-part }
+
+## Author Metadata Spans: creator names, contact lines, and the
+## separators emitted around author lists
+	ltx.author.span.elem =
+		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.span.author }
+
 ## Link or Cross Reference.  The last variant covers ltx:anchor, which
-## the transform emits with a legacy name attribute alongside id —
+## the transform emits with a legacy name attribute alongside id --
 ## obsolete in HTML5, but deliberate upstream output for old-style
 ## fragment anchors.
 	ltx.anchor.elem =
@@ -70,7 +83,7 @@
 	ltx.sub.elem =
 		element sub { ltx.Inline.model & ltx.attrs.no-class & ltx.class.sub }
 
-## Note: ltx:note is Meta.class — valid in every shared model, mirroring
+## Note: ltx:note is Meta.class -- valid in every shared model, mirroring
 ## the XML schema where Meta.class appears in Inline, Block, Para, and
 ## Flow models alike.
 	ltx.note.elem =
@@ -94,7 +107,7 @@
 	ltx.object.inner =
 		( ltx.Inline.model )
 
-## Conversion Error: ltx:ERROR (Misc.class) — the engine's rendering of
+## Conversion Error: ltx:ERROR (Misc.class) -- the engine's rendering of
 ## an unrecoverable conversion problem, e.g. an undefined control
 ## sequence shown as visible text.  Accepted as faithful LaTeXML output;
 ## quality gates that want to reject such documents should check for the

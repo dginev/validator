@@ -20,16 +20,16 @@
 	ltx.Misc.block.class |=
 		( ltx.block.rule.elem )
 
-## Paragraph Wrapper: ltx:para — a logical paragraph whose content is
+## Paragraph Wrapper: ltx:para -- a logical paragraph whose content is
 ## the Block model (para_model = Block.model)
 	ltx.paragraph.elem =
 		element div { ltx.Block.model & ltx.attrs.no-class & ltx.class.para }
 
-## Paragraph Line: ltx:p — actual prose, Inline model
+## Paragraph Line: ltx:p -- actual prose, Inline model
 	ltx.paragraph.line.elem =
 		element p { ltx.Inline.model & ltx.attrs.no-class & ltx.class.p }
 
-## Generic Block: ltx:block — CSS block fragments produced by bindings.
+## Generic Block: ltx:block -- CSS block fragments produced by bindings.
 ## Deviation from block_model = Block.model: the transform serializes
 ## inline material directly inside these divs, so the content is Flow,
 ## plus listing lines observed outside listings.
@@ -90,7 +90,7 @@
 	ltx.listing.line.inner =
 		( ltx.Inline.model )
 
-## Standalone Rule: ltx:rule (Para.class | Misc.class) — horizontal rules
+## Standalone Rule: ltx:rule (\code{Para.class | Misc.class}) -- horizontal rules
 ## emitted as styled spans in both block and inline contexts
 	ltx.block.rule.elem =
 		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.rule }

@@ -330,6 +330,29 @@ The `\ell@`-undefined conversion error in the book exercised the new
 `span.ltx_ERROR` acceptance end-to-end.  Not added as a fixture (8 MB);
 the structures it introduced are all model-cited above.
 
+## 2026-06-06 (architect round): error-message precision, docs, corpus harness
+
+- Split the 23-token generic span bucket into role-aligned patterns
+  (prose spans, note scaffolding, author metadata); `ltx_tag` now rides
+  `ltx.item.tag.elem` and `ltx_bibblock` its dedicated element, so a
+  failing span is reported against the intent that failed.
+- Equation-table tokens (`ltx_eqn_*`, `ltx_intertext`) moved from the
+  global layout bucket into an equation-scoped modifier set -- they can
+  no longer appear on unrelated elements.
+- Collapsed the duplicated theorem/bibliography h2-h6 title unions into
+  references to the shared frontmatter title pattern.
+- Docs hardening for the generated schema site: ASCII/TeX-safe comments
+  (the pipeline is TeX -- raw `|` and em-dashes mangle), `##` prose on
+  every class pattern and union base, ltx:* renditions named in element
+  prose, cross-links via \patternref/\moduleref, a landing overview on
+  the driver, single banner per module.  Known cosmetic issue left in
+  the generator (latexml-oxide): modules carrying the start/document
+  patterns appear twice in the site TOC.
+- `corpus-validate.py`: batched vnu JSON runs over a directory tree
+  with message-category aggregation and per-file ranking -- the tool
+  for validating parity-campaign output at arXiv scale.  Demo over the
+  current corpus: 12 files, 9 clean, findings only in the invalid set.
+
 ## Binding-Introduced Extension Vocabularies (audit, 2026-06-06)
 
 LaTeXML bindings (`*.sty.ltxml` / `*_sty.rs`) introduce their own attribute
