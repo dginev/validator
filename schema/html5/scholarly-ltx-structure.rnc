@@ -77,12 +77,10 @@
 		  ltx.abstract.title.elem?,
 		  ltx.Block.model
 		)
+## The abstract title is exactly h6: the transform hard-codes the rank
+## rather than deriving it from sectional depth.
 	ltx.abstract.title.elem =
-		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
-		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
-		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
-		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
-		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
+		( element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
 		)
 	ltx.frontmatter.block.elem =
 		element div { ltx.frontmatter.block.inner & ltx.attrs.no-class & ltx.class.frontmatter }
@@ -224,7 +222,7 @@
 		  text
 		)
 
-## Sectional Paragraph: the formal, possibly labelled LaTeX \paragraph
+## Sectional Paragraph: the formal, possibly labelled LaTeX \cs{paragraph}
 	ltx.sectional.paragraph.elem =
 		element section { ltx.sectional.paragraph.inner & ltx.attrs.no-class & ltx.class.sectional.paragraph }
 	ltx.sectional.paragraph.inner =

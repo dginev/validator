@@ -70,6 +70,9 @@ Current repairs include:
 - Removed invalid `target` from a canonical `link`.
 - Replaced invalid negative `padding-top` inline styles with negative
   `margin-top` in one fixture.
+- `example.html`: hand-written abstract title corrected h2 -> h6; the
+  transform hard-codes h6 for abstract titles, and the original h2 had
+  leaked into the inferred schema as a spurious h2-h6 union.
 
 ## Critical Design Improvements
 
