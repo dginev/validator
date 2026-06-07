@@ -490,7 +490,6 @@
 				| "ltx_ref"
 				| "ltx_url"
 				| "ltx_LaTeXML_logo"
-				| "ltx_note"
 				| "ltx_rule" ),
 					ltx.class.inline.extra*
 				}
@@ -547,5 +546,5 @@
 		attribute class { list { "ltx_sub", ltx.class.inline.extra* } }
 ## Base tokens for notes (\code{ltx:note}): footnotes and frontmatter notes; the note role arrives as a generated \attrval{ltx_role_}-prefixed modifier.
 	ltx.class.note =
-		attribute class { list { ( "ltx_note" | "ltx_note_outer" ), ltx.class.inline.extra* } }
+		attribute class { list { "ltx_note", ltx.class.inline.extra* } }
 

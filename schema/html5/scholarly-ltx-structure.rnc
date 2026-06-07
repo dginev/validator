@@ -89,12 +89,11 @@
 		  ltx.frontmatter.title.elem?,
 		  ltx.Inline.model
 		)
+## Frontmatter-block titles are exactly h6: the transform hard-codes the
+## rank for acknowledgements, keywords, classification, and theorem-like
+## headings rather than deriving it from sectional depth.
 	ltx.frontmatter.title.elem =
-		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
-		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
-		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
-		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
-		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		( element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
 		)
 
 ## CV Header: custom header grid used by the LaTeXML moderncv binding --

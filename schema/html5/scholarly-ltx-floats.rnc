@@ -40,8 +40,15 @@
 		  ltx.bibliography.list.elem?,
 		  text
 		)
+## The bibliography is a sectional unit, so its title rank follows
+## sectional depth (h2 at document level, deeper inside book chapters).
 	ltx.bibliography.title.elem =
-		( ltx.frontmatter.title.elem )
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		)
 	ltx.bibliography.list.elem =
 		element ul { ltx.bibliography.list.inner & ltx.attrs.no-class & ltx.class.biblist }
 	ltx.bibliography.list.inner =
@@ -225,8 +232,10 @@
 		)
 
 ## Display Equation Row Group: equations are emitted in a table body
+## Equation row groups are emitted as bare tbody (id at most, never a
+## class token) -- witnessed across every display equation in the corpus.
 	ltx.equation.rowgroup.elem =
-		element tbody { ltx.equation.rowgroup.inner & ltx.attrs.no-class & ltx.class.tbody? }
+		element tbody { ltx.equation.rowgroup.inner & ltx.attrs.no-class }
 	ltx.equation.rowgroup.inner =
 		( text,
 		  ltx.equation.row.elem+,

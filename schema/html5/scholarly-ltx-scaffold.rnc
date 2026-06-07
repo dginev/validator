@@ -108,12 +108,9 @@
 		  ltx.toc.list.elem?,
 		  text
 		)
+## The TOC title ("Contents") is exactly h6, hard-coded in the transform.
 	ltx.toc.title.elem =
-		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
-		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
-		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
-		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
-		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		( element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
 		)
 	ltx.toc.list.elem =
 		element ol { ltx.toc.list.inner & ltx.attrs.no-class & ltx.class.toclist }
