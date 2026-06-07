@@ -82,7 +82,7 @@ public class HeadingHierarchyChecker extends Checker {
     private Locator locator;
     private Deque<AncestorInfo> ancestorStack;
     private List<HeadingInfo> headings;
-    private final boolean allowLatexmlGeneratedHeadings;
+    private boolean allowLatexmlGeneratedHeadings;
 
     public HeadingHierarchyChecker() {
         this(false);
@@ -92,11 +92,25 @@ public class HeadingHierarchyChecker extends Checker {
      * @param allowLatexmlGeneratedHeadings if {@code true}, h6 elements
      *        marked with LaTeXML-generated {@code ltx_title_*} class tokens
      *        (abstract / theorem / proof / classification / keywords titles)
-     *        are skipped from outline-rank checking. Intended for the
+     *        are skipped from outline-rank checking, and rank-skip
+     *        reporting is disabled (LaTeXML assigns rank by sectional
+     *        type, so skips are intent-legitimate). Intended for the
      *        scholarly HTML5 profile.
      */
     public HeadingHierarchyChecker(boolean allowLatexmlGeneratedHeadings) {
         this.allowLatexmlGeneratedHeadings = allowLatexmlGeneratedHeadings;
+    }
+
+    /**
+     * Servlet-path equivalent of the boolean constructor: checkers
+     * reached through {@code CheckerSchema} are instantiated
+     * reflectively with the no-arg constructor, so the transaction
+     * flips this after construction when the requested schema list
+     * names the scholarly profile (mirrors how {@code Assertions}
+     * receives its request context).
+     */
+    public void setAllowLatexmlGeneratedHeadings(boolean allow) {
+        this.allowLatexmlGeneratedHeadings = allow;
     }
 
     @Override

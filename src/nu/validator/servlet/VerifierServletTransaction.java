@@ -56,6 +56,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import nu.validator.checker.HeadingHierarchyChecker;
 import nu.validator.checker.LanguageDetectingChecker;
 import nu.validator.checker.XmlPiChecker;
 import nu.validator.checker.jing.CheckerSchema;
@@ -1114,7 +1115,10 @@ class VerifierServletTransaction implements DocumentModeHandler, SchemaResolver 
                 || schemaUrls.startsWith("http://s.validator.nu/html5.rnc")
                 || schemaUrls.startsWith("http://s.validator.nu/html5-all.rnc")
                 || schemaUrls.startsWith("http://s.validator.nu/html5-its.rnc")
-                || schemaUrls.startsWith("http://s.validator.nu/html5-rdfalite.rnc"));
+                || schemaUrls.startsWith("http://s.validator.nu/html5-rdfalite.rnc")
+                // The scholarly profile validates LaTeXML's HTML5
+                // serialization — text/html is its native input.
+                || schemaUrls.startsWith("http://s.validator.nu/html5-scholarly.rnc"));
 
     }
 
@@ -1903,6 +1907,15 @@ class VerifierServletTransaction implements DocumentModeHandler, SchemaResolver 
             Assertions assertions = (Assertions) validatorContentHandler;
             assertions.setRequest(request);
             assertions.setSourceIsCss(sourceCode.getIsCss());
+        }
+        if (validatorContentHandler instanceof HeadingHierarchyChecker) {
+            // The scholarly profile assigns heading rank by LaTeXML
+            // sectional type; suppress rank-skip reporting there, the
+            // same as SimpleDocumentValidator does on the CLI path.
+            HeadingHierarchyChecker headingChecker = //
+                    (HeadingHierarchyChecker) validatorContentHandler;
+            headingChecker.setAllowLatexmlGeneratedHeadings(
+                    schemaUrls != null && schemaUrls.contains("html5-scholarly"));
         }
         if (validatorContentHandler instanceof LanguageDetectingChecker) {
             LanguageDetectingChecker langdetect = //
