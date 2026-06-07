@@ -2,58 +2,14 @@ datatypes w = "http://whattf.org/datatype-draft"
 default namespace = "http://www.w3.org/1999/xhtml"
 
 # #####################################################################
-##  LaTeXML scholarly HTML profile                                    #
+#   LaTeXML scholarly HTML profile                                    #
 # #####################################################################
 
-## This schema validates the HTML5 emitted by LaTeXML for scholarly
-## documents: arXiv articles, ar5iv pages, and full books.  It mirrors
-## the structure of LaTeXML's own XML schema, in which every XML
-## element is rendered as an HTML element carrying a deterministic
-## class token -- \code{ltx_} followed by the XML name -- so that
-## \code{ltx:section} renders as \code{section.ltx_section}, and
-## \code{ltx:text} as \code{span.ltx_text}.
-##
-## The module \moduleref{scholarly-ltx-model} is the natural entry
-## point.  Every element belongs to one of a small number of content
-## classes -- Inline, Block, Para, Misc, and Meta, matching the
-## classes of the XML schema -- and every container is built from four
-## shared models over those classes.  The concrete element definitions
-## reside in \moduleref{scholarly-ltx-inline},
-## \moduleref{scholarly-ltx-blocks}, \moduleref{scholarly-ltx-floats},
-## and \moduleref{scholarly-ltx-structure}; the attribute and
-## class-token contracts in \moduleref{scholarly-ltx-classes}.
-## Hosted-page chrome -- the arXiv and ar5iv page shells -- is
-## confined to \moduleref{scholarly-ltx-scaffold}, separate from the
-## article model.
-##
-## Where the emitted HTML deliberately deviates from the XML content
-## model or from the HTML specification, the deviation is accepted and
-## documented at the pattern that carries it: the schema describes
-## what LaTeXML actually emits.
-##
-## \begin{description}
-## \item[Intent first] The XML schema defines meaning; the transform
-## defines its HTML projection.  Each pattern cites the model it
-## renders.
-## \item[Empirical grounding] Every constraint is tested against a
-## corpus of converted articles and books before it lands.
-## \item[Faithful output] Deliberate deviations are documented, never
-## silently patched.
-## \item[Loosen uniformly, tighten pointwise] Permissions flow through
-## the shared models; restrictions attach to specific patterns, each
-## with a transform citation.
-## \item[Separate worlds] The article model, the page chrome, and
-## per-package vocabularies remain in distinct compartments.
-## \item[Errors name intent] A validation failure reports the
-## publication concept that broke, not merely the HTML element.
-## \item[Track upstream] The union structure mirrors the XML schema's
-## extension idiom, so upstream changes port mechanically.
-## \end{description}
-
-## Entry point: LaTeXML serializes a document as a page shell holding
-## one article and an optional generated footer; this start pattern
-## keeps that shell distinct from the publication model, so validation
-## errors name the intent that failed.
+## LaTeXML serializes a document as a page shell containing one article
+## and an optional generated footer.  The definitions below keep that
+## shell distinct from the document-level publication model so validation
+## errors name the intent that failed instead of only the concrete HTML
+## element that happened to carry it.
 
 	ltx.content.start =
 		( ltx.page.elem | ltx.arxiv.body | ltx.ar5iv.body )
