@@ -59,10 +59,13 @@
 ## inline-block wrappers).
 	ltx.Misc.block.class = notAllowed
 
-## Meta-class elements: metadata that may appear in any model
-## (\code{ltx:note}; the other Meta.class members -- \code{ltx:rdf},
-## \code{ltx:indexmark}, \code{ltx:declare} -- are consumed or
-## head-hoisted by the transform and never reach article content).
+## Meta-class elements: metadata that may appear in any model.  Two
+## members survive into article content and are modelled in
+## scholarly-ltx-inline.rnc: \code{ltx:note} (footnotes/frontmatter notes)
+## and \code{ltx:rdf} (an RDFa metadata container the transform renders as
+## a usually-display:none div/span, e.g. from hyperref pdf metadata).  The
+## remaining members -- \code{ltx:indexmark}, \code{ltx:declare} -- are
+## consumed or head-hoisted by the transform and never reach the body.
 	ltx.Meta.class = notAllowed
 
 ## Inline model: phrasing content of paragraphs, headings, captions,

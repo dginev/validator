@@ -31,7 +31,8 @@
 		| svg
 		)
 	ltx.Meta.class |=
-		( ltx.note.elem )      # ltx:note
+		( ltx.note.elem        # ltx:note
+		| ltx.rdf.elem )       # ltx:rdf
 
 ## Inline Span: prose-level text spans (ltx:text and kin)
 	ltx.span.elem =
@@ -88,6 +89,19 @@
 ## Flow models alike.
 	ltx.note.elem =
 		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.note }
+
+## RDF Metadata Container: ltx:rdf is Meta.class -- an invisible (typically
+## display:none) carrier of an RDFa triple.  It is emitted from hyperref pdf
+## metadata (\pdfauthor -> dcterms:creator, \pdftitle -> dcterms:title, ...),
+## resolved \lxRDF triples, or \addbibresource-style annotations.  The
+## transform (LaTeXML-meta-xhtml.xsl) renders it as div in block context and
+## span inline; the body is usually empty but may carry Flow content via the
+## optional \lxRDF[content] argument.  The RDFa attributes (about, property,
+## content, ...) ride in through \patternref{ltx.attrs.no-class}.
+	ltx.rdf.elem =
+		( element div  { ltx.Flow.model   & ltx.attrs.no-class & ltx.class.rdf }
+		| element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.rdf }
+		)
 
 ## Inline Image: ltx:graphics renders as img for bitmaps, or as an
 ## object embed when the graphic is converted to SVG
