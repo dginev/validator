@@ -9,6 +9,8 @@ on:
 
 jobs:
   build-and-push-image:
+    # Only publish images from a successful Build run.
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -44,7 +46,9 @@ jobs:
         id: meta
         uses: docker/metadata-action@v6
         with:
-          images: ghcr.io/validator/validator
+          # Publish under the repo's own namespace, so forks push to
+          # their own package instead of failing against upstream's.
+          images: ghcr.io/${{ github.repository }}
           tags: type=semver,pattern={{version}}
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
@@ -53,5 +57,5 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           no-cache: true
-          tags: ghcr.io/validator/validator:latest, ${{ steps.meta.outputs.tags }}
+          tags: ghcr.io/${{ github.repository }}:latest, ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
