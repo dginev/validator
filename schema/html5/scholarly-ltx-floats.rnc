@@ -264,7 +264,6 @@
 		  | ltx.Inline.class
 		  | ltx.Misc.inline.class
 		  | ltx.Meta.class
-		  | ltx.paragraph.line.elem
 		  )*,
 		  text
 		)

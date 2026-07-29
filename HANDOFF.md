@@ -24,10 +24,12 @@ real transform output or **provably emittable** by the upstream XSLT
    - `JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 python3 checker.py build`
    - `./corpus-validate.py tests/html-scholarly/*.html` → must be 9/9 clean
    - `tests/html-scholarly/invalid/*` → must all exit non-zero
-   - `./corpus-validate.py <corpus>` → diff the category table and the
-     failing-file set against a pre-change baseline; the failing-file set
-     must not grow (message-count drift inside already-invalid files is
-     jing recovery noise and acceptable)
+   - `./corpus-validate.py --json out.json <corpus>` → diff the exact
+     failing-file set (the `by_file` keys in the JSON dump) against a
+     pre-change baseline; the failing-file set must not grow
+     (message-count drift inside already-invalid files is jing recovery
+     noise and acceptable).  Do NOT diff the printed report: its file
+     list is top-40 only, so small-error-count files are invisible there.
    - probe documents for each new rejection/acceptance (see the pattern
      in the audit round: minimal valid shell + one injected construct,
      asserting exact exit codes both ways)
@@ -67,19 +69,13 @@ part shifts them (see below).
    inline tabular span stack in `scholarly-ltx-floats.rnc` is the
    template for how to do this), scoped to inline contexts — do not just
    widen `ltx.class.span`.
-3. **`ltx_missing_image`.**  A failed `ltx:graphics` emits
-   `img.ltx_graphics ltx_missing ltx_missing_image` *without* `src` —
-   currently unrepresentable (token missing from the semantic modifiers,
-   and `ltx.image.attrs` requires src/srcset).  Decide whether it is
-   accepted-as-faithful (like `ltx_ERROR`) and model it, or leave it a
-   validation error by policy.  Document the decision either way.
-4. **Author-metadata span scoping.**  `ltx.author.span.elem`
-   (`ltx_personname`, `ltx_contact`, `ltx_author_before/after`, ...) is
-   still a member of the general `ltx.Inline.class`, so author spans
-   validate in arbitrary prose.  Scope them: `ltx_personname`/`ltx_contact`
-   inside `span.ltx_creator`, the before/after separators inside
-   `div.ltx_authors`.  Needs witness confirmation that nothing else
-   emits them mid-prose (check `\thanks`/`\and` edge cases at scale).
+3. ~~**`ltx_missing_image`.**~~  Done in the pass-2 round: modeled as a
+   dedicated img variant (`src=""` + the ltx_missing markers), accepted
+   as faithful conversion output like `ltx_ERROR`.
+4. ~~**Author-metadata span scoping.**~~  Done in the pass-2 round:
+   authors > (creator | before/after separator); creator > personname?,
+   author-notes?; contact scoped inside author-notes.  Re-confirm at
+   arXiv scale that nothing emits these spans mid-prose.
 5. **Re-confirm the narrow unions at arXiv scale.**  Cheap re-runs of
    the witness scan to either harden or relax with evidence:
    - appendix/bibliography/index title ranks (h3 witnesses currently come
@@ -102,6 +98,31 @@ part shifts them (see below).
    consistency across a document (all `ltx:section`s share one rank per
    `f:seclev-aux`) is not expressible in RELAX NG; the schema enforces
    per-unit rank *ranges* only.
+
+## Pass-2 leftovers (2026-07-29 round)
+
+The second audit pass tightened the attribute contract (hyperlink/img/
+cell attrs cut to the emitted set), pruned the scaffold element list to
+the witnessed chrome, scoped the author block, cut `p` from equation
+cells, replaced the never-matching csquotes/citemacro prefix entries
+with their real forms (bare quote tokens; dynamic `ltx_citemacro_*` and
+`ltx_lst_*` families), added missed upstream tokens (`ltx_parbox`,
+`ltx_align_justify`, flex sizes, logos, `ltx_Url`, ...), and modeled
+`ltx:verbatim` (`code`/`pre`) and the missing-image img.  New leftovers:
+
+- **Inline span-stack cell structure**: the unmodeled inline renditions
+  carry `rowspan`/`colspan` attributes and `ltx_colspan_N`/
+  `ltx_rowspan_N` tokens on `span.ltx_td` — fold into worklist item 2.
+- **`div.ltx_inline-block` inside equation cells** (~9 witnesses, from
+  `\parbox` in display math): currently rejected because equation cells
+  admit only inline Misc; confirm the upstream emission context, then
+  admit `ltx.Misc.block.class` in `ltx.equation.number.cell.inner` if
+  sanctioned.
+- **Element gaps with few witnesses**: `div.ltx_epigraph` (+ source/
+  text spans), `div.ltx_titlepage` — model when the arXiv sample set
+  provides enough witnesses.
+- **`headers`/`scope` on cells**: cut as never-emitted; revisit if an
+  accessibility postprocessing pass starts adding them.
 
 ## Where things live
 

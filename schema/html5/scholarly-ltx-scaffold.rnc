@@ -15,6 +15,11 @@
 		( text
 		& ( ltx.scaffold.elem | svg )*
 		)
+## The element set is the one witnessed across the arXiv/ar5iv chrome:
+## navigation and modal structure (a, button, div, form, header, footer,
+## nav, ul, li, label, input, textarea), prose bits (p, span, strong,
+## br), and the two heading ranks the templates use (h2 in the keyboard
+## glossary, h5 as the modal title).
 	ltx.scaffold.elem =
 		( element a { ltx.scaffold.inner & ltx.scaffold.attrs }
 		| element button { ltx.scaffold.inner & ltx.scaffold.attrs }
@@ -25,19 +30,12 @@
 		| element nav { ltx.scaffold.inner & ltx.scaffold.attrs }
 		| element p { ltx.scaffold.inner & ltx.scaffold.attrs }
 		| element ul { ltx.scaffold.inner & ltx.scaffold.attrs }
-		| element ol { ltx.scaffold.inner & ltx.scaffold.attrs }
 		| element li { ltx.scaffold.inner & ltx.scaffold.attrs }
 		| element span { ltx.scaffold.inner & ltx.scaffold.attrs }
 		| element strong { ltx.scaffold.inner & ltx.scaffold.attrs }
-		| element em { ltx.scaffold.inner & ltx.scaffold.attrs }
-		| element small { ltx.scaffold.inner & ltx.scaffold.attrs }
 		| element label { ltx.scaffold.inner & ltx.scaffold.attrs }
-		| element h1 { ltx.scaffold.inner & ltx.scaffold.attrs }
 		| element h2 { ltx.scaffold.inner & ltx.scaffold.attrs }
-		| element h3 { ltx.scaffold.inner & ltx.scaffold.attrs }
-		| element h4 { ltx.scaffold.inner & ltx.scaffold.attrs }
 		| element h5 { ltx.scaffold.inner & ltx.scaffold.attrs }
-		| element h6 { ltx.scaffold.inner & ltx.scaffold.attrs }
 		| element input { empty & ltx.scaffold.attrs }
 		| element img { empty & ltx.scaffold.attrs }
 		| element textarea { text & ltx.scaffold.attrs }

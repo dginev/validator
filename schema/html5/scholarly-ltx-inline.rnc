@@ -5,7 +5,6 @@
 ## annotated with the LaTeXML XML element it renders.
 	ltx.Inline.class |=
 		( ltx.span.elem        # ltx:text (and inline span renditions)
-		| ltx.author.span.elem # creator/contact metadata spans
 		| ltx.item.tag.elem    # ltx:tag (caption and item labels)
 		| ltx.anchor.elem      # ltx:ref, ltx:anchor, ltx:bibref
 		| ltx.emphasis.elem    # ltx:emph
@@ -16,17 +15,22 @@
 		| ltx.math.elem        # ltx:Math
 		)
 	ltx.Misc.inline.class |=
-		( ltx.image.elem       # ltx:graphics
-		| ltx.linebreak.elem   # ltx:break
-		| ltx.error.elem       # ltx:ERROR
-		| svg                  # ltx:svg
+		( ltx.image.elem         # ltx:graphics
+		| ltx.linebreak.elem     # ltx:break
+		| ltx.error.elem         # ltx:ERROR
+		| ltx.verbatim.code.elem # ltx:verbatim (single-line)
+		| svg                    # ltx:svg
 		)
 	## The same Misc renditions are context-free: they appear unchanged in
 	## block contexts (img directly inside div.ltx_para, br inside figure).
+	## Multi-line verbatim renders as pre, which HTML restricts to block
+	## contexts.
 	ltx.Misc.block.class |=
 		( ltx.image.elem
 		| ltx.linebreak.elem
 		| ltx.error.elem
+		| ltx.verbatim.code.elem
+		| ltx.verbatim.pre.elem
 		| svg
 		)
 	ltx.Meta.class |=
@@ -37,10 +41,27 @@
 	ltx.span.elem =
 		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.span }
 
-## Author Metadata Spans: creator names, contact lines, and the
-## separators emitted around author lists
-	ltx.author.span.elem =
-		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.span.author }
+## Author Metadata Spans: the transform emits a fixed nesting inside the
+## author list (LaTeXML-structure-xhtml.xsl): each creator holds a
+## personname and optionally an author-notes wrapper, which holds the
+## contact lines.  These spans are scoped to the author block and are not
+## general prose members.
+	ltx.personname.elem =
+		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.personname }
+	ltx.author.notes.elem =
+		element span { ltx.attrs.no-class & ltx.class.author.notes
+		             & ( text
+		               & ( ltx.contact.elem
+		                 | ltx.Inline.class
+		                 | ltx.Misc.inline.class
+		                 | ltx.Meta.class
+		                 )*
+		               )
+		             }
+	ltx.contact.elem =
+		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.contact }
+	ltx.author.separator.elem =
+		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.author.separator }
 
 ## Link or Cross Reference.  Exactly two anchor shapes leave the
 ## transform: hyperlinks (ltx:ref with a target, always href, with the
@@ -123,12 +144,33 @@
 		| element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.rdf }
 		)
 
+## Verbatim: ltx:verbatim (Misc.class) -- the transform picks code for
+## single-line material and pre for multi-line (LaTeXML-misc-xhtml.xsl).
+	ltx.verbatim.code.elem =
+		element code { ltx.Inline.model & ltx.attrs.no-class & ltx.class.verbatim }
+	ltx.verbatim.pre.elem =
+		element pre { ltx.Inline.model & ltx.attrs.no-class & ltx.class.verbatim }
+	ltx.class.verbatim =
+		attribute class { list { "ltx_verbatim", ltx.class.inline.extra* } }
+
 ## Inline Image: ltx:graphics renders as img for bitmaps, or as an
-## object embed when the graphic is converted to SVG
+## object embed when the graphic is converted to SVG.  A graphic whose
+## source could not be resolved is emitted with an empty src and the
+## ltx_missing markers -- accepted as faithful conversion output, like
+## ltx:ERROR.
 	ltx.image.elem =
-		( ltx.img.elem | ltx.object.elem )
+		( ltx.img.elem | ltx.img.missing.elem | ltx.object.elem )
 	ltx.img.elem =
 		element img { img.inner & ltx.image.attrs & ltx.class.img? }
+	ltx.img.missing.elem =
+		element img { img.inner & ltx.attrs.no-class
+		            & attribute src { "" }
+		            & img.attrs.alt?
+		            & ltx.class.img.missing }
+	ltx.class.img.missing =
+		attribute class {
+			list { "ltx_graphics", ltx.class.extra*, "ltx_missing", "ltx_missing_image", ltx.class.extra* }
+		}
 	ltx.object.elem =
 		element object { ltx.object.inner & ltx.object.attrs & ltx.class.img }
 	ltx.object.attrs =

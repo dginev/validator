@@ -54,41 +54,34 @@
 		& ltx.rdfa.attrs?
 		& aria.global?
 		)
-## Attributes for table cells: the common set plus the stock HTML cell structure (colspan, rowspan, headers, scope).
+## Attributes for table cells: the common set plus colspan/rowspan; the
+## transform never emits headers or scope.
 	ltx.table.cell.attrs =
 		( ltx.attrs.no-class
 		& tables.attrs.cell-structure
-		& tables.attrs.headers?
-		& tables.attrs.scope?
 		)
-## Attributes for hyperlinks: the common set plus the stock HTML hyperlink attributes (href required).
+## Attributes for hyperlinks: the transform emits href (required), title,
+## and download (the listing-data source link); target survives on
+## hosted-page footer links, and an RDFa rel can ride in via \lxRDFa.
+## The remaining stock hyperlink attributes (hreflang, type, ping,
+## referrerpolicy) have no emission path and are excluded.
 	ltx.anchor.href.attrs =
 		( ltx.attrs.no-class
 		& shared-hyperlink.attrs.href
 		& shared-hyperlink.attrs.download?
 		& shared-hyperlink.attrs.target?
 		& shared-hyperlink.attrs.rel?
-		& shared-hyperlink.attrs.hreflang?
-		& shared-hyperlink.attrs.type?
-		& shared-hyperlink.attrs.ping?
-		& referrerpolicy?
 		)
-## Attributes for images: the common set plus the stock HTML img attributes; src or srcset required, alt as emitted.
+## Attributes for images: the transform emits src (required), alt,
+## height, and width; the remaining stock img attributes (srcset, sizes,
+## usemap, ismap, decoding, loading, fetchpriority, crossorigin,
+## referrerpolicy) have no emission path and are excluded.
 	ltx.image.attrs =
 		( ltx.attrs.no-class
-		& ( ( img.attrs.src & img.attrs.srcset? )
-		  | ( img.attrs.srcset & img.attrs.src? ) )
-		& img.attrs.sizes?
+		& img.attrs.src
 		& img.attrs.generator-unable-to-provide-required-alt?
 		& img.attrs.height?
 		& img.attrs.width?
-		& img.attrs.usemap?
-		& img.attrs.ismap?
-		& img.attrs.decoding?
-		& img.attrs.loading?
-		& common.attrs.fetchpriority?
-		& referrerpolicy?
-		& embedded.content.attrs.crossorigin?
 		& img.attrs.alt?
 		)
 
@@ -99,6 +92,7 @@
 		| ltx.class.font.modifier
 		| ltx.class.reference.modifier
 		| ltx.class.role.modifier
+		| ltx.class.quote.modifier
 		| ltx.class.generated.modifier
 		)
 		## Modifier tokens permitted on inline elements: the global set plus inline listing tokens.
@@ -133,12 +127,18 @@
 		| "ltx_missing_label"
 		| "ltx_missing_citation"
 		| "ltx_nolink"
-		| "ltx_nodisplay" )
+		| "ltx_nodisplay"
+		| "ltx_algorithm"
+		| "ltx_teaserfigure"
+		| "ltx_LaTeX_logo"
+		| "ltx_TeX_logo" )
 ## Layout tokens projecting LaTeXML's Positionable and Transformable attributes: alignment (\attrval{ltx_align_left} and kin), floats, minipages, flex-figure cells, and CSS-transform wrappers.
 	ltx.class.layout.modifier =
 		( "ltx_align_left"
 		| "ltx_align_center"
 		| "ltx_align_right"
+		| "ltx_align_justify"
+		| "ltx_align_floatright"
 		| "ltx_align_top"
 		| "ltx_align_bottom"
 		| "ltx_align_middle"
@@ -157,11 +157,17 @@
 		| "ltx_overlay_over"
 		| "ltx_phantom"
 		| "ltx_minipage"
+		| "ltx_parbox"
 		| "ltx_figure_panel"
 		| "ltx_flex_figure"
 		| "ltx_flex_cell"
 		| "ltx_flex_break"
 		| "ltx_flex_size_1"
+		| "ltx_flex_size_2"
+		| "ltx_flex_size_3"
+		| "ltx_flex_size_4"
+		| "ltx_flex_size_many"
+		| "ltx_flex_table"
 		| "ltx_img_landscape"
 		| "ltx_transformed_outer"
 		| "ltx_transformed_inner"
@@ -173,6 +179,7 @@
 		( "ltx_emph"
 		| "ltx_font_bold"
 		| "ltx_font_medium"
+		| "ltx_font_nullfont"
 		| "ltx_font_italic"
 		| "ltx_font_upright"
 		| "ltx_font_slanted"
@@ -198,13 +205,14 @@
 		| "ltx_mathvariant_bold-fraktur" )
 ## Reference and bibliography tokens: citation macro markers (\attrval{ltx_citemacro_citep}), reference styles, and the \attrval{ltx_bib_}-prefixed field tokens emitted by the bibliography formatter.
 	ltx.class.reference.modifier =
-		( "ltx_citemacro_cite"
-		| "ltx_href"
+		( "ltx_href"
 		| "ltx_refmacro_nameref"
+		| "ltx_refmacro_autoref"
 		| "ltx_ref_self"
 		| "ltx_ref_tag"
 		| "ltx_ref_title"
 		| "ltx_url"
+		| "ltx_Url"
 		| "ltx_bib_author"
 		| "ltx_bib_author-year"
 		| "ltx_bib_key"
@@ -217,11 +225,11 @@
 		| "ltx_bib_cited"
 		| "ltx_bib_misc"
 		| "ltx_bib_links"
-		| "ltx_citemacro_citep"
-		| "ltx_citemacro_citet"
 		| "ltx_role_refnum"
 		| "doi"
-		| "issn" )
+		| "issn"
+		| "orcid"
+		| "ltx_orcid" )
 ## Role tokens projecting the XML \attr{role} attribute on frontmatter and author material (\attrval{ltx_role_author}, \attrval{ltx_role_email}).
 	ltx.class.role.modifier =
 		( "ltx_role_author"
@@ -252,15 +260,31 @@
 		( "ltx_listing"
 		| "ltx_lstlisting"
 		)
-## Inline listing tokens: syntax-category spans inside listing lines.
+## Inline listing tokens: the listings binding mints one token per
+## syntax category and per language (\attrval{ltx_lst_keyword},
+## \attrval{ltx_lst_language_Python}, \attrval{ltx_lst_numbers_left}),
+## so only the prefix is closed.
 	ltx.class.listing.inline.modifier =
-		( "ltx_lst_identifier"
-		| "ltx_lst_space" )
+		xsd:NMTOKEN {
+			pattern = "ltx_lst_[A-Za-z0-9_]+(-[A-Za-z0-9_]+)*"
+		}
+## Quotation tokens from the csquotes binding: emitted as bare tokens on
+## text spans and quote blocks (csquotes.sty.ltxml), not as generated
+## \attrval{ltx_xxx_name} families.
+	ltx.class.quote.modifier =
+		( "ltx_inline-quote"
+		| "ltx_outerquote"
+		| "ltx_innerquote"
+		| "ltx_textquote"
+		| "ltx_blockquote"
+		| "ltx_displayquote"
+		| "ltx_citation"
+		| "ltx_ccitation" )
 ## Open generated-token families, validated by pattern: bindings mint per-name tokens such as \attrval{ltx_theorem_lemma} (from \cs{newtheorem}), \attrval{ltx_tocentry_chapter}, or \attrval{ltx_glossary_acronym}, so only the prefix is closed.
 	ltx.class.generated.modifier =
 		xsd:NMTOKEN {
 			pattern =
-				"ltx_(title|tag|tocentry|toclist|toc|list|theorem|float|img|bib|glossary|role|border|th|framed|cv|affiliation|ulem|math|unit|svg|tikzmatrix|inline-quote|outerquote|innerquote|citation|ccitation|textquote|blockquote|displayquote|ast)_[A-Za-z0-9_.:]+(-[A-Za-z0-9_.:]+)*"
+				"ltx_(title|tag|tocentry|toclist|toc|list|theorem|float|img|bib|glossary|role|border|th|framed|cv|affiliation|ulem|math|svg|tikzmatrix|ast|citemacro)_[A-Za-z0-9_.:]+(-[A-Za-z0-9_.:]+)*"
 		}
 
 	ltx.class.page.main =
@@ -581,21 +605,20 @@
 		attribute class { list { "ltx_note_content", ltx.class.inline.extra* } }
 	ltx.class.note.type =
 		attribute class { list { "ltx_note_type", ltx.class.inline.extra* } }
-## Base tokens for author metadata spans: contributor names, contact lines, and author-list separators.
-	ltx.class.span.author =
-		attribute class {
-			list {
-				( "ltx_personname"
-				| "ltx_author_before"
-				| "ltx_author_notes"
-				| "ltx_author_after"
-				| "ltx_contact"
-				| "author-name"
-				| "author-title"
-				| "author-contact" ),
-					ltx.class.inline.extra*
-				}
-			}
+## Classes for the author block, one per role (see the structural model
+## in scholarly-ltx-structure.rnc): contributor names, note wrappers,
+## contact lines, and the separators emitted around the author list.
+	ltx.class.personname =
+		attribute class { list { "ltx_personname", ltx.class.inline.extra* } }
+	ltx.class.author.notes =
+		attribute class { list { "ltx_author_notes", ltx.class.inline.extra* } }
+	ltx.class.contact =
+		attribute class { list { "ltx_contact", ltx.class.inline.extra* } }
+	ltx.class.author.separator =
+		attribute class { list { ( "ltx_author_before" | "ltx_author_after" ), ltx.class.inline.extra* } }
+## moderncv binding: header spans carrying the binding's own tokens.
+	ltx.class.cv.span =
+		attribute class { list { ( "author-name" | "author-title" | "author-contact" ), ltx.class.inline.extra* } }
 ## Base token for hyperlinks: the transform's class assembly always puts
 ## \attrval{ltx_ref} first, with URL/citation/bibliography styling tokens
 ## following as modifiers.

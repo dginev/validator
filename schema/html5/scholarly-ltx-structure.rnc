@@ -52,18 +52,25 @@
 	ltx.author.list.inner =
 		( text,
 		  ( ltx.creator.elem
-		  | ltx.author.span.elem
-		  | ltx.note.elem
-		  | ltx.span.elem
+		  | ltx.author.separator.elem
 		  )*,
 		  text
 		)
 
-## Creator: person or institutional contributor
+## Creator: person or institutional contributor.  The transform emits at
+## most one personname span followed by at most one author-notes wrapper
+## (LaTeXML-structure-xhtml.xsl).
 	ltx.creator.elem =
-		element span { ltx.Inline.model & ltx.creator.attrs }
+		element span { ltx.creator.inner & ltx.creator.attrs }
 	ltx.creator.attrs =
 		( ltx.attrs.no-class & ltx.class.creator )
+	ltx.creator.inner =
+		( text,
+		  ltx.personname.elem?,
+		  text,
+		  ltx.author.notes.elem?,
+		  text
+		)
 
 ## Date List
 	ltx.date.list.elem =
@@ -122,6 +129,8 @@
 		( text,
 		  ( ltx.cv.heading.elem
 		  | ltx.heading.elem
+		  | ltx.cv.span.elem
+		  | ltx.contact.elem
 		  | ltx.Para.class
 		  | ltx.Block.class
 		  | ltx.Inline.class
@@ -131,6 +140,8 @@
 		  )*,
 		  text
 		)
+	ltx.cv.span.elem =
+		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.cv.span }
 	ltx.cv.heading.elem =
 		( element h1 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.cv.heading }
 		| element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.cv.heading }
