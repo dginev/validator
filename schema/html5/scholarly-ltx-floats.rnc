@@ -26,8 +26,10 @@
 		  ltx.theorem.title.elem?,
 		  ltx.Para.model
 		)
+## Theorem titles are exactly h6, hard-coded in the transform.
 	ltx.theorem.title.elem =
-		( ltx.frontmatter.title.elem )
+		( element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.theorem }
+		)
 
 ## Bibliography: BackMatter -- referenced from the document model, not a
 ## member of the shared classes
@@ -40,14 +42,11 @@
 		  ltx.bibliography.list.elem?,
 		  text
 		)
-## The bibliography is a sectional unit, so its title rank follows
-## sectional depth (h2 at document level, deeper inside book chapters).
+## The bibliography is backmatter at chapter or section level: h2 at
+## document level, h3 when hosted by a book chapter.
 	ltx.bibliography.title.elem =
-		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
-		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
-		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
-		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
-		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.bibliography }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.bibliography }
 		)
 	ltx.bibliography.list.elem =
 		element ul { ltx.bibliography.list.inner & ltx.attrs.no-class & ltx.class.biblist }
@@ -56,16 +55,15 @@
 		  ltx.bibliography.item.elem*,
 		  text
 		)
+## Bibliography items mirror bibitem_model = tags?, bibblock*: the tag
+## renditions and bibblock spans are the only children the transform
+## emits.
 	ltx.bibliography.item.elem =
-		element li { ltx.bibliography.item.inner & ltx.attrs.no-class & ltx.class.item }
+		element li { ltx.bibliography.item.inner & ltx.attrs.no-class & ltx.class.bibitem }
 	ltx.bibliography.item.inner =
 		( text,
 		  ( ltx.item.tag.elem
 		  | ltx.bibblock.elem
-		  | ltx.Inline.class
-		  | ltx.Misc.inline.class
-		  | ltx.Meta.class
-		  | ltx.paragraph.line.elem
 		  )*,
 		  text
 		)
@@ -96,13 +94,19 @@
 		attribute class { list { "ltx_index", ltx.class.extra* } }
 	ltx.index.inner =
 		( text,
-		  ltx.section.title.elem?,
+		  ltx.index.title.elem?,
 		  text,
 		  ( ltx.Para.class
 		  | ltx.Meta.class
 		  | ltx.index.list.elem
 		  )*,
 		  text
+		)
+## The index is backmatter at chapter or section level, like the
+## bibliography.
+	ltx.index.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.index }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.index }
 		)
 	ltx.index.list.elem =
 		element ul { ltx.index.list.inner & ltx.attrs.no-class & ltx.class.indexlist }

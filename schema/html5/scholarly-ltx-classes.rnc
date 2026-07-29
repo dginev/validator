@@ -341,35 +341,74 @@
 ## Class for the abstract heading.
 	ltx.class.title.abstract =
 		attribute class { list { "ltx_title", "ltx_title_abstract", ltx.class.extra* } }
-## Class for generated headings on frontmatter and backmatter blocks: keywords, classification, bibliography, theorems, proofs, appendices.
-	ltx.class.title.frontmatter =
+## Classes for theorem-like headings (\code{ltx:theorem}, \code{ltx:proof}):
+## the kind token matches the hosting environment.
+	ltx.class.title.theorem =
 		attribute class {
 			list {
 				"ltx_title",
 				ltx.class.extra*,
-				( "ltx_title_keywords"
-				| "ltx_title_classification"
-				| "ltx_title_bibliography"
-				| "ltx_title_theorem"
-				| "ltx_title_proof"
-				| "ltx_title_appendix" ),
+				( "ltx_title_theorem" | "ltx_title_proof" ),
 				ltx.class.extra*
 			}
 		}
-## Class for sectional-unit headings; the kind token names the unit type.
-	ltx.class.title.section =
-		attribute class { list { "ltx_title", ltx.class.extra*, ltx.class.title.section.kind, ltx.class.extra* } }
-## The sectional kind tokens, one per unit type from chapter down to subparagraph, plus appendix, index, and contents.
-	ltx.class.title.section.kind =
-		( "ltx_title_chapter"
-		| "ltx_title_section"
-		| "ltx_title_subsection"
-		| "ltx_title_subsubsection"
-		| "ltx_title_paragraph"
-		| "ltx_title_subparagraph"
-		| "ltx_title_appendix"
-		| "ltx_title_index"
-		| "ltx_title_contents" )
+## Class for the bibliography heading.
+	ltx.class.title.bibliography =
+		attribute class { list { "ltx_title", ltx.class.extra*, "ltx_title_bibliography", ltx.class.extra* } }
+## Classes for frontmatter-block headings, one per block kind so a
+## keywords block cannot carry a classification heading and vice versa.
+	ltx.class.title.keywords =
+		attribute class { list { "ltx_title", ltx.class.extra*, "ltx_title_keywords", ltx.class.extra* } }
+	ltx.class.title.classification =
+		attribute class { list { "ltx_title", ltx.class.extra*, "ltx_title_classification", ltx.class.extra* } }
+	ltx.class.title.acknowledgements =
+		attribute class { list { "ltx_title", ltx.class.extra*, "ltx_title_acknowledgements", ltx.class.extra* } }
+## Sectional-unit headings, one class pattern per unit so the kind token
+## always names the unit that hosts the heading.  The admissible heading
+## ranks are derived per unit from the transform's global level function
+## (\code{f:seclev-aux} in LaTeXML-structure-xhtml.xsl): rank floor is h2
+## (h1 is reserved for the document title), and each nesting host that
+## can precede a unit adds one -- with \code{ltx:part} outside the
+## profile, chapters sit at h2, sections at h2-h3 (chapter or
+## chapter-level appendix hosts), and so on down to the h6 cap.
+	ltx.class.title.chapter =
+		attribute class { list { "ltx_title", ltx.class.extra*, "ltx_title_chapter", ltx.class.extra* } }
+	ltx.class.title.sectionkind =
+		attribute class { list { "ltx_title", ltx.class.extra*, "ltx_title_section", ltx.class.extra* } }
+	ltx.class.title.subsection =
+		attribute class { list { "ltx_title", ltx.class.extra*, "ltx_title_subsection", ltx.class.extra* } }
+	ltx.class.title.subsubsection =
+		attribute class { list { "ltx_title", ltx.class.extra*, "ltx_title_subsubsection", ltx.class.extra* } }
+	ltx.class.title.paragraph =
+		attribute class { list { "ltx_title", ltx.class.extra*, "ltx_title_paragraph", ltx.class.extra* } }
+	ltx.class.title.subparagraph =
+		attribute class { list { "ltx_title", ltx.class.extra*, "ltx_title_subparagraph", ltx.class.extra* } }
+	ltx.class.title.appendix =
+		attribute class { list { "ltx_title", ltx.class.extra*, "ltx_title_appendix", ltx.class.extra* } }
+	ltx.class.title.index =
+		attribute class { list { "ltx_title", ltx.class.extra*, "ltx_title_index", ltx.class.extra* } }
+	ltx.class.title.contents =
+		attribute class { list { "ltx_title", ltx.class.extra*, "ltx_title_contents", ltx.class.extra* } }
+## Any sectional heading kind at any rank: used only by the moderncv
+## header columns, where the binding hoists sectional headings into a
+## layout grid and the profile cannot see the hosting unit.
+	ltx.class.title.any =
+		attribute class {
+			list {
+				"ltx_title",
+				ltx.class.extra*,
+				( "ltx_title_chapter"
+				| "ltx_title_section"
+				| "ltx_title_subsection"
+				| "ltx_title_subsubsection"
+				| "ltx_title_paragraph"
+				| "ltx_title_subparagraph"
+				| "ltx_title_appendix"
+				| "ltx_title_index"
+				| "ltx_title_contents" ),
+				ltx.class.extra*
+			}
+		}
 ## moderncv binding: name/title/contact headings.
 	ltx.class.cv.heading =
 		attribute class { list { ( "author-name" | "author-title" | "author-contact" ), ltx.class.extra* } }
@@ -385,9 +424,14 @@
 ## Class for the abstract container (\code{ltx:abstract}).
 	ltx.class.abstract =
 		attribute class { list { "ltx_abstract", ltx.class.extra* } }
-## Classes for frontmatter blocks: keywords, classification, acknowledgements.
-	ltx.class.frontmatter =
-		attribute class { list { ( "ltx_keywords" | "ltx_classification" | "ltx_acknowledgements" ), ltx.class.extra* } }
+## Classes for frontmatter blocks, one per kind, paired with the
+## matching heading class in scholarly-ltx-structure.rnc.
+	ltx.class.keywords =
+		attribute class { list { "ltx_keywords", ltx.class.extra* } }
+	ltx.class.classification =
+		attribute class { list { "ltx_classification", ltx.class.extra* } }
+	ltx.class.acknowledgements =
+		attribute class { list { "ltx_acknowledgements", ltx.class.extra* } }
 ## moderncv binding: header grid container.
 	ltx.class.cv.header =
 		attribute class { list { "flex-grid", ltx.class.extra* } }
@@ -459,9 +503,14 @@
 ## Class for the display-equation table (\code{ltx:equation}, \code{ltx:equationgroup}); \attrval{ltx_eqn_table} marks the scaffold.
 	ltx.class.equation.table =
 		attribute class { list { ( "ltx_equation" | "ltx_equationgroup" ), ltx.class.equation.extra*, "ltx_eqn_table", ltx.class.equation.extra* } }
-## Class for one display-equation row.
+## Class for one display-equation row: the scaffold token
+## \attrval{ltx_eqn_row} is always present, and rows that render an
+## \code{ltx:equation} inside an equation group carry its base token first.
 	ltx.class.equation.row =
-		attribute class { list { ( "ltx_equation" | "ltx_eqn_row" ), ltx.class.equation.extra*, "ltx_eqn_row"?, ltx.class.equation.extra* } }
+		attribute class {
+			( list { "ltx_eqn_row", ltx.class.equation.extra* }
+			| list { "ltx_equation", ltx.class.equation.extra*, "ltx_eqn_row", ltx.class.equation.extra* } )
+		}
 ## Class for formula, padding, and number cells in a display-equation row.
 	ltx.class.equation.cell =
 		attribute class { list { ( "ltx_eqn_cell" | "ltx_td" ), ltx.class.equation.extra* } }
@@ -497,39 +546,41 @@
 ## Class for the bibliography list (\code{ltx:biblist}).
 	ltx.class.biblist =
 		attribute class { list { "ltx_biblist", ltx.class.extra* } }
-## Classes for list and bibliography items (\code{ltx:item}, \code{ltx:bibitem}).
+## Class for list items and description terms/bodies (\code{ltx:item}).
 	ltx.class.item =
-		attribute class { list { ( "ltx_item" | "ltx_bibitem" ), ltx.class.extra* } }
+		attribute class { list { "ltx_item", ltx.class.extra* } }
+## Class for bibliography items (\code{ltx:bibitem}); only biblist entries carry it.
+	ltx.class.bibitem =
+		attribute class { list { "ltx_bibitem", ltx.class.extra* } }
 ## Class for item and caption tags (\code{ltx:tag}): the visible label such as a bullet, an item number, or "Figure 1:".
 	ltx.class.tag =
 		attribute class { list { "ltx_tag", ltx.class.extra* } }
 
-## Base tokens for prose-level spans: \attrval{ltx_text} is the rendition of \code{ltx:text}; the rest are inline span renditions the transform picks in inline context.
+## Base tokens for prose-level spans: \attrval{ltx_text} is the rendition
+## of \code{ltx:text}; \attrval{ltx_p} and \attrval{ltx_inline-block} are
+## the span renditions the transform picks for those blocks in inline
+## context; \attrval{ltx_ref} is an unresolvable \code{ltx:ref} (no
+## target), which the transform demotes from anchor to span.
 	ltx.class.span =
 		attribute class {
 			list {
 				( "ltx_text"
 				| "ltx_p"
 				| "ltx_inline-block"
-				| "ltx_font_smallcaps"
-				| "ltx_ref"
-				| "ltx_url"
-				| "ltx_LaTeXML_logo"
-				| "ltx_rule" ),
+				| "ltx_ref" ),
 					ltx.class.inline.extra*
 				}
 			}
-## Base tokens for the note scaffolding spans the transform synthesizes around \code{ltx:note} content.
-	ltx.class.span.note-part =
-		attribute class {
-			list {
-				( "ltx_note_mark"
-				| "ltx_note_outer"
-				| "ltx_note_content"
-				| "ltx_note_type" ),
-					ltx.class.inline.extra*
-				}
-			}
+## Classes for the note scaffolding the transform synthesizes around
+## \code{ltx:note} content, one per wrapper (see \patternref{ltx.note.elem}).
+	ltx.class.note.mark =
+		attribute class { list { "ltx_note_mark", ltx.class.inline.extra* } }
+	ltx.class.note.outer =
+		attribute class { list { "ltx_note_outer", ltx.class.inline.extra* } }
+	ltx.class.note.content =
+		attribute class { list { "ltx_note_content", ltx.class.inline.extra* } }
+	ltx.class.note.type =
+		attribute class { list { "ltx_note_type", ltx.class.inline.extra* } }
 ## Base tokens for author metadata spans: contributor names, contact lines, and author-list separators.
 	ltx.class.span.author =
 		attribute class {
@@ -545,12 +596,23 @@
 					ltx.class.inline.extra*
 				}
 			}
-## Base tokens for hyperlinks: cross-references (\code{ltx:ref}), URLs, anchors, and the generated-footer logo link.
+## Base token for hyperlinks: the transform's class assembly always puts
+## \attrval{ltx_ref} first, with URL/citation/bibliography styling tokens
+## following as modifiers.
 	ltx.class.a =
-		attribute class { list { ( "ltx_ref" | "ltx_url" | "ltx_anchor" | "ltx_LaTeXML_logo" ), ltx.class.inline.extra* } }
-## Classes for images (\code{ltx:graphics}) in both img and SVG-object renditions.
+		attribute class { list { "ltx_ref", ltx.class.inline.extra* } }
+## Class for old-style fragment anchors (\code{ltx:anchor}).
+	ltx.class.anchor =
+		attribute class { list { "ltx_anchor", ltx.class.inline.extra* } }
+## Class for the generated-footer LaTeXML logo link.
+	ltx.class.logo.a =
+		attribute class { list { "ltx_LaTeXML_logo", ltx.class.inline.extra* } }
+## Class for the hard-coded typography spans inside the footer logo.
+	ltx.class.footer.span =
+		attribute class { list { "ltx_font_smallcaps", ltx.class.inline.extra* } }
+## Class for images (\code{ltx:graphics}) in both img and SVG-object renditions.
 	ltx.class.img =
-		attribute class { list { ( "ltx_graphics" | "ltx_img" | "ltx_orcidlogo" ), ltx.class.extra* } }
+		attribute class { list { "ltx_graphics", ltx.class.extra* } }
 ## Class for line breaks (\code{ltx:break}).
 	ltx.class.break =
 		attribute class { list { "ltx_break", "ltx_break"?, ltx.class.extra* } }
@@ -563,9 +625,10 @@
 ## Class for conversion-error spans (\code{ltx:ERROR}); the error category (e.g. \attrval{undefined}) follows as a free token.
 	ltx.class.error =
 		attribute class { list { "ltx_ERROR", xsd:NMTOKEN* } }
-## Classes for superscripts (\code{ltx:sup}) and note marks.
+## Class for superscripts (\code{ltx:sup}); note marks are modelled
+## structurally inside \patternref{ltx.note.elem}.
 	ltx.class.sup =
-		attribute class { list { ( "ltx_sup" | "ltx_note_mark" ), ltx.class.inline.extra* } }
+		attribute class { list { "ltx_sup", ltx.class.inline.extra* } }
 ## Class for subscripts (\code{ltx:sub}).
 	ltx.class.sub =
 		attribute class { list { "ltx_sub", ltx.class.inline.extra* } }

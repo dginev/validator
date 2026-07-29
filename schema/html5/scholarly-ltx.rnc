@@ -9,10 +9,12 @@ default namespace = "http://www.w3.org/1999/xhtml"
 ## and an optional generated footer.  The definitions below keep that
 ## shell distinct from the document-level publication model so validation
 ## errors name the intent that failed instead of only the concrete HTML
-## element that happened to carry it.
+## element that happened to carry it.  Two page shapes exist: the LaTeXML
+## page shell (raw output and ar5iv-hosted pages, which add fixed chrome
+## inside the same shell), and the arXiv-hosted scaffold.
 
 	ltx.content.start =
-		( ltx.page.elem | ltx.arxiv.body | ltx.ar5iv.body )
+		( ltx.page.body | ltx.arxiv.body )
 
 include "scholarly-ltx-model.rnc"
 include "scholarly-ltx-classes.rnc"

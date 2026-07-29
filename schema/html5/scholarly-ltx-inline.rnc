@@ -5,7 +5,6 @@
 ## annotated with the LaTeXML XML element it renders.
 	ltx.Inline.class |=
 		( ltx.span.elem        # ltx:text (and inline span renditions)
-		| ltx.note.part.elem   # note scaffolding spans (mark/outer/content/type)
 		| ltx.author.span.elem # creator/contact metadata spans
 		| ltx.item.tag.elem    # ltx:tag (caption and item labels)
 		| ltx.anchor.elem      # ltx:ref, ltx:anchor, ltx:bibref
@@ -38,26 +37,21 @@
 	ltx.span.elem =
 		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.span }
 
-## Note Scaffolding Spans: the mark/outer/content/type wrappers the
-## transform synthesizes around ltx:note content
-	ltx.note.part.elem =
-		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.span.note-part }
-
 ## Author Metadata Spans: creator names, contact lines, and the
 ## separators emitted around author lists
 	ltx.author.span.elem =
 		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.span.author }
 
-## Link or Cross Reference.  The last variant covers ltx:anchor, which
-## the transform emits with a legacy name attribute alongside id --
-## obsolete in HTML5, but deliberate upstream output for old-style
-## fragment anchors.
+## Link or Cross Reference.  Exactly two anchor shapes leave the
+## transform: hyperlinks (ltx:ref with a target, always href, with the
+## ltx_ref class except for the raw mailto links emitted around contact
+## email addresses), and ltx:anchor, an old-style fragment anchor with a
+## legacy name attribute alongside id and no href -- obsolete in HTML5,
+## but deliberate upstream output.  A target-less ltx:ref is demoted to
+## span.ltx_ref, never to a classless or href-less a.
 	ltx.anchor.elem =
-		( element a { ltx.Inline.model & ltx.anchor.href.attrs & ltx.class.a }
-		| element a { ltx.Inline.model & ltx.anchor.href.attrs }
-		| element a { ltx.Inline.model & ltx.attrs.no-class & ltx.class.a }
-		| element a { ltx.Inline.model & ltx.attrs.no-class }
-		| element a { ltx.Inline.model & ltx.attrs.no-class & ltx.class.a
+		( element a { ltx.Inline.model & ltx.anchor.href.attrs & ltx.class.a? }
+		| element a { ltx.Inline.model & ltx.attrs.no-class & ltx.class.anchor
 		            & attribute name { text } }
 		)
 
@@ -86,9 +80,35 @@
 
 ## Note: ltx:note is Meta.class -- valid in every shared model, mirroring
 ## the XML schema where Meta.class appears in Inline, Block, Para, and
-## Flow models alike.
+## Flow models alike.  The transform (LaTeXML-meta-xhtml.xsl) synthesizes
+## a fixed scaffold around the note body: a sup.ltx_note_mark, then
+## span.ltx_note_outer holding span.ltx_note_content, which repeats the
+## mark, names the note role for non-footnotes (span.ltx_note_type), and
+## then carries the note body inline.
 	ltx.note.elem =
-		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.note }
+		element span { ltx.attrs.no-class & ltx.class.note
+		             & ( text,
+		                 ltx.note.mark.elem,
+		                 text,
+		                 ltx.note.outer.elem,
+		                 text )
+		             }
+	ltx.note.mark.elem =
+		element sup { ltx.Inline.model & ltx.attrs.no-class & ltx.class.note.mark }
+	ltx.note.outer.elem =
+		element span { ltx.attrs.no-class & ltx.class.note.outer
+		             & ( text, ltx.note.content.elem, text )
+		             }
+	ltx.note.content.elem =
+		element span { ltx.attrs.no-class & ltx.class.note.content
+		             & ( text,
+		                 ltx.note.mark.elem,
+		                 text,
+		                 ltx.note.type.elem?,
+		                 ltx.Inline.model )
+		             }
+	ltx.note.type.elem =
+		element span { ltx.Inline.model & ltx.attrs.no-class & ltx.class.note.type }
 
 ## RDF Metadata Container: ltx:rdf is Meta.class -- an invisible (typically
 ## display:none) carrier of an RDFa triple.  It is emitted from hyperref pdf

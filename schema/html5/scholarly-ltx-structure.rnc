@@ -82,18 +82,29 @@
 	ltx.abstract.title.elem =
 		( element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.abstract }
 		)
+## Frontmatter blocks: keywords, classification, and acknowledgements,
+## each pairing its container class with the matching heading kind.
+## Frontmatter-block titles are exactly h6: the transform hard-codes the
+## rank rather than deriving it from sectional depth.
 	ltx.frontmatter.block.elem =
-		element div { ltx.frontmatter.block.inner & ltx.attrs.no-class & ltx.class.frontmatter }
-	ltx.frontmatter.block.inner =
+		( element div { ltx.frontmatter.block.inner.keywords & ltx.attrs.no-class & ltx.class.keywords }
+		| element div { ltx.frontmatter.block.inner.classification & ltx.attrs.no-class & ltx.class.classification }
+		| element div { ltx.frontmatter.block.inner.acknowledgements & ltx.attrs.no-class & ltx.class.acknowledgements }
+		)
+	ltx.frontmatter.block.inner.keywords =
 		( text,
-		  ltx.frontmatter.title.elem?,
+		  element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.keywords }?,
 		  ltx.Inline.model
 		)
-## Frontmatter-block titles are exactly h6: the transform hard-codes the
-## rank for acknowledgements, keywords, classification, and theorem-like
-## headings rather than deriving it from sectional depth.
-	ltx.frontmatter.title.elem =
-		( element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.frontmatter }
+	ltx.frontmatter.block.inner.classification =
+		( text,
+		  element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.classification }?,
+		  ltx.Inline.model
+		)
+	ltx.frontmatter.block.inner.acknowledgements =
+		( text,
+		  element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.acknowledgements }?,
+		  ltx.Inline.model
 		)
 
 ## CV Header: custom header grid used by the LaTeXML moderncv binding --
@@ -139,7 +150,7 @@
 		element section { ltx.appendix.inner & ltx.attrs.no-class & ltx.class.appendix }
 	ltx.appendix.inner =
 		( text,
-		  ltx.section.title.elem?,
+		  ltx.appendix.title.elem?,
 		  text,
 		  ( ltx.Para.class
 		  | ltx.Meta.class
@@ -159,7 +170,7 @@
 		element section { ltx.chapter.inner & ltx.attrs.no-class & ltx.class.chapter }
 	ltx.chapter.inner =
 		( text,
-		  ltx.section.title.elem?,
+		  ltx.chapter.title.elem?,
 		  text,
 		  ( ltx.Para.class
 		  | ltx.Meta.class
@@ -195,7 +206,7 @@
 		element section { ltx.subsection.inner & ltx.attrs.no-class & ltx.class.subsection }
 	ltx.subsection.inner =
 		( text,
-		  ltx.section.title.elem?,
+		  ltx.subsection.title.elem?,
 		  text,
 		  ( ltx.Para.class
 		  | ltx.Meta.class
@@ -211,7 +222,7 @@
 		element section { ltx.subsubsection.inner & ltx.attrs.no-class & ltx.class.subsubsection }
 	ltx.subsubsection.inner =
 		( text,
-		  ltx.section.title.elem?,
+		  ltx.subsubsection.title.elem?,
 		  text,
 		  ( ltx.Para.class
 		  | ltx.Meta.class
@@ -226,7 +237,7 @@
 		element section { ltx.sectional.paragraph.inner & ltx.attrs.no-class & ltx.class.sectional.paragraph }
 	ltx.sectional.paragraph.inner =
 		( text,
-		  ltx.section.title.elem?,
+		  ltx.sectional.paragraph.title.elem?,
 		  text,
 		  ( ltx.Para.class
 		  | ltx.Meta.class
@@ -240,26 +251,64 @@
 		element section { ltx.subparagraph.inner & ltx.attrs.no-class & ltx.class.subparagraph }
 	ltx.subparagraph.inner =
 		( text,
-		  ltx.section.title.elem?,
+		  ltx.subparagraph.title.elem?,
 		  ltx.Para.model
 		)
 
-## Section Title: heading rank selected by LaTeXML from section depth
+## Sectional Unit Titles: the transform assigns each unit type one
+## document-global heading rank (\code{f:seclev-aux}): h1 is the document
+## title, so every unit starts at h2, and each unit-type that can host
+## the unit adds one rank, capped at h6.  With \code{ltx:part} outside
+## the profile that yields: chapter h2; section h2-h3; subsection h2-h4;
+## subsubsection h2-h5; paragraph and subparagraph h2-h6.
+	ltx.chapter.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.chapter }
+		)
 	ltx.section.title.elem =
-		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
-		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
-		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
-		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
-		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.sectionkind }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.sectionkind }
+		)
+	ltx.subsection.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.subsection }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.subsection }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.subsection }
+		)
+	ltx.subsubsection.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.subsubsection }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.subsubsection }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.subsubsection }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.subsubsection }
+		)
+	ltx.sectional.paragraph.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.paragraph }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.paragraph }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.paragraph }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.paragraph }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.paragraph }
+		)
+	ltx.subparagraph.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.subparagraph }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.subparagraph }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.subparagraph }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.subparagraph }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.subparagraph }
+		)
+## Appendices sit at chapter level (h2), or one deeper when the document
+## also carries titled chapters (h3).
+	ltx.appendix.title.elem =
+		( element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.appendix }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.appendix }
 		)
 
+## Any-rank, any-kind heading: only for the moderncv header columns,
+## where hoisted sectional headings carry no derivable rank or kind.
 	ltx.heading.elem =
-		( element h1 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
-		| element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
-		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
-		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
-		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
-		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		( element h1 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.any }
+		| element h2 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.any }
+		| element h3 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.any }
+		| element h4 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.any }
+		| element h5 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.any }
+		| element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.any }
 		)
 	ltx.heading.inner =
 		( ltx.Inline.model )

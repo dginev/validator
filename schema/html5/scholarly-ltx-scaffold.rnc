@@ -110,7 +110,7 @@
 		)
 ## The TOC title ("Contents") is exactly h6, hard-coded in the transform.
 	ltx.toc.title.elem =
-		( element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.section }
+		( element h6 { ltx.heading.inner & ltx.attrs.no-class & ltx.class.title.contents }
 		)
 	ltx.toc.list.elem =
 		element ol { ltx.toc.list.inner & ltx.attrs.no-class & ltx.class.toclist }
@@ -129,33 +129,19 @@
 		  text
 		)
 
-## ar5iv scaffold: article body plus ar5iv navigation/footer controls
-	ltx.ar5iv.body =
-		( text,
-		  ltx.ar5iv.page.main.elem,
-		  text,
-		  common.elem.script-supporting*
-		)
-	ltx.ar5iv.page.main.elem =
-		element div { ltx.ar5iv.page.main.inner & ltx.page.attrs }
-	ltx.ar5iv.page.main.inner =
-		( text,
-		  ltx.page.content.elem,
-		  text,
-		  ltx.ar5iv.footerbar.elem?,
-		  text,
-		  ltx.ar5iv.footer.elem?,
-		  text
-		)
-	ltx.ar5iv.footerbar.elem =
-		element div { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.ar5iv.footer }
-	ltx.ar5iv.footer.elem =
-		element footer { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.page.footer }
-
 # #####################################################################
 ## Page Shell
 
-## Page Shell: outer generated body wrapper
+## Page Shell: the LaTeXML page wrapper, shared by raw LaTeXML/oxide
+## output and ar5iv-hosted pages.  ar5iv adds a navigation footerbar
+## before the page footer, chrome links inside it, and trailing scripts;
+## raw output simply has none of those.
+	ltx.page.body =
+		( text,
+		  ltx.page.elem,
+		  text,
+		  common.elem.script-supporting*
+		)
 	ltx.page.elem =
 		element div { ltx.page.inner & ltx.page.attrs }
 	ltx.page.attrs =
@@ -164,9 +150,13 @@
 		( text,
 		  ltx.page.content.elem,
 		  text,
+		  ltx.ar5iv.footerbar.elem?,
+		  text,
 		  ltx.page.footer.elem?,
 		  text
 		)
+	ltx.ar5iv.footerbar.elem =
+		element div { ltx.scaffold.inner & ltx.attrs.no-class & ltx.class.ar5iv.footer }
 
 ## Page Content: wrapper around the authored document
 	ltx.page.content.elem =
@@ -179,16 +169,22 @@
 		  text
 		)
 
-## Page Footer: generated LaTeXML provenance
+## Page Footer: generated LaTeXML provenance, optionally preceded by the
+## fixed ar5iv chrome links (color-scheme toggle, copyright, privacy
+## policy) on hosted pages.
 	ltx.page.footer.elem =
 		element footer { ltx.page.footer.inner & ltx.page.footer.attrs }
 	ltx.page.footer.attrs =
 		( ltx.attrs.no-class & ltx.class.page.footer )
 	ltx.page.footer.inner =
 		( text,
+		  ltx.footer.chrome.link.elem*,
+		  text,
 		  ltx.footer.provenance.elem*,
 		  text
 		)
+	ltx.footer.chrome.link.elem =
+		element a { ltx.scaffold.inner & ltx.scaffold.attrs }
 
 ## Footer Provenance: generated logo/credit block
 	ltx.footer.provenance.elem =
@@ -199,9 +195,9 @@
 		( ltx.footer.inline.content )
 	ltx.footer.inline.content =
 		( text
-		& ( element a { ltx.footer.inline.content & ltx.anchor.href.attrs & ltx.class.a? }
+		& ( element a { ltx.footer.inline.content & ltx.anchor.href.attrs & ltx.class.logo.a? }
 		  | ltx.image.elem
-		  | element span { ltx.footer.inline.content & ltx.attrs.no-class & ltx.class.span? }
+		  | element span { ltx.footer.inline.content & ltx.attrs.no-class & ltx.class.footer.span? }
 		  )*
 		)
 
